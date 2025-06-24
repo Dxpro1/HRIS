@@ -25,9 +25,9 @@ date_default_timezone_set('Asia/Manila');
 # -------------------------------------------------------------
 
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'u778918094_eisdb');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_NAME', 'u778918094_hristest');
+define('DB_USER', 'u778918094_qa');
+define('DB_PASS', 'P@ssw0rd!x');
 define('DISABLE_FOREIGN_KEY_CHECKS', true);
 
 # -------------------------------------------------------------
