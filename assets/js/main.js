@@ -65,17 +65,24 @@
       );
     }
 
-    if ($("#employee-list-datatable").length) {
-      generate_datatable_two_parameter(
-        "employee list table",
-        "",
-        "",
-        "#employee-list-datatable",
-        0,
-        "asc",
-        [6]
-      );
-    }
+// Place this where you initialize your employee table
+if ($("#employee-list-datatable").length) {
+  // Define the multi-column sort order:
+  // 1. Sort by Status (column index 5) ascending.
+  // 2. Then, sort by Employee ID (column index 0) ascending.
+  const initialSortOrder = [ [5, 'asc'], [0, 'asc'] ];
+
+  generate_datatable_two_parameter(
+    "employee list table",
+    "",
+    "",
+    "#employee-list-datatable",
+    initialSortOrder, // Pass the multi-sort array here
+    null,             // The 'ordertype' parameter is now ignored, so pass null
+    [6]               // The index of the unsortable 'Action' column
+  );
+}
+ 
 
     if ($("#department-datatable").length) {
       generate_datatable(

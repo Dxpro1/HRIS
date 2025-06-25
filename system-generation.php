@@ -4986,36 +4986,37 @@ else if($formtype == 'pmw status form'){
             if ($api->databaseConnection()) {
                 $parameter1 = $_POST['parameter1'];
                 $parameter2 = $_POST['parameter2'];
-
                 # Get role permission
                 $delete_employee = $api->check_role_permissions($username, 34);
                 $view_employee_page = $api->check_role_permissions($username, 55);
+                
+                # We define the ORDER BY clause once to use in all queries
+                $order_by_clause = " ORDER BY EMPLOYMENT_STATUS ASC, ID_NUMBER ASC";
 
                 if(!empty($parameter1) && !empty($parameter2)){
                     if($parameter1 == 'branch'){
-                        $sql = $api->db_connection->prepare("SELECT EMPLOYEE_ID, FIRST_NAME, LAST_NAME, MIDDLE_NAME, SUFFIX, EMPLOYEMENT_TYPE, EMPLOYMENT_STATUS, DEPARTMENT, DESIGNATION FROM tblemployeeprofile WHERE BRANCH = :parameter2 AND EMPLOYEE_ID NOT LIKE 'USER-%'");
+                        $sql = $api->db_connection->prepare("SELECT EMPLOYEE_ID, ID_NUMBER, FIRST_NAME, LAST_NAME, MIDDLE_NAME, SUFFIX, EMPLOYEMENT_TYPE, EMPLOYMENT_STATUS, DEPARTMENT, DESIGNATION FROM tblemployeeprofile WHERE BRANCH = :parameter2 AND EMPLOYEE_ID NOT LIKE 'USER-%'" . $order_by_clause);
                     }
                     else if($parameter1 == 'department'){
-                        $sql = $api->db_connection->prepare("SELECT EMPLOYEE_ID, FIRST_NAME, LAST_NAME, MIDDLE_NAME, SUFFIX, EMPLOYEMENT_TYPE, EMPLOYMENT_STATUS, DEPARTMENT, DESIGNATION FROM tblemployeeprofile WHERE DEPARTMENT = :parameter2 AND EMPLOYEE_ID NOT LIKE 'USER-%'");
+                        $sql = $api->db_connection->prepare("SELECT EMPLOYEE_ID, ID_NUMBER, FIRST_NAME, LAST_NAME, MIDDLE_NAME, SUFFIX, EMPLOYEMENT_TYPE, EMPLOYMENT_STATUS, DEPARTMENT, DESIGNATION FROM tblemployeeprofile WHERE DEPARTMENT = :parameter2 AND EMPLOYEE_ID NOT LIKE 'USER-%'" . $order_by_clause);
                     }
                     else if($parameter1 == 'designation'){
-                        $sql = $api->db_connection->prepare("SELECT EMPLOYEE_ID, FIRST_NAME, LAST_NAME, MIDDLE_NAME, SUFFIX, EMPLOYEMENT_TYPE, EMPLOYMENT_STATUS, DEPARTMENT, DESIGNATION FROM tblemployeeprofile WHERE DESIGNATION = :parameter2 AND EMPLOYEE_ID NOT LIKE 'USER-%'");
+                        $sql = $api->db_connection->prepare("SELECT EMPLOYEE_ID, ID_NUMBER, FIRST_NAME, LAST_NAME, MIDDLE_NAME, SUFFIX, EMPLOYEMENT_TYPE, EMPLOYMENT_STATUS, DEPARTMENT, DESIGNATION FROM tblemployeeprofile WHERE DESIGNATION = :parameter2 AND EMPLOYEE_ID NOT LIKE 'USER-%'" . $order_by_clause);
                     }
                     else if($parameter1 == 'employmenttype'){
-                        $sql = $api->db_connection->prepare("SELECT EMPLOYEE_ID, FIRST_NAME, LAST_NAME, MIDDLE_NAME, SUFFIX, EMPLOYEMENT_TYPE, EMPLOYMENT_STATUS, DEPARTMENT, DESIGNATION FROM tblemployeeprofile WHERE EMPLOYEMENT_TYPE = :parameter2 AND EMPLOYEE_ID NOT LIKE 'USER-%'");
+                        $sql = $api->db_connection->prepare("SELECT EMPLOYEE_ID, ID_NUMBER, FIRST_NAME, LAST_NAME, MIDDLE_NAME, SUFFIX, EMPLOYEMENT_TYPE, EMPLOYMENT_STATUS, DEPARTMENT, DESIGNATION FROM tblemployeeprofile WHERE EMPLOYEMENT_TYPE = :parameter2 AND EMPLOYEE_ID NOT LIKE 'USER-%'" . $order_by_clause);
                     }
                     else{
-                        $sql = $api->db_connection->prepare("SELECT EMPLOYEE_ID, FIRST_NAME, LAST_NAME, MIDDLE_NAME, SUFFIX, EMPLOYEMENT_TYPE, EMPLOYMENT_STATUS, DEPARTMENT, DESIGNATION FROM tblemployeeprofile WHERE EMPLOYMENT_STATUS = :parameter2 AND EMPLOYEE_ID NOT LIKE 'USER-%'");
+                        $sql = $api->db_connection->prepare("SELECT  EMPLOYEE_ID, ID_NUMBER, FIRST_NAME, LAST_NAME, MIDDLE_NAME, SUFFIX, EMPLOYEMENT_TYPE, EMPLOYMENT_STATUS, DEPARTMENT, DESIGNATION FROM tblemployeeprofile WHERE EMPLOYMENT_STATUS = :parameter2 AND EMPLOYEE_ID NOT LIKE 'USER-%'" . $order_by_clause);
                     }
-
                     $sql->bindParam(':parameter2', $parameter2);
                 }
                 else{
-                    $sql = $api->db_connection->prepare("SELECT EMPLOYEE_ID, FIRST_NAME, LAST_NAME, MIDDLE_NAME, SUFFIX, EMPLOYEMENT_TYPE, EMPLOYMENT_STATUS, DEPARTMENT, DESIGNATION FROM tblemployeeprofile WHERE EMPLOYEE_ID NOT LIKE 'USER-%'");
+                    $sql = $api->db_connection->prepare("SELECT EMPLOYEE_ID, ID_NUMBER, FIRST_NAME, LAST_NAME, MIDDLE_NAME, SUFFIX, EMPLOYEMENT_TYPE, EMPLOYMENT_STATUS, DEPARTMENT, DESIGNATION FROM tblemployeeprofile WHERE EMPLOYEE_ID NOT LIKE 'USER-%'   ORDER BY EMPLOYMENT_STATUS ASC" );
                 }
-
                 if($sql->execute()){
                     while($row = $sql->fetch()){
+                        $id_number = trim($row['ID_NUMBER']);
                         $employee_id = trim($row['EMPLOYEE_ID']);
                         $first_name = trim($row['FIRST_NAME']);
                         $last_name = trim($row['LAST_NAME']);
@@ -5029,7 +5030,6 @@ else if($formtype == 'pmw status form'){
                         $designation_details = $api->get_data_details_one_parameter('designation', $row['DESIGNATION']);
                         $department = $department_details[0]['DEPARTMENT'];
                         $designation = $designation_details[0]['DESIGNATION'];
-
                         if($view_employee_page > 0){
                             $view = '<a href="employee.php?id='. $employee_id_encrypted .'" class="btn btn-warning waves-effect waves-light view-employee" title="View Employee Page">
                                         <i class="bx bx-user font-size-16 align-middle"></i>
@@ -5038,7 +5038,6 @@ else if($formtype == 'pmw status form'){
                         else{
                             $view = '';
                         }
-
                         if($delete_employee > 0){
                             $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-employee" data-employeeid="'. $employee_id .'" title="Delete Employee">
                                         <i class="bx bx-trash font-size-16 align-middle"></i>
@@ -5047,9 +5046,8 @@ else if($formtype == 'pmw status form'){
                         else{
                             $delete = '';
                         }
-
                         $response[] = array(
-                            'EMPLOYEE_ID' => $employee_id,
+                            'EMPLOYEE_ID' => $id_number,
                             'FULL_NAME' => $full_name,
                             'DEPARTMENT' => $department,
                             'DESIGNATION' => $designation,
@@ -5063,7 +5061,6 @@ else if($formtype == 'pmw status form'){
                             </div>'
                         );
                     }
-
                     echo json_encode($response);
                 }
                 else{

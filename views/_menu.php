@@ -451,7 +451,7 @@
          if($pmw_page < 1){
             $menu .= '<li>
                         <a href="pmw-monitoring.php" class="waves-effect">
-                            <i class="bx bx-briefcase"></i>
+                            <i class="bx bx-repeat"></i>
                             <span key="t-human-resource-modules">PMW Monitoring</span>
                         </a>
                     </li>';

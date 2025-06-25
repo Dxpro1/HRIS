@@ -501,12 +501,21 @@ if (isset($_POST['transaction']) && !empty($_POST['transaction'])) {
         echo json_encode($details);
     }
 
-    else if ($transaction == 'employee work anniversaries') {
+        else if ($transaction == 'employee work anniversaries') {
+        // Get month parameter or default to current month
         $month = isset($_POST['month']) ? intval($_POST['month']) : date('n');
-        $details = $api->get_employee_work_anniversaries($month);
+        
+        // Validate month range
+        if ($month < 1 || $month > 12) {
+            echo json_encode(['error' => 'Invalid month parameter']);
+            exit;
+        }
+        
+        // Fetch anniversary data
+        $details = $api->get_employee_work_anniversaries(null, null, $month);
 
         if ($details === false) {
-            echo json_encode(['error' => 'You do not have permission or data could not be retrieved.']);
+            echo json_encode(['error' => 'Unable to retrieve anniversary data. Please try again.']);
         } else {
             echo json_encode($details);
         }

@@ -1909,162 +1909,80 @@ function generate_datatable_two_parameter(type, parameter1, parameter2, datatabl
 
 
     if(type == 'attendance logs table' || type == 'attendance summary table' || type == 'attendance adjustment summary table' ){
-        var filter_branch = $('#filter_branch').val();
-        var filter_department = $('#filter_department').val();
-        var filter_start_date = $('#filter_start_date').val();
-        var filter_end_date = $('#filter_end_date').val();
+        ajaxData = {
+            'type' : type, 'username' : username,
+            'filter_branch' : $('#filter_branch').val(),
+            'filter_department' : $('#filter_department').val(),
+            'filter_start_date' : $('#filter_start_date').val(),
+            'filter_end_date' : $('#filter_end_date').val()
+        };
+    }
+    else {
+        ajaxData = {
+            'type' : type, 'username' : username, 'parameter1' : parameter1, 'parameter2' : parameter2
+        };
+    }
 
-        if(buttons == '1'){
-            var settings = {
-                'ajax': {
-                    'url' : 'system-generation.php',
-                    'method' : 'POST',
-                    'dataType': 'JSON',
-                    'data': {'type' : type, 'username' : username, 'filter_branch' : filter_branch, 'filter_department' : filter_department, 'filter_start_date' : filter_start_date, 'filter_end_date' : filter_end_date},
-                    'dataSrc' : ''
-                },
-                dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +
-                "<'row'<'col-sm-12'tr>>" +
-                "<'row'<'col-sm-5'i><'col-sm-7'p>>",
-                buttons: [
-                    'csv', 'excel', 'pdf'
-                ],
-                'order': [[ order, ordertype ]],
-                'columns' : column,
-                'scrollY': false,
-                'scrollX': true,
-                'scrollCollapse': true,
-                'fnDrawCallback': function( oSettings ) {
-                    readjust_datatable_column();
-                },
-                'aoColumnDefs': [{
-                    'bSortable': false,
-                    'aTargets': unsort
-                }],
-                'lengthMenu': length_menu,
-                'language': {
-                    'emptyTable': 'No data found attendance',
-                    'searchPlaceholder': 'Search...',
-                    'search': '',
-                    'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
-                }
-            };
-        }
-        else{
-            var settings = {
-                'ajax': {
-                    'url' : 'system-generation.php',
-                    'method' : 'POST',
-                    'dataType': 'JSON',
-                    'data': {'type' : type, 'username' : username, 'filter_branch' : filter_branch, 'filter_department' : filter_department, 'filter_start_date' : filter_start_date, 'filter_end_date' : filter_end_date},
-                    'dataSrc' : ''
-                },
-                 dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +
-                "<'row'<'col-sm-12'tr>>" +
-                "<'row'<'col-sm-5'i><'col-sm-7'p>>",
-                buttons: [
-                    'csv', 'excel', 'pdf'
-                ],
-                'order': [[ order, ordertype ]],
-                'columns' : column,
-                'scrollY': false,
-                'scrollX': true,
-                'scrollCollapse': true,
-                'fnDrawCallback': function( oSettings ) {
-                    readjust_datatable_column();
-                },
-                'aoColumnDefs': [{
-                    'bSortable': false,
-                    'aTargets': unsort
-                }],
-                'lengthMenu': [ [5, 10, 25, 50, -1], [5, 10, 25, 50, 'All'] ],
-                'language': {
-                    'emptyTable': 'No data foundx',
-                    'searchPlaceholder': 'Search...',
-                    'search': '',
-                    'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
-                }
-            };
-        }
+    // Define length menu
+    if(showall == '1'){
+        length_menu = [ [-1], ['All'] ];
     }
     else{
-        if(buttons == '1'){
-            var settings = {
-                'ajax': {
-                    'url' : 'system-generation.php',
-                    'method' : 'POST',
-                    'dataType': 'JSON',
-                    'data': {'type' : type, 'username' : username, 'parameter1' : parameter1, 'parameter2' : parameter2},
-                    'dataSrc' : ''
-                },
-                dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +
-                "<'row'<'col-sm-12'tr>>" +
-                "<'row'<'col-sm-5'i><'col-sm-7'p>>",
-                buttons: [
-                    'csv', 'excel', 'pdf'
-                ],
-                'order': [[ order, ordertype ]],
-                'columns' : column,
-                'scrollY': false,
-                'scrollX': true,
-                'scrollCollapse': true,
-                'fnDrawCallback': function( oSettings ) {
-                    readjust_datatable_column();
-                },
-                'aoColumnDefs': [{
-                    'bSortable': false,
-                    'aTargets': unsort
-                }],
-                'lengthMenu': length_menu,
-                'language': {
-                    'emptyTable': 'No data found',
-                    'searchPlaceholder': 'Search...',
-                    'search': '',
-                    'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
-                }
-            };
-        }
-        else{
-            var settings = {
-                'ajax': {
-                    'url' : 'system-generation.php',
-                    'method' : 'POST',
-                    'dataType': 'JSON',
-                    'data': {'type' : type, 'username' : username, 'parameter1' : parameter1, 'parameter2' : parameter2},
-                    'dataSrc' : ''
-                },
-                 dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +
-                "<'row'<'col-sm-12'tr>>" +
-                "<'row'<'col-sm-5'i><'col-sm-7'p>>",
-                buttons: [
-                    'csv', 'excel', 'pdf'
-                ],
-                'order': [[ order, ordertype ]],
-                'columns' : column,
-                'scrollY': false,
-                'scrollX': true,
-                'scrollCollapse': true,
-                'fnDrawCallback': function( oSettings ) {
-                    readjust_datatable_column();
-                },
-                'aoColumnDefs': [{
-                    'bSortable': false,
-                    'aTargets': unsort
-                }],
-                'lengthMenu': [ [5, 10, 25, 50, -1], [5, 10, 25, 50, 'All'] ],
-                'language': {
-                    'emptyTable': 'No data found 1',
-                    'searchPlaceholder': 'Search...',
-                    'search': '',
-                    'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
-                }
-            };
-        }
+        length_menu = [ [5, 10, 25, 50, -1], [5, 10, 25, 50, 'All'] ];
     }
 
-    $(datatablename).dataTable(settings);
-}
+    // --- 2. Determine the sort order (The main logic change) ---
+    var finalOrder;
+    if (Array.isArray(order) && Array.isArray(order[0])) {
+        // This is a multi-column sort, e.g., [[5, 'asc'], [0, 'asc']]
+        // Use it directly.
+        finalOrder = order;
+    } else {
+        // This is a single-column sort (the old way)
+        // Construct the array from the separate 'order' and 'ordertype' parameters.
+        finalOrder = [[ order, ordertype ]];
+    }
 
+    // --- 3. Define the settings object ONCE ---
+    var settings = {
+        'ajax': {
+            'url' : 'system-generation.php',
+            'method' : 'POST',
+            'dataType': 'JSON',
+            'data': ajaxData, // Use the data object we prepared earlier
+            'dataSrc' : ''
+        },
+        dom:  "<'row'<'col-sm-3'l><'col-sm-6 text-center mb-2'B><'col-sm-3'f>>" +
+              "<'row'<'col-sm-12'tr>>" +
+              "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+        buttons: (buttons == '1') ? ['csv', 'excel', 'pdf'] : [], // Conditionally show buttons
+        'order': finalOrder, // Use the smart 'finalOrder' variable
+        'columns' : column,
+        'scrollY': false,
+        'scrollX': true,
+        'scrollCollapse': true,
+        'fnDrawCallback': function( oSettings ) {
+            readjust_datatable_column();
+        },
+        'aoColumnDefs': [{
+            'bSortable': false,
+            'aTargets': unsort
+        }],
+        'lengthMenu': length_menu,
+        'language': {
+            'emptyTable': 'No data found',
+            'searchPlaceholder': 'Search...',
+            'search': '',
+            'loadingRecords': '<div class="spinner-border spinner-border-lg text-info" role="status"><span class="sr-only">Loading...</span></div>'
+        }
+    };
+
+    // --- 4. Initialize the DataTable ---
+    if ($.fn.DataTable.isDataTable(datatablename)) {
+        $(datatablename).DataTable().destroy();
+    }
+    $(datatablename).DataTable(settings);
+}
 function generate_datatable_three_parameter(type, parameter1, parameter2, parameter3, datatablename, order, ordertype, unsort, buttons = '0', showall = '0'){
     var username = $('#username').text();
     var column;

@@ -2179,13 +2179,13 @@ public function get_employee_work_anniversaries($username = null, $permission_id
             return false;
         }
     }
-
     if ($this->databaseConnection()) {
         // If no month specified, use current month
         if ($month === null) {
             $month = date('n'); // Current month as number (1-12)
         }
-
+        
+        // --- THIS IS THE CORRECTED QUERY ---
         $query = "
             SELECT
                 EMPLOYEE_ID,
@@ -2193,7 +2193,7 @@ public function get_employee_work_anniversaries($username = null, $permission_id
                 LAST_NAME,
                 JOIN_DATE,
                 DAY(JOIN_DATE) AS anniversary_day,
-                TIMESTAMPDIFF(YEAR, JOIN_DATE, CURRENT_DATE()) AS years_of_service,
+                (YEAR(CURRENT_DATE()) - YEAR(JOIN_DATE)) AS years_of_service, 
                 PROFILE_IMAGE,
                 DEPARTMENT,
                 DESIGNATION
@@ -2203,20 +2203,17 @@ public function get_employee_work_anniversaries($username = null, $permission_id
                 MONTH(JOIN_DATE) = ?
                 AND EMPLOYMENT_STATUS = 1
                 AND (EXIT_DATE IS NULL OR EXIT_DATE > CURRENT_DATE())
-                AND TIMESTAMPDIFF(YEAR, JOIN_DATE, CURRENT_DATE()) > 0
+                AND (YEAR(CURRENT_DATE()) - YEAR(JOIN_DATE)) > 0
             ORDER BY
                 DAY(JOIN_DATE) ASC";
-
+        
         $sql = $this->db_connection->prepare($query);
-
         if (!$sql->execute([$month])) {
             error_log("Error fetching employee work anniversaries: " . json_encode($sql->errorInfo()));
             return false;
         }
-
         return $sql->fetchAll(PDO::FETCH_ASSOC);
     }
-
     return false;
 }
 
@@ -15467,38 +15464,34 @@ public function update_document_tags($document_id, $tags) {
     # Returns    : Array
     #
     # -------------------------------------------------------------
-    public function get_leave_entitlement_status($no_leaves, $acquired_no_leaves){
-        $response = [];
+      public function get_leave_entitlement_status($no_leaves, $acquired_no_leaves){
+    $response = [];
 
-        if($acquired_no_leaves > 0){
-
-            if($no_leaves == 0){
-                $button_class = 'bg-success';
-            }else{
+    if($acquired_no_leaves > 0){
+        if($no_leaves == 0){
+            $button_class = 'bg-success';
+        } else {
             $percent = ($acquired_no_leaves / $no_leaves) * 100;
             if($percent < 50){
                 $button_class = 'bg-success';
-            }
-                else if ($percent >= 50 && $percent <79){
+            } else if ($percent >= 50 && $percent < 80){
                 $button_class = 'bg-warning';
+            } else {
+                $button_class = 'bg-danger'; // Covers percent >= 80
             }
-                else if($percent > 80){
-                $button_class = 'bg-danger';
-            }
-
         }
-        }
-
-        else{
-            $button_class = 'bg-success';
-        }
-        $response[] = [
-            'STATUS' => $acquired_no_leaves . ' / '  .$no_leaves ,
-            'BADGE' => '<span class="badge '. $button_class  .'">'.number_format($this->check_number($acquired_no_leaves), 1). ' / ' . ( $no_leaves == 0 ? '∞' : $no_leaves ) .'</span>'
-        ];
-
-        return $response;
+    } else {
+        $button_class = 'bg-success';
     }
+
+    $response[] = [
+        'STATUS' => $acquired_no_leaves . ' / ' . $no_leaves,
+        'BADGE' => '<span class="badge '. $button_class  .'">'.number_format($this->check_number($acquired_no_leaves), 1). ' / ' . ( $no_leaves == 0 ? '∞' : $no_leaves ) .'</span>'
+    ];
+
+    return $response;
+}
+
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------

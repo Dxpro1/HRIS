@@ -33,6 +33,7 @@
     $total_published_positions = $api->get_total_published_positions();
     $career_management_permission = $api->check_role_permissions($username, 429);
 
+    $add_career = $api->check_role_permissions($username, 430);
 	if($page_access == 0){
 		header('location: 404-page.php');
 	}
@@ -439,8 +440,7 @@
                         <!-- Anniversary Cards Container -->
                         <div id="anniversary-container" class="mt-4" style="display: none;">
                             <div class="row" id="anniversary-cards">
-                                <!-- Anniversary cards will be dynamically inserted here -->
-                            </div>
+                             </div>
                         </div>
 
                         <!-- No Anniversaries Message -->
@@ -631,9 +631,12 @@
                                     <i class="bx bx-briefcase fs-1 text-muted mb-3"></i>
                                     <h5>No Positions Available</h5>
                                     <p class="text-muted">No job postings are currently published.</p>
+                                    <?php if ($add_career > 0) { ?>
                                     <a href="career.php" class="btn btn-outline-primary">
-                                        <i class="bx bx-plus me-1"></i> Add New
-                                    </a>
+                                                                        <i class="bx bx-plus me-1"></i> Add New
+                                                                    </a>
+                                   <?php } ?>
+                              
                                 </div>
                             <?php endif; ?>
                         </div>

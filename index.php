@@ -94,7 +94,7 @@
                                     <!-- Footer -->
                                     <div class="mt-4 mt-md-5 text-center">
                                         <hr class="my-4">
-                                        <p class="mb-0"> Copyright © <?php echo date('Y'); ?> Human Resource Information Systems. All rights reserved. test</p>
+                                        <p class="mb-0"> Copyright © <?php echo date('Y'); ?> Human Resource Information Systems. All rights reserved.</p>
                                     </div>
                                 </div>
                             </div>
