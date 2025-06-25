@@ -34,6 +34,8 @@
         $employee_address = $employee_profile_info[0]['ADDRESS'];
         $employee_account_name = $employee_profile_info[0]['ACCOUNT_NAME'];
         $employee_account_number = $employee_profile_info[0]['ACCOUNT_NUMBER'];
+        $position1 = $employee_profile_info[0]['POSITION'];
+
         $employee_type = $api->get_system_description('EMPLOYMENTTP', $employee_profile_info[0]['EMPLOYEMENT_TYPE']);
         $employee_basic_pay = number_format($employee_profile_info[0]['BASIC_PAY'], 2);
         $employee_daily_rate = number_format($employee_profile_info[0]['DAILY_RATE'], 2);
@@ -53,6 +55,13 @@
         $employee_civil_status = $api->get_system_description('CIVIL_STATUS', $employee_profile_info[0]['CIVIL_STATUS']);
         $employee_payroll_periond = $api->get_system_description('PAYROLLPERIOD', $employee_profile_info[0]['PAYROLL_PERIOD']);
         $employee_employment_status = $api->get_employment_status($employee_profile_info[0]['EMPLOYMENT_STATUS'])[0]['STATUS'];
+
+
+         $employee_designation_details = $api->get_data_details_one_parameter('designation', $employee_profile_info[0]['DESIGNATION']);
+         $employee_designation = $employee_designation_details[0]['DESIGNATION'];
+
+
+
     }
 ?>
         <?php
@@ -186,6 +195,10 @@
                                                                 <th scope="row">Designation :</th>
                                                                 <td><?php echo $employee_designation; ?></td>
                                                             </tr>
+                                                               <tr>
+                                                                <th scope="row">Position2 :</th>
+                                                                <td><?php echo $position1; ?></td>
+                                                            </tr>
                                                             <tr>
                                                                 <th scope="row">Department :</th>
                                                                 <td><?php echo $employee_department; ?></td>
@@ -250,6 +263,7 @@
                                                                 <th scope="row">Hired Date :</th>
                                                                 <td><?php echo $employee_join_date; ?></td>
                                                             </tr>
+                                                             
                                                             <?php
                                                                 if(!empty($employee_exit_date)){
                                                                     echo '<tr>

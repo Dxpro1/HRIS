@@ -1736,6 +1736,9 @@ function initialize_form_validation(formtype){
                 designation: {
                     required: true
                 },
+                position: {
+                    required: true
+                },
                 joindate: {
                     required: true
                 },
@@ -1816,6 +1819,9 @@ function initialize_form_validation(formtype){
                 },
                 designation: {
                     required: 'Please choose the designation',
+                },
+                position: {
+                    required: 'Please enter the position',
                 },
                 joindate: {
                     required: 'Please enter the join date',
@@ -14564,9 +14570,11 @@ function enable_form(formtype){
             document.getElementById('idnumber').readOnly = true;
             document.getElementById('department').disabled = false;
             document.getElementById('designation').disabled = false;
+            document.getElementById('position').disabled = false;
             document.getElementById('joindate').disabled = false;
             document.getElementById('exitdate').disabled = false;
             document.getElementById('permanentdate').disabled = false;
+            document.getElementById('end_of_contract').disabled = false;
             document.getElementById('employmentstatus').disabled = false;
             document.getElementById('branch').disabled = false;
             document.getElementById('payrollperiod').disabled = false;
@@ -15085,9 +15093,11 @@ function disable_form(formtype){
         document.getElementById('idnumber').readOnly = true;
         document.getElementById('department').disabled = true;
         document.getElementById('designation').disabled = true;
+        document.getElementById('position').disabled = true;
         document.getElementById('joindate').disabled = true;
         document.getElementById('exitdate').disabled = true;
         document.getElementById('permanentdate').disabled = true;
+        document.getElementById('end_of_contract').disabled = true;
         document.getElementById('employmentstatus').disabled = true;
         document.getElementById('branch').disabled = true;
         document.getElementById('payrollperiod').disabled = true;

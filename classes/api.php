@@ -3103,11 +3103,11 @@ public function get_employee_birthdays($month = null) {
     # Returns    : String
     #
     # -------------------------------------------------------------
-    public function update_employee($id_number, $first_name, $middle_name, $last_name, $suffix, $birthday, $employment_type, $employment_status, $join_date, $permanent_date, $exit_date, $email, $phone, $telephone, $department, $branch, $designation, $gender, $civil_status, $address, $payroll_period, $basic_pay, $daily_rate, $hourly_rate, $minute_rate, $sss, $tin, $philhealth, $pagibig, $driver_license, $account_name, $account_number, $employee_id, $username){
+    public function update_employee($id_number, $first_name, $middle_name, $last_name, $suffix, $birthday, $employment_type, $employment_status, $join_date, $permanent_date, $end_of_contract, $exit_date, $email, $phone, $telephone, $department, $branch, $designation, $position, $gender, $civil_status, $address, $payroll_period, $basic_pay, $daily_rate, $hourly_rate, $minute_rate, $sss, $tin, $philhealth, $pagibig, $driver_license, $account_name, $account_number, $employee_id, $username){
         if ($this->databaseConnection()) {
             $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
 
-            $sql = $this->db_connection->prepare('UPDATE tblemployeeprofile SET ID_NUMBER = :id_number, FIRST_NAME = :first_name, LAST_NAME = :last_name, MIDDLE_NAME = :middle_name, SUFFIX = :suffix, BIRTHDAY = :birthday, EMPLOYEMENT_TYPE = :employment_type, EMPLOYMENT_STATUS = :employment_status, JOIN_DATE = :join_date, PERMANENT_DATE = :permanent_date, EXIT_DATE = :exit_date, EMAIL = :email, PHONE = :phone, TELEPHONE = :telephone, DEPARTMENT = :department, BRANCH = :branch, DESIGNATION = :designation, GENDER = :gender, CIVIL_STATUS = :civil_status, ADDRESS = :address, PAYROLL_PERIOD = :payroll_period, BASIC_PAY = :basic_pay, DAILY_RATE = :daily_rate, HOURLY_RATE = :hourly_rate, MINUTE_RATE = :minute_rate, SSS = :sss, TIN = :tin, PHILHEALTH = :philhealth, PAGIBIG = :pagibig, DRIVERS_LICENSE = :driver_license, ACCOUNT_NAME = :account_name, ACCOUNT_NUMBER = :account_number, RECORD_LOG = :record_log WHERE EMPLOYEE_ID = :employee_id');
+            $sql = $this->db_connection->prepare('UPDATE tblemployeeprofile SET ID_NUMBER = :id_number, FIRST_NAME = :first_name, LAST_NAME = :last_name, MIDDLE_NAME = :middle_name, SUFFIX = :suffix, BIRTHDAY = :birthday, EMPLOYEMENT_TYPE = :employment_type, EMPLOYMENT_STATUS = :employment_status, JOIN_DATE = :join_date, PERMANENT_DATE = :permanent_date, END_OF_CONTRACT = :end_of_contract, EXIT_DATE = :exit_date, EMAIL = :email, PHONE = :phone, TELEPHONE = :telephone, DEPARTMENT = :department, BRANCH = :branch, DESIGNATION = :designation, POSITION = :position, GENDER = :gender, CIVIL_STATUS = :civil_status, ADDRESS = :address, PAYROLL_PERIOD = :payroll_period, BASIC_PAY = :basic_pay, DAILY_RATE = :daily_rate, HOURLY_RATE = :hourly_rate, MINUTE_RATE = :minute_rate, SSS = :sss, TIN = :tin, PHILHEALTH = :philhealth, PAGIBIG = :pagibig, DRIVERS_LICENSE = :driver_license, ACCOUNT_NAME = :account_name, ACCOUNT_NUMBER = :account_number, RECORD_LOG = :record_log WHERE EMPLOYEE_ID = :employee_id');
             $sql->bindParam(':id_number', $id_number);
             $sql->bindParam(':first_name', $first_name);
             $sql->bindParam(':last_name', $last_name);
@@ -3118,6 +3118,7 @@ public function get_employee_birthdays($month = null) {
             $sql->bindParam(':employment_status', $employment_status);
             $sql->bindParam(':join_date', $join_date);
             $sql->bindParam(':permanent_date', $permanent_date);
+             $sql->bindParam(':end_of_contract', $end_of_contract);
             $sql->bindParam(':exit_date', $exit_date);
             $sql->bindParam(':email', $email);
             $sql->bindParam(':phone', $phone);
@@ -3125,6 +3126,7 @@ public function get_employee_birthdays($month = null) {
             $sql->bindParam(':department', $department);
             $sql->bindParam(':branch', $branch);
             $sql->bindParam(':designation', $designation);
+            $sql->bindParam(':position', $position);
             $sql->bindParam(':gender', $gender);
             $sql->bindParam(':civil_status', $civil_status);
             $sql->bindParam(':address', $address);
@@ -7931,7 +7933,7 @@ public function get_pmw_monitoring_data($employment_type_filter = '', $status_fi
     # Returns    : String
     #
     # -------------------------------------------------------------
-    public function insert_employee($profile_image_file_tmp_name, $profile_image_file_actual_ext, $id_number, $first_name, $middle_name, $last_name, $suffix, $birthday, $employment_type, $employment_status, $join_date, $permanent_date, $exit_date, $email, $phone, $telephone, $department, $branch, $designation, $gender, $civil_status, $address, $payroll_period, $basic_pay, $daily_rate, $hourly_rate, $minute_rate, $sss, $tin, $philhealth, $pagibig, $driver_license, $account_name, $account_number, $superior, $subordinates, $username){
+    public function insert_employee($profile_image_file_tmp_name, $profile_image_file_actual_ext, $id_number, $first_name, $middle_name, $last_name, $suffix, $birthday, $employment_type, $employment_status, $join_date, $permanent_date, $end_of_contract, $exit_date, $email, $phone, $telephone, $department, $branch, $designation, $position, $gender, $civil_status, $address, $payroll_period, $basic_pay, $daily_rate, $hourly_rate, $minute_rate, $sss, $tin, $philhealth, $pagibig, $driver_license, $account_name, $account_number, $superior, $subordinates, $username){
         if ($this->databaseConnection()) {
             $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
             $error = '';
@@ -7941,7 +7943,7 @@ public function get_pmw_monitoring_data($employment_type_filter = '', $status_fi
             $paramnum = $system_parameter[0]['PARAMNUM'];
             $id = $system_parameter[0]['ID'];
 
-            $sql = $this->db_connection->prepare('INSERT INTO tblemployeeprofile (EMPLOYEE_ID, ID_NUMBER, FIRST_NAME, LAST_NAME, MIDDLE_NAME, SUFFIX, BIRTHDAY, EMPLOYEMENT_TYPE, EMPLOYMENT_STATUS, JOIN_DATE, PERMANENT_DATE, EXIT_DATE, EMAIL, PHONE, TELEPHONE, DEPARTMENT, BRANCH, DESIGNATION, GENDER, CIVIL_STATUS, ADDRESS, PAYROLL_PERIOD, BASIC_PAY, DAILY_RATE, HOURLY_RATE, MINUTE_RATE, SSS, TIN, PHILHEALTH, PAGIBIG, DRIVERS_LICENSE, ACCOUNT_NAME, ACCOUNT_NUMBER, RECORD_LOG) VALUES (:id, :id_number, :first_name, :last_name, :middle_name, :suffix, :birthday, :employment_type, :employment_status, :join_date, :permanent_date, :exit_date, :email, :phone, :telephone, :department, :branch, :designation, :gender, :civil_status, :address, :payroll_period, :basic_pay, :daily_rate, :hourly_rate, :minute_rate, :sss, :tin, :philhealth, :pagibig, :driver_license, :account_name, :account_number, :record_log)');
+            $sql = $this->db_connection->prepare('INSERT INTO tblemployeeprofile (EMPLOYEE_ID, ID_NUMBER, FIRST_NAME, LAST_NAME, MIDDLE_NAME, SUFFIX, BIRTHDAY, EMPLOYEMENT_TYPE, EMPLOYMENT_STATUS, JOIN_DATE, PERMANENT_DATE, END_OF_CONTRACT, EXIT_DATE, EMAIL, PHONE, TELEPHONE, DEPARTMENT, BRANCH, DESIGNATION, POSITION, GENDER, CIVIL_STATUS, ADDRESS, PAYROLL_PERIOD, BASIC_PAY, DAILY_RATE, HOURLY_RATE, MINUTE_RATE, SSS, TIN, PHILHEALTH, PAGIBIG, DRIVERS_LICENSE, ACCOUNT_NAME, ACCOUNT_NUMBER, RECORD_LOG) VALUES (:id, :id_number, :first_name, :last_name, :middle_name, :suffix, :birthday, :employment_type, :employment_status, :join_date, :permanent_date, :end_of_contract, :exit_date, :email, :phone, :telephone, :department, :branch, :designation, :position, :gender, :civil_status, :address, :payroll_period, :basic_pay, :daily_rate, :hourly_rate, :minute_rate, :sss, :tin, :philhealth, :pagibig, :driver_license, :account_name, :account_number, :record_log)');
             $sql->bindParam(':id', $id);
             $sql->bindParam(':id_number', $id_number);
             $sql->bindParam(':first_name', $first_name);
@@ -7953,6 +7955,7 @@ public function get_pmw_monitoring_data($employment_type_filter = '', $status_fi
             $sql->bindParam(':employment_status', $employment_status);
             $sql->bindParam(':join_date', $join_date);
             $sql->bindParam(':permanent_date', $permanent_date);
+            $sql->bindParam(':end_of_contract', $end_of_contract);
             $sql->bindParam(':exit_date', $exit_date);
             $sql->bindParam(':email', $email);
             $sql->bindParam(':phone', $phone);
@@ -7960,6 +7963,7 @@ public function get_pmw_monitoring_data($employment_type_filter = '', $status_fi
             $sql->bindParam(':department', $department);
             $sql->bindParam(':branch', $branch);
             $sql->bindParam(':designation', $designation);
+            $sql->bindParam(':position', $position);
             $sql->bindParam(':gender', $gender);
             $sql->bindParam(':civil_status', $civil_status);
             $sql->bindParam(':address', $address);
@@ -18474,7 +18478,7 @@ public function get_total_published_positions() {
                     $query = 'SELECT EMPLOYEE_ID, USERNAME, PASSWORD, ROLE_ID, ACTIVE, PASSWORD_EXPIRY_DATE, FAILED_LOGIN, LAST_FAILED_LOGIN, RECORD_LOG FROM tbluseraccount WHERE EMPLOYEE_ID = :parameter OR USERNAME = :parameter';
                     break;
                 case 'employee profile':
-                    $query = 'SELECT EMPLOYEE_ID, USERNAME, ID_NUMBER, FIRST_NAME, LAST_NAME, MIDDLE_NAME, SUFFIX, BIRTHDAY, EMPLOYEMENT_TYPE, EMPLOYMENT_STATUS, JOIN_DATE, PERMANENT_DATE, EXIT_DATE, EXIT_REASON, PROFILE_IMAGE, EMAIL, PHONE, TELEPHONE, DEPARTMENT, BRANCH, DESIGNATION, GENDER, CIVIL_STATUS, ADDRESS, PAYROLL_PERIOD, BASIC_PAY, DAILY_RATE, HOURLY_RATE, MINUTE_RATE, SSS, TIN, PHILHEALTH, PAGIBIG, DRIVERS_LICENSE, ACCOUNT_NAME, ACCOUNT_NUMBER, RECORD_LOG FROM tblemployeeprofile WHERE EMPLOYEE_ID = :parameter OR USERNAME = :parameter';
+                    $query = 'SELECT EMPLOYEE_ID, USERNAME, ID_NUMBER, FIRST_NAME, LAST_NAME, MIDDLE_NAME, SUFFIX, BIRTHDAY, EMPLOYEMENT_TYPE, EMPLOYMENT_STATUS, JOIN_DATE, PERMANENT_DATE, END_OF_CONTRACT, EXIT_DATE, EXIT_REASON, PROFILE_IMAGE, EMAIL, PHONE, TELEPHONE, DEPARTMENT, BRANCH, DESIGNATION, POSITION, GENDER, CIVIL_STATUS, ADDRESS, PAYROLL_PERIOD, BASIC_PAY, DAILY_RATE, HOURLY_RATE, MINUTE_RATE, SSS, TIN, PHILHEALTH, PAGIBIG, DRIVERS_LICENSE, ACCOUNT_NAME, ACCOUNT_NUMBER, RECORD_LOG FROM tblemployeeprofile WHERE EMPLOYEE_ID = :parameter OR USERNAME = :parameter';
                     break;
                 case 'page':
                     $query = 'SELECT PAGE_NAME, RECORD_LOG FROM tblpage WHERE PAGE_ID = :parameter';
@@ -18817,6 +18821,7 @@ public function get_total_published_positions() {
                                 'EMPLOYMENT_STATUS' => $row['EMPLOYMENT_STATUS'],
                                 'JOIN_DATE' => $this->check_date('empty', $row['JOIN_DATE'], '', 'm/d/Y', '', '', ''),
                                 'PERMANENT_DATE' => $this->check_date('empty', $row['PERMANENT_DATE'], '', 'm/d/Y', '', '', ''),
+                                'END_OF_CONTRACT' => $this->check_date('empty', $row['END_OF_CONTRACT'], '', 'm/d/Y', '', '', ''),
                                 'EXIT_DATE' => $this->check_date('empty', $row['EXIT_DATE'], '', 'm/d/Y', '', '', ''),
                                 'EXIT_REASON' => $row['EXIT_REASON'],
                                 'PROFILE_IMAGE' => $this->check_profile_image($row['PROFILE_IMAGE']),
@@ -18825,6 +18830,7 @@ public function get_total_published_positions() {
                                 'TELEPHONE' => $row['TELEPHONE'],
                                 'DEPARTMENT' => $row['DEPARTMENT'],
                                 'BRANCH' => $row['BRANCH'],
+                                'POSITION' => $row['POSITION'],
                                 'DESIGNATION' => $row['DESIGNATION'],
                                 'GENDER' => $row['GENDER'],
                                 'CIVIL_STATUS' => $row['CIVIL_STATUS'],

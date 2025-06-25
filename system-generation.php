@@ -342,8 +342,18 @@ else if($formtype == 'pmw status form'){
                                         $form .='</select>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="mb-3">
+                               <div class="col-md-2">
+                                    <div class="mb-2">
+                                        <label for="position" class="form-label">Position<span class="required"> *</span></label>
+                                        <select class="form-control" id="position" name="position" required>
+                                            <option value="" disabled selected>--</option>
+                                            <option value="STAFF">Staff</option>
+                                            <option value="OFFICER">Officer</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="mb-2">
                                         <label class="form-label">Hired Date <span class="required">*</span></label>
                                         <div class="input-group" id="join-date-container">
                                             <input type="text" class="form-control" id="joindate" name="joindate" autocomplete="off" data-date-format="m/dd/yyyy" data-date-container="#join-date-container" data-provide="datepicker" data-date-autoclose="true">
@@ -351,8 +361,8 @@ else if($formtype == 'pmw status form'){
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="mb-3">
+                                <div class="col-md-2">
+                                    <div class="mb-2">
                                         <label class="form-label">Exit Date</label>
                                         <div class="input-group" id="exit-date-container">
                                             <input type="text" class="form-control" id="exitdate" name="exitdate" autocomplete="off" data-date-format="m/dd/yyyy" data-date-container="#exit-date-container" data-provide="datepicker" data-date-autoclose="true">
@@ -381,8 +391,8 @@ else if($formtype == 'pmw status form'){
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="mb-3">
+                                <div class="col-md-2">
+                                    <div class="mb-2">
                                         <label class="form-label">Permanency Date</label>
                                         <div class="input-group" id="permanent-date-container">
                                             <input type="text" class="form-control" id="permanentdate" name="permanentdate" autocomplete="off" data-date-format="m/dd/yyyy" data-date-container="#permanent-date-container" data-provide="datepicker" data-date-autoclose="true">
@@ -390,8 +400,17 @@ else if($formtype == 'pmw status form'){
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="mb-3">
+                                  <div class="col-md-2">
+                                    <div class="mb-2">
+                                        <label class="form-label">End of Contract</label>
+                                        <div class="input-group" id="endo-date-container">
+                                            <input type="text" class="form-control" id="end_of_contract" name="end_of_contract" autocomplete="off" data-date-format="m/dd/yyyy" data-date-container="#permanent-date-container" data-provide="datepicker" data-date-autoclose="true">
+                                            <span class="input-group-text"><i class="mdi mdi-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="mb-2">
                                         <label class="form-label">Birthday <span class="required">*</span></label>
                                         <div class="input-group" id="birthday-container">
                                             <input type="text" class="form-control" id="birthday" name="birthday" autocomplete="off" data-date-format="m/dd/yyyy" data-date-container="#birthday-container" data-provide="datepicker" data-date-autoclose="true">

@@ -1283,7 +1283,7 @@ if (isset($_POST['transaction']) && !empty($_POST['transaction'])) {
 
     # Insert/update employee
     else if ($transaction == 'submit employee') {
-        if (isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['employeeid']) && isset($_POST['idnumber']) && !empty($_POST['idnumber']) && isset($_POST['firstname']) && !empty($_POST['firstname']) && isset($_POST['middlename']) && isset($_POST['lastname']) && !empty($_POST['lastname']) && isset($_POST['suffix']) && isset($_POST['department']) && !empty($_POST['department']) && isset($_POST['designation']) && !empty($_POST['designation']) && isset($_POST['joindate']) && !empty($_POST['joindate']) && isset($_POST['permanentdate']) && isset($_POST['exitdate']) && isset($_POST['employmenttp']) && !empty($_POST['employmenttp']) && isset($_POST['employmentstatus']) && isset($_POST['branch']) && !empty($_POST['branch']) && isset($_POST['payrollperiod']) && !empty($_POST['payrollperiod']) && isset($_POST['basicpay']) && !empty($_POST['basicpay']) && isset($_POST['dailyrate']) && isset($_POST['hourlyrate']) && isset($_POST['minuterate']) && isset($_POST['birthday']) && !empty($_POST['birthday']) && isset($_POST['superior']) && isset($_POST['subordinate']) && isset($_POST['authorizer']) && isset($_POST['gender']) && !empty($_POST['gender'])  && isset($_POST['civil_status']) && !empty($_POST['civil_status']) && isset($_POST['email']) && !empty($_POST['email']) && isset($_POST['phone']) && isset($_POST['telephone']) && isset($_POST['address']) && !empty($_POST['address']) && isset($_POST['sss']) && isset($_POST['tin']) && isset($_POST['philhealth']) && isset($_POST['pagibig']) && isset($_POST['driverlicense']) && isset($_POST['accountname']) && !empty($_POST['accountname']) && isset($_POST['accountnumber']) && !empty($_POST['accountnumber'])) {
+        if (isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['employeeid']) && isset($_POST['idnumber']) && !empty($_POST['idnumber']) && isset($_POST['firstname']) && !empty($_POST['firstname']) && isset($_POST['middlename']) && isset($_POST['lastname']) && !empty($_POST['lastname']) && isset($_POST['suffix']) && isset($_POST['department']) && !empty($_POST['department']) && isset($_POST['designation']) && !empty($_POST['designation'])  && isset($_POST['position']) && !empty($_POST['position']) && isset($_POST['joindate']) && !empty($_POST['joindate']) && isset($_POST['permanentdate']) && isset($_POST['end_of_contract']) && isset($_POST['exitdate']) && isset($_POST['employmenttp']) && !empty($_POST['employmenttp']) && isset($_POST['employmentstatus']) && isset($_POST['branch']) && !empty($_POST['branch']) && isset($_POST['payrollperiod']) && !empty($_POST['payrollperiod']) && isset($_POST['basicpay']) && !empty($_POST['basicpay']) && isset($_POST['dailyrate']) && isset($_POST['hourlyrate']) && isset($_POST['minuterate']) && isset($_POST['birthday']) && !empty($_POST['birthday']) && isset($_POST['superior']) && isset($_POST['subordinate']) && isset($_POST['authorizer']) && isset($_POST['gender']) && !empty($_POST['gender'])  && isset($_POST['civil_status']) && !empty($_POST['civil_status']) && isset($_POST['email']) && !empty($_POST['email']) && isset($_POST['phone']) && isset($_POST['telephone']) && isset($_POST['address']) && !empty($_POST['address']) && isset($_POST['sss']) && isset($_POST['tin']) && isset($_POST['philhealth']) && isset($_POST['pagibig']) && isset($_POST['driverlicense']) && isset($_POST['accountname']) && !empty($_POST['accountname']) && isset($_POST['accountnumber']) && !empty($_POST['accountnumber'])) {
             $error = '';
             $username = $_POST['username'];
             $employee_id = $_POST['employeeid'];
@@ -1294,6 +1294,7 @@ if (isset($_POST['transaction']) && !empty($_POST['transaction'])) {
             $suffix = $_POST['suffix'];
             $department = $_POST['department'];
             $designation = $_POST['designation'];
+            $position = $_POST['position'];
             $employment_type = $_POST['employmenttp'];
             $employment_status = $_POST['employmentstatus'];
             $branch = $_POST['branch'];
@@ -1320,6 +1321,7 @@ if (isset($_POST['transaction']) && !empty($_POST['transaction'])) {
             $account_number = $_POST['accountnumber'];
             $join_date = $api->check_date('empty', $_POST['joindate'], '', 'Y-m-d', '', '', '');
             $permanent_date = $api->check_date('empty', $_POST['permanentdate'], '', 'Y-m-d', '', '', '');
+            $end_of_contract = $api->check_date('empty', $_POST['end_of_contract'], '', 'Y-m-d', '', '', '');
             $exit_date = $api->check_date('empty', $_POST['exitdate'], '', 'Y-m-d', '', '', '');
             $birthday = $api->check_date('empty', $_POST['birthday'], '', 'Y-m-d', '', '', '');
 
@@ -1334,7 +1336,7 @@ if (isset($_POST['transaction']) && !empty($_POST['transaction'])) {
             $check_employee_profile_exist = $api->check_data_exist_one_parameter('employee profile', $employee_id);
 
             if ($check_employee_profile_exist > 0) {
-                $update_employee = $api->update_employee($id_number, $first_name, $middle_name, $last_name, $suffix, $birthday, $employment_type, $employment_status, $join_date, $permanent_date, $exit_date, $email, $phone, $telephone, $department, $branch, $designation, $gender, $civil_status,  $address, $payroll_period, $basic_pay, $daily_rate, $hourly_rate, $minute_rate, $sss, $tin, $philhealth, $pagibig, $driver_license, $account_name, $account_number, $employee_id, $username);
+                $update_employee = $api->update_employee($id_number, $first_name, $middle_name, $last_name, $suffix, $birthday, $employment_type, $employment_status, $join_date, $permanent_date, $end_of_contract, $exit_date, $email, $phone, $telephone, $department, $branch, $designation, $position, $gender, $civil_status,  $address, $payroll_period, $basic_pay, $daily_rate, $hourly_rate, $minute_rate, $sss, $tin, $philhealth, $pagibig, $driver_license, $account_name, $account_number, $employee_id, $username);
 
                 if ($update_employee == '1') {
                     if (!empty($profile_image_file_name)) {
@@ -1457,7 +1459,7 @@ if (isset($_POST['transaction']) && !empty($_POST['transaction'])) {
                         if (in_array($profile_image_file_actual_ext, $allowed_ext)) {
                             if (!$profile_image_file_error) {
                                 if ($profile_image_file_size < 2000000) {
-                                    $insert_employee = $api->insert_employee($profile_image_file_tmp_name, $profile_image_file_actual_ext, $id_number, $first_name, $middle_name, $last_name, $suffix, $birthday, $employment_type, $employment_status, $join_date, $permanent_date, $exit_date, $email, $phone, $telephone, $department, $branch, $designation, $gender, $civil_status, $address, $payroll_period, $basic_pay, $daily_rate, $hourly_rate, $minute_rate, $sss, $tin, $philhealth, $pagibig, $driver_license, $account_name, $account_number, $superior, $subordinates, $username);
+                                    $insert_employee = $api->insert_employee($profile_image_file_tmp_name, $profile_image_file_actual_ext, $id_number, $first_name, $middle_name, $last_name, $suffix, $birthday, $employment_type, $employment_status, $join_date, $permanent_date, $end_of_contract, $exit_date, $email, $phone, $telephone, $department, $branch, $designation, $position, $gender, $civil_status, $address, $payroll_period, $basic_pay, $daily_rate, $hourly_rate, $minute_rate, $sss, $tin, $philhealth, $pagibig, $driver_license, $account_name, $account_number, $superior, $subordinates, $username);
 
                                     if ($insert_employee == '1') {
                                         echo 'Inserted';
@@ -1474,7 +1476,7 @@ if (isset($_POST['transaction']) && !empty($_POST['transaction'])) {
                             echo 'File Type';
                         }
                     } else {
-                        $insert_employee = $api->insert_employee('', '', $id_number, $first_name, $middle_name, $last_name, $suffix, $birthday, $employment_type, $employment_status, $join_date, $permanent_date, $exit_date, $email, $phone, $telephone, $department, $branch, $designation, $gender, $civil_status, $address, $payroll_period, $basic_pay, $daily_rate, $hourly_rate, $minute_rate, $sss, $tin, $philhealth, $pagibig, $driver_license, $account_name, $account_number, $superior, $subordinates, $username);
+                        $insert_employee = $api->insert_employee('', '', $id_number, $first_name, $middle_name, $last_name, $suffix, $birthday, $employment_type, $employment_status, $join_date, $permanent_date, $end_of_contract, $exit_date, $email, $phone, $telephone, $department, $branch, $designation, $position, $gender, $civil_status, $address, $payroll_period, $basic_pay, $daily_rate, $hourly_rate, $minute_rate, $sss, $tin, $philhealth, $pagibig, $driver_license, $account_name, $account_number, $superior, $subordinates, $username);
 
                         if ($insert_employee == '1') {
                             echo 'Inserted';
@@ -1521,55 +1523,8 @@ if (isset($_POST['transaction']) && !empty($_POST['transaction'])) {
         exit;
     }
 
-# PMW Alert Dismissal
-else if ($transaction == 'dismiss pmw alert') {
-    if (isset($_POST['username']) && !empty($_POST['username']) &&
-        isset($_POST['alert_id']) && !empty($_POST['alert_id']) &&
-        isset($_POST['employee_id']) && !empty($_POST['employee_id'])) {
-
-        $username = $_POST['username'];
-        $alert_id = $_POST['alert_id'];
-        $employee_id = $_POST['employee_id'];
-
-        $dismiss_alert = $api->dismiss_pmw_alert($alert_id, $employee_id, $username);
-        echo ($dismiss_alert == '1') ? 'Dismissed' : $dismiss_alert;
-    }
-}
-
-# Get Employee PMW Alerts for Login
-else if ($transaction == 'get employee pmw alerts') {
-    if (isset($_POST['employee_id']) && !empty($_POST['employee_id'])) {
-        $employee_id = $_POST['employee_id'];
-        $alerts = $api->get_employee_pmw_alerts($employee_id);
-        echo json_encode($alerts);
-    }
-}
-
-# Create PMW Periods (Administrative Function)
-else if ($transaction == 'create pmw periods') {
-    if (isset($_POST['username']) && !empty($_POST['username']) &&
-        isset($_POST['year']) && !empty($_POST['year'])) {
-
-        $username = $_POST['username'];
-        $year = $_POST['year'];
-
-        $create_periods = $api->create_pmw_periods($year, $username);
-        echo ($create_periods == '1') ? 'Created' : $create_periods;
-    }
-}
-
-# Get PMW summary counts for dashboard
-// in controller.php
-
-else if ($transaction == 'check pmw alert') {
-    if (isset($_POST['username'])) {
-        // Assuming the username for the alert is the employee_id
-        $employee_id = $_POST['username'];
-        $alert_data = $api->check_pmw_alert_status($employee_id);
-        echo json_encode($alert_data);
-    }
-}
-
+ 
+ 
 else if ($transaction == 'confirm pmw submission alert') {
     if (isset($_POST['username']) && isset($_POST['pmw_year']) && isset($_POST['pmw_period'])) {
         $employee_id = $_POST['username'];
@@ -10189,6 +10144,7 @@ else if($transaction == 'delete career'){
                 'SUFFIX' => $employee_profile_details[0]['SUFFIX'],
                 'JOIN_DATE' => $employee_profile_details[0]['JOIN_DATE'],
                 'PERMANENT_DATE' => $api->check_date('empty', $employee_profile_details[0]['PERMANENT_DATE'], '', 'm/d/Y', '', '', ''),
+                'END_OF_CONTRACT' => $api->check_date('empty', $employee_profile_details[0]['END_OF_CONTRACT'], '', 'm/d/Y', '', '', ''),
                 'EXIT_DATE' => $api->check_date('empty', $employee_profile_details[0]['EXIT_DATE'], '', 'm/d/Y', '', '', ''),
                 'PAYROLL_PERIOD' => $employee_profile_details[0]['PAYROLL_PERIOD'],
                 'BASIC_PAY' => $employee_profile_details[0]['BASIC_PAY'],
@@ -10202,6 +10158,7 @@ else if($transaction == 'delete career'){
                 'ADDRESS' => $employee_profile_details[0]['ADDRESS'],
                 'DEPARTMENT' => $employee_profile_details[0]['DEPARTMENT'],
                 'DESIGNATION' => $employee_profile_details[0]['DESIGNATION'],
+                'POSITION' => $employee_profile_details[0]['POSITION'],
                 'EMPLOYEMENT_TYPE' => $employee_profile_details[0]['EMPLOYEMENT_TYPE'],
                 'EMPLOYMENT_STATUS' => $employee_profile_details[0]['EMPLOYMENT_STATUS'],
                 'BRANCH' => $employee_profile_details[0]['BRANCH'],

@@ -766,9 +766,11 @@ function display_form_details(formtype){
 
                 check_empty(response[0].EXIT_DATE, '#exitdate', 'val');
                 check_empty(response[0].PERMANENT_DATE, '#permanentdate', 'val');
+                check_empty(response[0].END_OF_CONTRACT, '#end_of_contract', 'val');
                 check_empty(response[0].SUFFIX, '#suffix', 'select');
                 check_empty(response[0].DEPARTMENT, '#department', 'select');
                 check_empty(response[0].DESIGNATION, '#designation', 'select');
+                check_empty(response[0].POSITION, '#position', 'select');
                 check_empty(response[0].EMPLOYEMENT_TYPE, '#employmenttp', 'select');
                 check_empty(response[0].EMPLOYMENT_STATUS, '#employmentstatus', 'select');
                 check_empty(response[0].BRANCH, '#branch', 'select');
