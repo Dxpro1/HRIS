@@ -432,14 +432,30 @@
         //             </li>';
         // }
 
+ 
+
         if($employee_list_page > 0){
             $menu .= '<li>
-                        <a href="employee-list.php" class="waves-effect">
+                        <a href="javascript: void(0);" class="has-arrow waves-effect">
                             <i class="bx bx-user"></i>
-                            <span key="t-human-resource-modules">Employee List</span>
+                            <span key="t-human-resource-modules">Employee</span>
                         </a>
+                        <ul class="sub-menu" aria-expanded="false">';
+
+                        if($employee_list_page > 0){
+                            $menu .= '<li><a href="employee-list.php" key="t-human-resource">Employee List</a></li>';
+                        }
+
+                        if($employee_list_page > 0){
+                            $menu .= '<li><a href="employee-summary.php" key="t-human-resource">Employee Summary</a></li>';
+                        }
+
+                      
+
+            $menu .= '</ul>
                     </li>';
         }
+
         if($career_page > 0){
             $menu .= '<li>
                         <a href="career.php" class="waves-effect">

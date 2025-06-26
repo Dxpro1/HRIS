@@ -490,10 +490,21 @@ if (isset($_POST['transaction']) && !empty($_POST['transaction'])) {
             echo json_encode($details);
     }
 
+ 
     else if ($transaction == 'employee departures') {
     $details = $api->get_employee_departures();
     echo json_encode($details);
     }
+    else if ($transaction == 'position gender headcount') {
+    $details = $api->get_position_gender_headcount();
+    echo json_encode($details);
+    }   
+  else if ($transaction == 'department headcount') {
+    $details = $api->get_department_headcount_with_names();
+    echo json_encode($details);
+    }
+
+
 
     else if ($transaction == 'employee birthdays') {
         $month = isset($_POST['month']) ? intval($_POST['month']) : date('n');

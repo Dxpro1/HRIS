@@ -29,7 +29,7 @@
     $get_total_employee_regular = $api ->get_total_employee_regular($username, 23);
     $get_total_employee_probitionary = $api ->get_total_employee_probitionary($username, 23);
 
-     $careers_by_branch = $api->get_published_careers_by_branch();
+    $careers_by_branch = $api->get_published_careers_by_branch();
     $total_published_positions = $api->get_total_published_positions();
     $career_management_permission = $api->check_role_permissions($username, 429);
 

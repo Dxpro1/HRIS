@@ -2398,6 +2398,41 @@ public function get_total_employee_headcount($username = null, $permission_id = 
                 (JOIN_DATE <= ?) AND
                 (EXIT_DATE IS NULL OR EXIT_DATE > ?) AND
                 EMPLOYMENT_STATUS = 1 AND
+                DEPARTMENT != 'DEPT9'";
+
+        $sql = $this->db_connection->prepare($query);
+        $sql->execute([$current_date, $current_date]);
+        $total_count = $sql->fetch(PDO::FETCH_ASSOC)['total_headcount'];
+
+        return (int)$total_count;
+    }
+
+    return false;
+}
+
+
+public function get_total_employee_male($username = null, $permission_id = null) {
+    // Check permissions if parameters are provided
+    if ($username && $permission_id) {
+        $has_permission = $this->check_role_permissions($username, $permission_id);
+        if (!$has_permission) {
+            return false;
+        }
+    }
+
+    if ($this->databaseConnection()) {
+        // Get the current date
+        $current_date = date('Y-m-d');
+
+        // Query for active employees as of today
+        $query = "
+            SELECT COUNT(*) as total_headcount
+            FROM tblemployeeprofile
+            WHERE
+                (JOIN_DATE <= ?) AND
+                (EXIT_DATE IS NULL OR EXIT_DATE > ?) AND
+                EMPLOYMENT_STATUS = 1 AND
+                GENDER = 'MALE' AND
                 (USERNAME != 'guard')";
 
         $sql = $this->db_connection->prepare($query);
@@ -2409,6 +2444,234 @@ public function get_total_employee_headcount($username = null, $permission_id = 
 
     return false;
 }
+
+
+public function get_total_employee_female($username = null, $permission_id = null) {
+    // Check permissions if parameters are provided
+    if ($username && $permission_id) {
+        $has_permission = $this->check_role_permissions($username, $permission_id);
+        if (!$has_permission) {
+            return false;
+        }
+    }
+
+    if ($this->databaseConnection()) {
+        // Get the current date
+        $current_date = date('Y-m-d');
+
+        // Query for active employees as of today
+        $query = "
+            SELECT COUNT(*) as total_headcount
+            FROM tblemployeeprofile
+            WHERE
+                (JOIN_DATE <= ?) AND
+                (EXIT_DATE IS NULL OR EXIT_DATE > ?) AND
+                EMPLOYMENT_STATUS = 1 AND
+                GENDER = 'FEMALE' AND
+                (USERNAME != 'guard')";
+
+        $sql = $this->db_connection->prepare($query);
+        $sql->execute([$current_date, $current_date]);
+        $total_count = $sql->fetch(PDO::FETCH_ASSOC)['total_headcount'];
+
+        return (int)$total_count;
+    }
+
+    return false;
+}
+
+public function get_total_employee_male_staff($username = null, $permission_id = null) {
+    // Check permissions if parameters are provided
+    if ($username && $permission_id) {
+        $has_permission = $this->check_role_permissions($username, $permission_id);
+        if (!$has_permission) {
+            return false;
+        }
+    }
+
+    if ($this->databaseConnection()) {
+        // Get the current date
+        $current_date = date('Y-m-d');
+
+        // Query for active employees as of today
+        $query = "
+            SELECT COUNT(*) as total_headcount
+            FROM tblemployeeprofile
+            WHERE
+                (JOIN_DATE <= ?) AND
+                (EXIT_DATE IS NULL OR EXIT_DATE > ?) AND
+                EMPLOYMENT_STATUS = 1 AND
+                GENDER = 'MALE' AND POSITION = 'STAFF' AND
+                (USERNAME != 'guard')";
+
+        $sql = $this->db_connection->prepare($query);
+        $sql->execute([$current_date, $current_date]);
+        $total_count = $sql->fetch(PDO::FETCH_ASSOC)['total_headcount'];
+
+        return (int)$total_count;
+    }
+
+    return false;
+}
+
+public function get_total_employee_female_staff($username = null, $permission_id = null) {
+    // Check permissions if parameters are provided
+    if ($username && $permission_id) {
+        $has_permission = $this->check_role_permissions($username, $permission_id);
+        if (!$has_permission) {
+            return false;
+        }
+    }
+
+    if ($this->databaseConnection()) {
+        // Get the current date
+        $current_date = date('Y-m-d');
+
+        // Query for active employees as of today
+        $query = "
+            SELECT COUNT(*) as total_headcount
+            FROM tblemployeeprofile
+            WHERE
+                (JOIN_DATE <= ?) AND
+                (EXIT_DATE IS NULL OR EXIT_DATE > ?) AND
+                EMPLOYMENT_STATUS = 1 AND
+                GENDER = 'FEMALE' AND POSITION = 'STAFF' AND
+                (USERNAME != 'guard')";
+
+        $sql = $this->db_connection->prepare($query);
+        $sql->execute([$current_date, $current_date]);
+        $total_count = $sql->fetch(PDO::FETCH_ASSOC)['total_headcount'];
+
+        return (int)$total_count;
+    }
+
+    return false;
+}
+
+public function get_department_headcount_with_names() {
+    if ($this->databaseConnection()) {
+        $query = "
+            SELECT DEPARTMENT, COUNT(*) AS total_count
+            FROM tblemployeeprofile
+            WHERE EMPLOYMENT_STATUS = 1 AND DEPARTMENT != 'DEPT9'
+            GROUP BY DEPARTMENT";
+
+        $sql = $this->db_connection->prepare($query);
+        $sql->execute();
+        $raw_results = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+        $results = [];
+        foreach ($raw_results as $row) {
+            $code = $row['DEPARTMENT'];
+            $name = $this->get_data_details_one_parameter('department', $code)[0]['DEPARTMENT'] ?? 'N/A';
+            $results[] = [
+                'code' => $code,
+                'name' => $name,
+                'total_count' => $row['total_count']
+            ];
+        }
+
+        return $results;
+    }
+
+    return false;
+}
+
+ 
+
+public function get_total_employee_female_officer($username = null, $permission_id = null) {
+    // Check permissions if parameters are provided
+    if ($username && $permission_id) {
+        $has_permission = $this->check_role_permissions($username, $permission_id);
+        if (!$has_permission) {
+            return false;
+        }
+    }
+
+    if ($this->databaseConnection()) {
+        // Get the current date
+        $current_date = date('Y-m-d');
+
+        // Query for active employees as of today
+        $query = "
+            SELECT COUNT(*) as total_headcount
+            FROM tblemployeeprofile
+            WHERE
+                (JOIN_DATE <= ?) AND
+                (EXIT_DATE IS NULL OR EXIT_DATE > ?) AND
+                EMPLOYMENT_STATUS = 1 AND
+                GENDER = 'FEMALE' AND POSITION = 'OFFICER' AND
+                (USERNAME != 'guard')";
+
+        $sql = $this->db_connection->prepare($query);
+        $sql->execute([$current_date, $current_date]);
+        $total_count = $sql->fetch(PDO::FETCH_ASSOC)['total_headcount'];
+
+        return (int)$total_count;
+    }
+
+    return false;
+}
+
+public function get_total_employee_male_officer($username = null, $permission_id = null) {
+    // Check permissions if parameters are provided
+    if ($username && $permission_id) {
+        $has_permission = $this->check_role_permissions($username, $permission_id);
+        if (!$has_permission) {
+            return false;
+        }
+    }
+
+    if ($this->databaseConnection()) {
+        // Get the current date
+        $current_date = date('Y-m-d');
+
+        // Query for active employees as of today
+        $query = "
+            SELECT COUNT(*) as total_headcount
+            FROM tblemployeeprofile
+            WHERE
+                (JOIN_DATE <= ?) AND
+                (EXIT_DATE IS NULL OR EXIT_DATE > ?) AND
+                EMPLOYMENT_STATUS = 1 AND
+                GENDER = 'MALE' AND POSITION = 'OFFICER' AND
+                (USERNAME != 'guard')";
+
+        $sql = $this->db_connection->prepare($query);
+        $sql->execute([$current_date, $current_date]);
+        $total_count = $sql->fetch(PDO::FETCH_ASSOC)['total_headcount'];
+
+        return (int)$total_count;
+    }
+
+    return false;
+}
+
+
+public function get_position_gender_headcount() {
+    if ($this->databaseConnection()) {
+        $current_date = date('Y-m-d');
+
+        $query = "
+            SELECT POSITION, GENDER, COUNT(*) AS total
+            FROM tblemployeeprofile
+            WHERE
+                (JOIN_DATE <= ?) AND
+                (EXIT_DATE IS NULL OR EXIT_DATE > ?) AND
+                EMPLOYMENT_STATUS = 1 AND
+                USERNAME != 'guard'
+            GROUP BY POSITION, GENDER";
+
+        $sql = $this->db_connection->prepare($query);
+        $sql->execute([$current_date, $current_date]);
+        $result = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+        return $result;
+    }
+
+    return false;
+}
+
 
 
 

@@ -1644,12 +1644,72 @@ if ($("#employee-list-datatable").length) {
       });
     }
 
+    if ($("#positionGenderChart").length) {
+                const transaction = "position gender headcount";
+                $.ajax({
+                    url: 'controller.php',
+                    method: 'POST',
+                    dataType: 'JSON',
+                    data: { transaction: transaction },
+                    success: function(response) {
+                        const positions = [...new Set(response.map(item => item.POSITION))];
+                        
+                        const genderMap = {
+                            Male: Array(positions.length).fill(0),
+                            Female: Array(positions.length).fill(0)
+                        };
+                        
+                        response.forEach(item => {
+                            const index = positions.indexOf(item.POSITION);
+                            if (item.GENDER.toUpperCase() === 'MALE') {
+                                genderMap.Male[index] = parseInt(item.total);
+                            } else if (item.GENDER.toUpperCase() === 'FEMALE') {
+                                genderMap.Female[index] = parseInt(item.total);
+                            }
+                        });
+                        
+                        const ctx = document.getElementById('positionGenderChart').getContext('2d');
+                        new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: positions,
+                                datasets: [
+                                    {
+                                        label: 'Male',
+                                        data: genderMap.Male,
+                                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                                        borderColor: 'rgba(54, 162, 235, 1)',
+                                        borderWidth: 1
+                                    },
+                                    {
+                                        label: 'Female',
+                                        data: genderMap.Female,
+                                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                                        borderColor: 'rgba(255, 99, 132, 1)',
+                                        borderWidth: 1
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                scales: {
+                                    x: { stacked: true },
+                                    y: { stacked: true, beginAtZero: true }
+                                },
+                                plugins: {
+                                    legend: {
+                                        display: true
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+            }
 
 
-
-
-     if ($("#new-employees-chart").length) {
-  transaction = "new employee details";
+ if ($("#departmentChart").length) {
+  const transaction = "department headcount";
 
   $.ajax({
     url: 'controller.php',
@@ -1657,69 +1717,191 @@ if ($("#employee-list-datatable").length) {
     dataType: 'JSON',
     data: { transaction: transaction },
     success: function(response) {
-      const employeeData = response.map(data => ({
-        month: data.month,
-        headcount: parseInt(data.headcount) // Ensure numeric values
-      }));
+      const labels = response.map(item => item.name);
+      const data = response.map(item => parseInt(item.total_count));
 
-      const newEmployeesChart = document.getElementById('new-employees-chart');
-      new Chart(newEmployeesChart, {
-        type: 'bar',
+      const colors = [
+        'rgba(255, 99, 132, 0.7)',
+        'rgba(54, 162, 235, 0.7)',
+        'rgba(255, 206, 86, 0.7)',
+        'rgba(75, 192, 192, 0.7)',
+        'rgba(153, 102, 255, 0.7)',
+        'rgba(255, 159, 64, 0.7)',
+        'rgba(199, 199, 199, 0.7)',
+        'rgba(83, 102, 255, 0.7)',
+        'rgba(255, 99, 255, 0.7)'
+      ];
+
+      const ctx = document.getElementById('departmentChart').getContext('2d');
+
+      new Chart(ctx, {
+        type: 'doughnut',
         data: {
-          labels: employeeData.map(data => data.month),
+          labels: labels,
           datasets: [{
-            label: 'New Provisional Employees',
-            data: employeeData.map(data => data.headcount),
-            backgroundColor: '#2ecc71', // Green color for new employees
-            borderColor: '#27ae60',
+            data: data,
+            backgroundColor: colors.slice(0, data.length), // use only needed colors
+            borderColor: '#fff',
             borderWidth: 1
           }]
         },
         options: {
           responsive: true,
-          scales: {
-            y: {
-              beginAtZero: true,
-              title: {
-                display: true,
-                text: 'Number of New Employees'
-              },
-              ticks: {
-                precision: 0 // Only show whole numbers
-              }
-            },
-            x: {
-              title: {
-                display: true,
-                text: 'Month'
-              }
-            }
-          },
           plugins: {
             legend: {
-              display: false
+              position: 'right',
+              labels: {
+                boxWidth: 26
+              }
+            },
+            datalabels: {
+              color: '#000',
+              font: {
+                weight: 'bold',
+                size: 14
+              },
+              formatter: (value) => value
             },
             tooltip: {
+              enabled: true,
               callbacks: {
-                title: function(tooltipItems) {
-                  return tooltipItems[0].label + ' ' + new Date().getFullYear();
-                },
                 label: function(context) {
-                  return context.dataset.data[context.dataIndex] + ' new employees';
+                  const label = context.label || '';
+                  const value = context.parsed;
+                  return `${label}: ${value}`;
                 }
               }
             }
           }
-        }
+        },
+        plugins: [ChartDataLabels]
       });
     },
     error: function(error) {
-      console.error("Error fetching new employee data:", error);
-      // Display a user-friendly error message
-      $("#new-employees-chart").html('<div class="alert alert-danger">Failed to load new employee data</div>');
+      console.error("Failed to fetch department data for chart:", error);
     }
   });
 }
+
+         
+
+if ($("#departmentTable").length) {
+  const transaction = "department headcount";
+
+  $.ajax({
+    url: 'controller.php',
+    method: 'POST',
+    dataType: 'JSON',
+    data: { transaction: transaction },
+    success: function(response) {
+      let total = 0;
+      let html = '';
+
+      response.forEach(item => {
+        const departmentName = item.name;
+        const count = parseInt(item.total_count);
+
+        html += `
+          <tr>
+            <td>${departmentName}</td>
+            <td>${count}</td>
+          </tr>
+        `;
+
+        total += count;
+      });
+
+      // Add total row
+      html += `
+        <tr class="table-info">
+          <td><strong>TOTAL</strong></td>
+          <td><strong>${total}</strong></td>
+        </tr>
+      `;
+
+      $('#departmentTableBody').html(html);
+    },
+    error: function(err) {
+      console.error('Failed to fetch department headcount:', err);
+    }
+  });
+}
+
+
+
+
+     if ($("#new-employees-chart").length) {
+      transaction = "new employee details";
+
+      $.ajax({
+        url: 'controller.php',
+        method: 'POST',
+        dataType: 'JSON',
+        data: { transaction: transaction },
+        success: function(response) {
+          const employeeData = response.map(data => ({
+            month: data.month,
+            headcount: parseInt(data.headcount) // Ensure numeric values
+          }));
+
+          const newEmployeesChart = document.getElementById('new-employees-chart');
+          new Chart(newEmployeesChart, {
+            type: 'bar',
+            data: {
+              labels: employeeData.map(data => data.month),
+              datasets: [{
+                label: 'New Provisional Employees',
+                data: employeeData.map(data => data.headcount),
+                backgroundColor: '#2ecc71', // Green color for new employees
+                borderColor: '#27ae60',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  title: {
+                    display: true,
+                    text: 'Number of New Employees'
+                  },
+                  ticks: {
+                    precision: 0 // Only show whole numbers
+                  }
+                },
+                x: {
+                  title: {
+                    display: true,
+                    text: 'Month'
+                  }
+                }
+              },
+              plugins: {
+                legend: {
+                  display: false
+                },
+                tooltip: {
+                  callbacks: {
+                    title: function(tooltipItems) {
+                      return tooltipItems[0].label + ' ' + new Date().getFullYear();
+                    },
+                    label: function(context) {
+                      return context.dataset.data[context.dataIndex] + ' new employees';
+                    }
+                  }
+                }
+              }
+            }
+          });
+        },
+        error: function(error) {
+          console.error("Error fetching new employee data:", error);
+          // Display a user-friendly error message
+          $("#new-employees-chart").html('<div class="alert alert-danger">Failed to load new employee data</div>');
+        }
+      });
+  }
 
 if ($("#departures-chart").length) {
   transaction = "employee departures";
