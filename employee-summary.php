@@ -59,6 +59,9 @@
             .export-btn {
                 margin-right: 10px;
             }
+            .card-title, h2{
+                color: black;
+            }
         </style>
     </head>
     <body data-sidebar="dark">
