@@ -14624,15 +14624,17 @@ else if($type == 'publish documents table'){
                     $hours_since_publish = '';
 
                     if ($publish == 1 && $publish_datetime) {
-                        $now = new DateTime();
-                        $published_time = new DateTime($publish_datetime);
+                        // Set Philippines timezone for all datetime operations
+                        $phTimeZone = new DateTimeZone('Asia/Manila');
+                        $now = new DateTime('now', $phTimeZone);
+                        $published_time = new DateTime($publish_datetime, $phTimeZone);
+                        
                         $interval = $published_time->diff($now);
-                        $hours_since_publish = ($interval->days * 24) + $interval->h . ' hr(s)';
+                        $totalHours = ($interval->days * 24) + $interval->h;
+                        $hours_since_publish = $totalHours . ' hr(s)';
                     } else {
                         $hours_since_publish = '-';
                     }
-
-
 
 
 

@@ -449,41 +449,7 @@ if (isset($_POST['transaction']) && !empty($_POST['transaction'])) {
         echo json_encode($details);
     }
 
-    else if ($transaction == 'hiring positions') {
-        if ($api->databaseConnection()) {
-            $sql = $api->db_connection->prepare("
-                SELECT CAREER_ID, POSITION, BRANCH, AVAILABLE_POSITION, PUBLISH_DATETIME
-                FROM tblcareer
-                WHERE PUBLISH = 1 AND AVAILABLE_POSITION > 0
-            ");
-
-            if ($sql->execute()) {
-                $response = [];
-
-                while ($row = $sql->fetch(PDO::FETCH_ASSOC)) {
-                    $branch_name = $api->get_data_details_one_parameter('branch', $row['BRANCH'])[0]['BRANCH'] ?? 'N/A';
-
-                    $now = new DateTime();
-                    $published = new DateTime($row['PUBLISH_DATETIME']);
-                    $interval = $published->diff($now);
-                    $since = ($interval->days > 0) ? $interval->days . ' day(s) ago' : $interval->h . ' hour(s) ago';
-
-                    $response[] = [
-                        'CAREER_ID' => $row['CAREER_ID'],
-                        'POSITION' => $row['POSITION'],
-                        'BRANCH' => $branch_name,
-                        'AVAILABLE_POSITION' => $row['AVAILABLE_POSITION'],
-                        'HOURS_SINCE_PUBLISH' => $since
-                    ];
-                }
-
-                echo json_encode($response);
-            } else {
-                echo json_encode([]);
-            }
-        }
-    }
-
+     
 
     else if ($transaction == 'employee headcount details') {
             $details = $api->get_employee_headcount_details();
