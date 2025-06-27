@@ -16811,47 +16811,55 @@ public function get_total_ob_paid_hours($employee_id, $parameter_1, $parameter_2
                 }
             }
         }
-        public function update_career_publish_status($career_id, $active, $username){
-            if ($this->databaseConnection()) {
-                $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+ public function update_career_publish_status($career_id, $active, $username){
+    if ($this->databaseConnection()) {
+        // Set Philippine timezone
+        $ph_timezone = new DateTimeZone('Asia/Manila');
+        $current_time = new DateTime('now', $ph_timezone);
+        
+        // Format times for different uses
+        $record_log_time = $current_time->format('Y-m-d h:i:s'); // For log string (12-hour format)
+        $db_datetime = $current_time->format('Y-m-d H:i:s');    // For database (24-hour format)
+        
+        $record_log = 'UPD->' . $username . '->' . $record_log_time;
+        $publish_datetime = ($active == 1) ? $db_datetime : null;
 
-                // ✅ Updated SQL: Also sets PUBLISH_DATETIME when published
-                $sql = $this->db_connection->prepare('
-                    UPDATE tblcareer
-                    SET PUBLISH = :active,
-                        PUBLISH_DATETIME = CASE WHEN :active = 1 THEN NOW() ELSE NULL END,
-                        RECORD_LOG = :record_log
-                    WHERE CAREER_ID = :career_id
-                ');
-
-                $sql->bindParam(':active', $active);
-                $sql->bindParam(':record_log', $record_log);
-                $sql->bindParam(':career_id', $career_id);
-
-                if($sql->execute()){
-                    if($active == 1){
-                        $log_type = 'Publish Career';
-                        $log = 'User ' . $username . ' published career (' . $career_id . ')';
-                    }
-                    else{
-                        $log_type = 'Unpublish Career';
-                        $log = 'User ' . $username . ' unpublished career (' . $career_id . ')';
-                    }
-
-                    $insert_user_log = $this->insert_logs($username, $log_type, $log);
-
-                    if($insert_user_log == '1'){
-                        return '1';
-                    }
-                    else{
-                        return $insert_user_log;
-                    }
-                }
-                else{
-                    return $sql->errorInfo()[2];
-                }
+        $sql = $this->db_connection->prepare('
+            UPDATE tblcareer
+            SET PUBLISH = :active,
+                PUBLISH_DATETIME = :publish_datetime,
+                RECORD_LOG = :record_log
+            WHERE CAREER_ID = :career_id
+        ');
+        
+        $sql->bindParam(':active', $active);
+        $sql->bindParam(':publish_datetime', $publish_datetime);
+        $sql->bindParam(':record_log', $record_log);
+        $sql->bindParam(':career_id', $career_id);
+        
+        if($sql->execute()){
+            if($active == 1){
+                $log_type = 'Publish Career';
+                $log = 'User ' . $username . ' published career (' . $career_id . ') at ' . $record_log_time;
+            }
+            else{
+                $log_type = 'Unpublish Career';
+                $log = 'User ' . $username . ' unpublished career (' . $career_id . ') at ' . $record_log_time;
+            }
+            
+            $insert_user_log = $this->insert_logs($username, $log_type, $log);
+            if($insert_user_log == '1'){
+                return '1';
+            }
+            else{
+                return $insert_user_log;
             }
         }
+        else{
+            return $sql->errorInfo()[2];
+        }
+    }
+}
 
 
     public function get_last_career_order(){
