@@ -14623,15 +14623,31 @@ else if($type == 'publish documents table'){
                     $publish_datetime = $row['PUBLISH_DATETIME'];
                     $hours_since_publish = '';
 
+                    // Define the Philippine time zone
+                    $philippine_timezone = new DateTimeZone('Asia/Manila');
+
                     if ($publish == 1 && $publish_datetime) {
-                        // Set Philippines timezone for all datetime operations
-                        $phTimeZone = new DateTimeZone('Asia/Manila');
-                        $now = new DateTime('now', $phTimeZone);
-                        $published_time = new DateTime($publish_datetime, $phTimeZone);
-                        
-                        $interval = $published_time->diff($now);
-                        $totalHours = ($interval->days * 24) + $interval->h;
-                        $hours_since_publish = $totalHours . ' hr(s)';
+                        try {
+                            // Get the current time in the Philippine time zone
+                            $now = new DateTime('now', $philippine_timezone);
+
+                            // Create the published_time DateTime object,
+                            // assuming $row['PUBLISH_DATETIME'] is already in Philippine time
+                            // or a timezone-agnostic string (e.g., 'YYYY-MM-DD HH:MM:SS').
+                            // By passing $philippine_timezone, we interpret it directly in that zone.
+                            $published_time = new DateTime($publish_datetime, $philippine_timezone);
+
+                            // Calculate the difference
+                            $interval = $published_time->diff($now);
+
+                            // Calculate total hours
+                            $hours_since_publish = ($interval->days * 24) + $interval->h . ' hr(s)';
+
+                        } catch (Exception $e) {
+                            // Handle potential errors if $publish_datetime is not a valid date string
+                            error_log("Error parsing publish_datetime: " . $e->getMessage());
+                            $hours_since_publish = 'Invalid Date'; // Or another error indicator
+                        }
                     } else {
                         $hours_since_publish = '-';
                     }
