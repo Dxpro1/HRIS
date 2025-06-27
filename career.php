@@ -76,7 +76,7 @@
                                                 <table id="career-datatable" class="table table-bordered table-hover align-middle dt-responsive nowrap w-100">
                                                 <thead>
                                                     <tr>
-                                                        <th class="all" width="35%">Position</th>
+                                                        <th class="all" width="35%">Position1</th>
                                                         <th class="all" width="25%">Branch</th>
                                                         <th class="all" width="10%">Available Position</th>
                                                         <th class="all" width="10%">Hours Since Published</th> <!-- NEW -->
