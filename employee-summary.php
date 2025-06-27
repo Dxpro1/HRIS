@@ -98,7 +98,7 @@
                         
                         <!-- Summary Cards -->
                         <div class="row">
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <div class="card summary-card bg-primary text-white">
                                     <div class="card-body">
                                         <h5 class="card-title">TOTAL EMPLOYEES</h5>
@@ -107,7 +107,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <div class="card summary-card bg-info text-white">
                                     <div class="card-body">
                                         <h5 class="card-title">MALE</h5>
@@ -115,7 +115,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <div class="card summary-card bg-success text-white">
                                     <div class="card-body">
                                         <h5 class="card-title">FEMALE</h5>
@@ -123,14 +123,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="card summary-card bg-warning text-dark">
-                                    <div class="card-body">
-                                        <h5 class="card-title">TURNOVER RATE</h5>
-                                        <h2 class="mb-0">3.03%</h2>
-                                    </div>
-                                </div>
-                            </div>
+                       
                         </div>
                         
                         <!-- Charts Row -->
@@ -283,7 +276,7 @@
                             </div>
                         </div>
                         
-                        <!-- Personnel Status Table -->
+                        <!-- Personnel Status Table
                         <div class="row mt-4">
                             <div class="col-12">
                                 <div class="card">
@@ -312,7 +305,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         
                     </div>
                 </div>
