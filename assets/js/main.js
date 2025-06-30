@@ -1784,7 +1784,7 @@ if ($("#employee-list-datatable").length) {
   });
 }
 
-         
+
 
 if ($("#departmentTable").length) {
   const transaction = "department headcount";

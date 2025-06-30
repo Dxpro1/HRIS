@@ -624,7 +624,7 @@ else if(type == 'career table'){
         length_menu = [ [5, 10, 25, 50, -1], [5, 10, 25, 50, 'All'] ];
     }
 
-    if(buttons == '1'){
+    if(buttons == '0'){
         var settings = {
             'ajax': {
                 'url' : 'system-generation.php',

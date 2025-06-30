@@ -4207,6 +4207,8 @@ function refresh_pmw_monitoring() {
     update_pmw_summary_counts();
 }
 
+
+
 function filter_pmw_by_period_type(period_type) {
     generate_datatable_with_parameter(
         "pmw monitoring table",

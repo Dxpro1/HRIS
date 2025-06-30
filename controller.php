@@ -7619,46 +7619,10 @@ else if ($transaction == 'get pmw summary counts') {
     echo json_encode($summary);
     exit;
 }
-# PMW Alert Dismissal
-else if ($transaction == 'dismiss pmw alert') {
-    if (isset($_POST['username']) && !empty($_POST['username']) &&
-        isset($_POST['alert_id']) && !empty($_POST['alert_id']) &&
-        isset($_POST['employee_id']) && !empty($_POST['employee_id'])) {
-
-        $username = $_POST['username'];
-        $alert_id = $_POST['alert_id'];
-        $employee_id = $_POST['employee_id'];
-
-        $dismiss_alert = $api->dismiss_pmw_alert($alert_id, $employee_id, $username);
-        echo ($dismiss_alert == '1') ? 'Dismissed' : $dismiss_alert;
-    }
-}
-
-# Get Employee PMW Alerts for Login
-else if ($transaction == 'get employee pmw alerts') {
-    if (isset($_POST['employee_id']) && !empty($_POST['employee_id'])) {
-        $employee_id = $_POST['employee_id'];
-        $alerts = $api->get_employee_pmw_alerts($employee_id);
-        echo json_encode($alerts);
-    }
-}
-# Get PMW summary counts for dashboard
+ 
 
 
-
-# Create PMW Periods (Administrative Function)
-else if ($transaction == 'create pmw periods') {
-    if (isset($_POST['username']) && !empty($_POST['username']) &&
-        isset($_POST['year']) && !empty($_POST['year'])) {
-
-        $username = $_POST['username'];
-        $year = $_POST['year'];
-
-        $create_periods = $api->create_pmw_periods($year, $username);
-        echo ($create_periods == '1') ? 'Created' : $create_periods;
-    }
-}
-
+ 
 
  # Get career details
 else if($transaction == 'career details'){

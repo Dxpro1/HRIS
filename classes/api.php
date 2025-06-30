@@ -3862,9 +3862,9 @@ public function get_pmw_monitoring_data($employment_type_filter = '', $status_fi
     }
 }
 
-    /**
-     * REVISED: Updates PMW status and automatically records the employment type at that time.
-     */
+ 
+     
+    
     public function update_pmw_status($employee_id, $year, $period, $new_status) {
         try {
             if (!$this->databaseConnection()) {
