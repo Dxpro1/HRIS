@@ -2672,6 +2672,52 @@ public function get_position_gender_headcount() {
     return false;
 }
 
+public function get_employee_list_by_gender($gender) {
+    if ($this->databaseConnection()) {
+        $query = "
+            SELECT FIRST_NAME, LAST_NAME, MIDDLE_NAME, SUFFIX
+            FROM tblemployeeprofile
+            WHERE GENDER = ? AND EMPLOYMENT_STATUS = 1 AND USERNAME != 'guard'
+            ORDER BY LAST_NAME ASC";
+
+        $stmt = $this->db_connection->prepare($query);
+        $stmt->execute([$gender]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    return [];
+}
+public function get_employee_list_by_department_with_names() {
+    if ($this->databaseConnection()) {
+        $query = "
+            SELECT FIRST_NAME, LAST_NAME, MIDDLE_NAME, SUFFIX, DEPARTMENT
+            FROM tblemployeeprofile
+            WHERE EMPLOYMENT_STATUS = 1
+              AND (EXIT_DATE IS NULL OR EXIT_DATE > CURDATE())
+              AND USERNAME != 'guard'
+            ORDER BY DEPARTMENT, LAST_NAME
+        ";
+
+        $stmt = $this->db_connection->prepare($query);
+        $stmt->execute();
+        $employees = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $results = [];
+
+        foreach ($employees as $emp) {
+            $deptCode = $emp['DEPARTMENT'];
+            $deptName = $this->get_data_details_one_parameter('department', $deptCode)[0]['DEPARTMENT'] ?? $deptCode;
+
+            $fullName = trim("{$emp['LAST_NAME']}, {$emp['FIRST_NAME']} {$emp['MIDDLE_NAME']} {$emp['SUFFIX']}");
+
+            $results[$deptName][] = $fullName;
+        }
+
+        return $results;
+    }
+
+    return [];
+}
 
 
 

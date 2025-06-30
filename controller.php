@@ -465,10 +465,21 @@ if (isset($_POST['transaction']) && !empty($_POST['transaction'])) {
     $details = $api->get_position_gender_headcount();
     echo json_encode($details);
     }   
-  else if ($transaction == 'department headcount') {
+    else if ($transaction == 'department headcount') {
     $details = $api->get_department_headcount_with_names();
     echo json_encode($details);
     }
+    else if ($transaction == 'employee list by gender') {
+        $gender = $_POST['gender']; // 'Male' or 'Female'
+        $details = $api->get_employee_list_by_gender($gender);
+        echo json_encode($details);
+    }
+    else if ($transaction == 'employee list by department') {
+        $details = $api->get_employee_list_by_department_with_names();
+        echo json_encode($details);
+    }
+
+
 
 
 

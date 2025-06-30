@@ -1706,6 +1706,7 @@ if ($("#employee-list-datatable").length) {
                     }
                 });
             }
+ 
 
 
  if ($("#departmentChart").length) {

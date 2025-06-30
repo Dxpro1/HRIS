@@ -62,6 +62,9 @@
             .card-title, h2{
                 color: black;
             }
+            h6{
+                color: white;
+            }
         </style>
     </head>
     <body data-sidebar="dark">
@@ -211,6 +214,7 @@
                         </div>
                         
                         <!-- Detailed Table -->
+                         
                         <div class="row mt-4">
                             <div class="col-12">
                                 <div class="card">
@@ -278,6 +282,40 @@
                                 </div>
                             </div>
                         </div>
+
+                          <div class="card">
+                                    <div class="card-body">
+                   <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h5 class="mb-3">Male Employees</h5>
+                            <table class="table table-bordered" id="maleTable">
+                            <thead class="table-light">
+                                <tr>
+                                <th>#</th>
+                                <th>Employee Name</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                            </table>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h5 class="mb-3">Female Employees</h5>
+                            <table class="table table-bordered" id="femaleTable">
+                            <thead class="table-light">
+                                <tr>
+                                <th>#</th>
+                                <th>Employee Name</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                            </table>
+                        </div>
+                  </div>
+                  <div id="departmentEmployeeTables" class="row mt-4"></div>
+
+
+
                         
                         <!-- Personnel Status Table
                         <div class="row mt-4">

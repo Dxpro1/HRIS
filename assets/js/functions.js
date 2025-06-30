@@ -4023,7 +4023,93 @@ function renderNewEmployeeCards(employees) {
         container.append(card);
     });
 }
+function loadEmployeeList(gender, tableId) {
+  $.ajax({
+    url: 'controller.php',
+    method: 'POST',
+    data: { transaction: 'employee list by gender', gender: gender },
+    dataType: 'json',
+    success: function(response) {
+      const tbody = $(`#${tableId} tbody`);
+      tbody.empty();
+      response.forEach((employee, index) => {
+        const fullName = `${employee.LAST_NAME}, ${employee.FIRST_NAME} ${employee.MIDDLE_NAME ?? ''} ${employee.SUFFIX ?? ''}`.trim();
+        tbody.append(`
+          <tr>
+            <td>${index + 1}</td>
+            <td>${fullName}</td>
+          </tr>
+        `);
+      });
+    }
+  });
+}
 
+$(document).ready(function () {
+  if ($("#maleTable").length) {
+    loadEmployeeList('Male', 'maleTable');
+  }
+
+  if ($("#femaleTable").length) {
+    loadEmployeeList('Female', 'femaleTable');
+  }
+});
+
+
+function loadEmployeesByDepartment() {
+  $.ajax({
+    url: 'controller.php',
+    method: 'POST',
+    data: { transaction: 'employee list by department' },
+    dataType: 'json',
+    success: function(response) {
+      const container = $('#departmentEmployeeTables');
+      container.empty();
+
+      Object.entries(response).forEach(([department, employees]) => {
+        const card = `
+          <div class="col-lg-6 col-md-12 mb-4">
+            <div class="card shadow-sm h-100">
+              <div class="card-header bg-primary text-white">
+                <h6 class="mb-0">${department}</h6>
+              </div>
+              <div class="card-body p-3">
+                <div class="table-responsive">
+                  <table class="table table-sm table-bordered mb-0">
+                    <thead class="table-light">
+                      <tr>
+                        <th>#</th>
+                        <th>Employee Name</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${employees.map((name, index) => `
+                        <tr>
+                          <td>${index + 1}</td>
+                          <td>${name}</td>
+                        </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        container.append(card);
+      });
+    },
+    error: function () {
+      $('#departmentEmployeeTables').html('<div class="col-12"><p class="text-danger">Failed to load employee list by department.</p></div>');
+    }
+  });
+}
+
+$(document).ready(function () {
+  loadEmployeesByDepartment();
+});
+
+ 
 
 function loadNewlyPermanentEmployees(month = null) {
     // Show loader, hide other elements
