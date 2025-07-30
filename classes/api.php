@@ -2204,6 +2204,7 @@ public function get_employee_work_anniversaries($username = null, $permission_id
                 AND EMPLOYMENT_STATUS = 1
                 AND (EXIT_DATE IS NULL OR EXIT_DATE > CURRENT_DATE())
                 AND (YEAR(CURRENT_DATE()) - YEAR(JOIN_DATE)) > 0
+                AND DEPARTMENT != 'DEPT9'
             ORDER BY
                 DAY(JOIN_DATE) ASC";
         
@@ -2859,6 +2860,7 @@ public function get_employee_birthdays($month = null) {
             WHERE
                 MONTH(BIRTHDAY) = ?
                 AND EMPLOYMENT_STATUS = 1
+                AND DEPARTMENT != 'DEPT9'
             ORDER BY
                 DAY(BIRTHDAY) ASC";
 
@@ -16995,6 +16997,245 @@ public function get_total_ob_paid_hours($employee_id, $parameter_1, $parameter_2
 }
 
 
+
+  public function insert_vendor($vendor_name, $vendor_type, $vendor_address, $contact_person, $email, $phone, $bank_name, $bank_account_name, $bank_account_number, $username) {
+        if ($this->databaseConnection()) {
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            // Get system parameter for vendor ID
+            $system_parameter = $this->get_system_parameter('18', 1); // Assuming 18 is for vendor
+            
+            if (empty($system_parameter)) {
+                return "System parameter not found";
+            }
+            
+            $paramnum = $system_parameter[0]['PARAMNUM'];
+            $id = $system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare("INSERT INTO tblvendor (
+                VENDOR_ID, VENDOR_NAME, VENDOR_TYPE, VENDOR_ADDRESS, CONTACT_PERSON, EMAIL, PHONE,
+                BANK_NAME, BANK_ACCOUNT_NAME, BANK_ACCOUNT_NUMBER, RECORD_LOG
+            ) VALUES (
+                :id, :vendor_name, :vendor_type, :vendor_address, :contact_person, :email, :phone,
+                :bank_name, :bank_account_name, :bank_account_number, :record_log
+            )");
+
+            $sql->bindParam(':id', $id);
+            $sql->bindParam(':vendor_name', $vendor_name);
+            $sql->bindParam(':vendor_type', $vendor_type);
+            $sql->bindParam(':vendor_address', $vendor_address);
+            $sql->bindParam(':contact_person', $contact_person);
+            $sql->bindParam(':email', $email);
+            $sql->bindParam(':phone', $phone);
+            $sql->bindParam(':bank_name', $bank_name);
+            $sql->bindParam(':bank_account_name', $bank_account_name);
+            $sql->bindParam(':bank_account_number', $bank_account_number);
+            $sql->bindParam(':record_log', $record_log);
+
+            if ($sql->execute()) {
+                // Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($paramnum, '18', $username);
+
+                if ($update_system_parameter_value) {
+                    $insert_user_log = $this->insert_logs($username, 'Insert Vendor', 'User ' . $username . ' inserted vendor (' . $id . ').');
+
+                    return $insert_user_log === '1' ? '1' : $insert_user_log;
+                } else {
+                    return "Failed to update system parameter";
+                }
+            } else {
+                $errorInfo = $sql->errorInfo();
+                error_log("Insert vendor SQL error: " . print_r($errorInfo, true));
+                return isset($errorInfo[2]) ? $errorInfo[2] : "Unknown SQL error";
+            }
+        } else {
+            return "Database connection failed";
+        }
+    }
+
+    public function update_vendor($vendor_name, $vendor_type, $vendor_address, $contact_person, $email, $phone, $bank_name, $bank_account_name, $bank_account_number, $vendor_id, $username) {
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+
+            $sql = $this->db_connection->prepare("UPDATE tblvendor SET
+                VENDOR_NAME = :vendor_name,
+                VENDOR_TYPE = :vendor_type,
+                VENDOR_ADDRESS = :vendor_address,
+                CONTACT_PERSON = :contact_person,
+                EMAIL = :email,
+                PHONE = :phone,
+                BANK_NAME = :bank_name,
+                BANK_ACCOUNT_NAME = :bank_account_name,
+                BANK_ACCOUNT_NUMBER = :bank_account_number,
+                RECORD_LOG = :record_log
+                WHERE VENDOR_ID = :vendor_id");
+
+            $sql->bindParam(':vendor_name', $vendor_name);
+            $sql->bindParam(':vendor_type', $vendor_type);
+            $sql->bindParam(':vendor_address', $vendor_address);
+            $sql->bindParam(':contact_person', $contact_person);
+            $sql->bindParam(':email', $email);
+            $sql->bindParam(':phone', $phone);
+            $sql->bindParam(':bank_name', $bank_name);
+            $sql->bindParam(':bank_account_name', $bank_account_name);
+            $sql->bindParam(':bank_account_number', $bank_account_number);
+            $sql->bindParam(':record_log', $record_log);
+            $sql->bindParam(':vendor_id', $vendor_id);
+
+            if ($sql->execute()) {
+                // Check if any rows were actually updated
+                if ($sql->rowCount() > 0) {
+                    $insert_user_log = $this->insert_logs($username, 'Update Vendor', 'User ' . $username . ' updated vendor (' . $vendor_id . ').');
+                    return $insert_user_log === '1' ? '1' : $insert_user_log;
+                } else {
+                    return "No vendor found with ID: " . $vendor_id;
+                }
+            } else {
+                $errorInfo = $sql->errorInfo();
+                error_log("Update vendor SQL error: " . print_r($errorInfo, true));
+                return isset($errorInfo[2]) ? $errorInfo[2] : "Unknown SQL error";
+            }
+        } else {
+            return "Database connection failed";
+        }
+    }
+
+    public function get_vendor_by_id($vendor_id) {
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare("SELECT * FROM tblvendor WHERE VENDOR_ID = :vendor_id");
+            $sql->bindParam(':vendor_id', $vendor_id);
+
+            if ($sql->execute()) {
+                $result = $sql->fetch(PDO::FETCH_ASSOC);
+                if ($result) {
+                    return $result;
+                } else {
+                    error_log("No vendor found with ID: " . $vendor_id);
+                    return false;
+                }
+            } else {
+                error_log("Error in get_vendor_by_id: " . print_r($sql->errorInfo(), true));
+                return false;
+            }
+        } else {
+            error_log("Database connection failed in get_vendor_by_id");
+            return false;
+        }
+    }
+
+public function delete_vendor($vendor_id, $username) {
+    error_log("DEBUG: delete_vendor() called. ID = " . $vendor_id . ", by user = " . $username);
+
+    if (!$this->db_connection) {
+        error_log("DEBUG: DB connection not found.");
+        return 'No DB Connection';
+    }
+
+    try {
+        $sql = $this->db_connection->prepare("DELETE FROM tblvendor WHERE VENDOR_ID = :id");
+        $sql->bindParam(':id', $vendor_id, PDO::PARAM_INT); // or use PARAM_STR if it's string
+
+        if ($sql->execute()) {
+            $rows = $sql->rowCount(); // Count affected rows
+            error_log("DEBUG: Rows affected = $rows");
+            return $rows > 0 ? '1' : 'No rows deleted';
+        } else {
+            error_log("DEBUG: SQL execution failed: " . print_r($sql->errorInfo(), true));
+            return 'Delete failed';
+        }
+    } catch (Exception $e) {
+        error_log("DEBUG: Exception during delete: " . $e->getMessage());
+        return 'Exception: ' . $e->getMessage();
+    }
+}
+
+
+// Add to api.php
+public function insert_purchase_order(
+    $vendor_id, $order_date, $terms, $fob, $delivery_note, $requested_by, $req_no,
+    $gross_amount, $withholding_tax_rate, $withholding_tax_amount, $vat_tax_rate, $vat_amount, $net_amount,
+    $status, $conforme_supplier, $approved_by_assistant_gm, $approved_by_gm, $username, $items, $delivery_date
+) {
+    if ($this->databaseConnection()) {
+        try {
+            // Start transaction
+            $this->db_connection->beginTransaction();
+
+            $system_parameter = $this->get_system_parameter('19', 1);
+
+            if (empty($system_parameter) || !isset($system_parameter[0]['PARAMNUM'])) {
+                return "System parameter not found or invalid format.";
+            }
+
+            $purchase_order_id = $system_parameter[0]['PARAMNUM']; // ✅ Correct numeric ID
+            $paramnum = $purchase_order_id; // Used to update PARAMNUM
+            
+            // Insert PO header
+            $sql = $this->db_connection->prepare("INSERT INTO tblpurchaseorder (
+                PURCHASE_ORDER_ID, VENDOR_ID, ORDER_DATE, TERMS, FOB, DELIVERY_NOTE, REQUESTED_BY, REQ_NO,
+                GROSS_AMOUNT, WITHHOLDING_TAX_RATE, WITHHOLDING_TAX_AMOUNT, VAT_TAX_RATE, VAT_TAX_AMOUNT, NET_AMOUNT,
+                STATUS, CONFORME_SUPPLIER, APPROVED_BY_ASSISTANT_GM, APPROVED_BY_GM, CREATED_BY, CREATED_DATE, DELIVERY_DATE
+            ) VALUES (
+                :purchase_order_id, :vendor_id, :order_date, :terms, :fob, :delivery_note, :requested_by, :req_no,
+                :gross_amount, :withholding_tax_rate, :withholding_tax_amount, :vat_tax_rate, :vat_amount, :net_amount,
+                :status, :conforme_supplier, :approved_by_assistant_gm, :approved_by_gm, :created_by, NOW(), :delivery_date
+            )");
+            $sql->bindParam(':purchase_order_id', $purchase_order_id);
+            $sql->bindParam(':vendor_id', $vendor_id);
+            $sql->bindParam(':order_date', $order_date);
+            $sql->bindParam(':terms', $terms);
+            $sql->bindParam(':fob', $fob);
+            $sql->bindParam(':delivery_note', $delivery_note);
+            $sql->bindParam(':requested_by', $requested_by);
+            $sql->bindParam(':req_no', $req_no);
+            $sql->bindParam(':gross_amount', $gross_amount);
+            $sql->bindParam(':withholding_tax_rate', $withholding_tax_rate);
+            $sql->bindParam(':withholding_tax_amount', $withholding_tax_amount);
+            $sql->bindParam(':vat_tax_rate', $vat_tax_rate);
+            $sql->bindParam(':vat_amount', $vat_amount);
+            $sql->bindParam(':net_amount', $net_amount);
+            $sql->bindParam(':status', $status);
+            $sql->bindParam(':conforme_supplier', $conforme_supplier);
+            $sql->bindParam(':approved_by_assistant_gm', $approved_by_assistant_gm);
+            $sql->bindParam(':approved_by_gm', $approved_by_gm);
+            $sql->bindParam(':created_by', $username);
+            $sql->bindParam(':delivery_date', $delivery_date);
+            if(!$sql->execute()){
+                $this->db_connection->rollBack();
+                return "Insert PO Error: " . print_r($sql->errorInfo(), true);
+            }
+
+            // Insert Line Items
+            foreach($items as $item){
+                $stmt = $this->db_connection->prepare("INSERT INTO tblpurchaseorderitem
+                    (PURCHASE_ORDER_ID, ITEM_DESCRIPTION, QUANTITY, UNIT, UNIT_PRICE,  DELIVERY_DATE)
+                    VALUES (:purchase_order_id, :item_description, :quantity, :unit, :unit_price, :delivery_date)
+                ");
+                $stmt->bindParam(':purchase_order_id', $purchase_order_id);
+                $stmt->bindParam(':item_description', $item['item_description']);
+                $stmt->bindParam(':quantity', $item['quantity']);
+                $stmt->bindParam(':unit', $item['unit']);
+                $stmt->bindParam(':unit_price', $item['price']);
+                $stmt->bindParam(':delivery_date', $delivery_date); // or $item['delivery_date'] if per item
+                if(!$stmt->execute()){
+                    $this->db_connection->rollBack();
+                    return "Insert PO Item Error: " . print_r($stmt->errorInfo(), true);
+                }
+            }
+
+            // Update system parameter for next PO#
+            $this->update_system_parameter_value($paramnum, '19', $username);
+
+            $this->db_connection->commit();
+            return 'Inserted';
+        } catch(Exception $e){
+            $this->db_connection->rollBack();
+            return "Exception: ".$e->getMessage();
+        }
+    }
+    return "Database Connection Error";
+}
+
 /**
  * Get total count of all published positions
  * @return int - Total number of published positions
@@ -18947,7 +19188,7 @@ public function get_total_published_positions() {
                     $query = 'SELECT MEETING_ID, OTHER_MATTERS, RECORD_LOG FROM tblmeetingothermatters WHERE OTHER_MATTERS_ID = :parameter';
                     break;
                 case 'overtime':
-                    $query = 'SELECT  EMPLOYEE_ID, TITLE, HOLIDAY_TYPE,  OVERTIME_DATE, START_TIME, END_TIME,  REASON  FROM tblovertime WHERE OVERTIME_ID = :parameter';
+                    $query = 'SELECT  EMPLOYEE_ID, TITLE, HOLIDAY_TYPE,  OVERTIME_DATE, START_TIME, END_TIME,  DECISION_DATE, DECISION_TIME, DECISION_BY, REASON, STATUS  FROM tblovertime WHERE OVERTIME_ID = :parameter';
                     break;
                 case 'training':
                     $query = 'SELECT EMPLOYEE_ID, TITLE, DETAILS, TRAINING_TYPE, STATUS, TRAINING_DATE, START_TIME, END_TIME, DECISION_DATE, DECISION_TIME, DECISION_BY, RECORD_LOG FROM tbltraining WHERE TRAINING_ID = :parameter';
@@ -24825,6 +25066,19 @@ public function get_hr_events($start_date = null, $end_date = null) {
         }
     }
     # -------------------------------------------------------------
+
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_purchase_order
+    # Purpose    : Inserts a new purchase order and its items.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+
+     
+   
 }
 
 class IRRHelper{

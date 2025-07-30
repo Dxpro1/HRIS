@@ -49,6 +49,17 @@ else if(type == 'career table'){
         ];
     }
 
+    else if (type == 'vendor table') {
+    column = [
+        { 'data': 'VENDOR_NAME' },
+        { 'data': 'CONTACT_PERSON' },
+        { 'data': 'EMAIL' },
+        { 'data': 'PHONE' },
+        { 'data': 'ACTION' }
+    ];
+}
+
+
     else if(type == 'permission table'){
         column = [
             { 'data' : 'PERMISSION_ID' },
@@ -468,6 +479,19 @@ else if(type == 'career table'){
 
         ];
     }
+
+    else if(type == 'purchase order table'){
+    column = [
+        { 'data' : 'PURCHASE_ORDER_ID' },
+        { 'data' : 'VENDOR_NAME' },
+        { 'data' : 'ORDER_DATE' },
+        { 'data' : 'EXPECTED_DELIVERY_DATE' },
+        { 'data' : 'GRAND_TOTAL' },
+        { 'data' : 'STATUS' },
+        { 'data' : 'ACTION' }
+    ];
+}
+
 
 
 	else if(type == 'meeting table'){
@@ -1267,7 +1291,7 @@ function generate_datatable_one_parameter(type, parameter, datatablename, order,
             { 'data' : 'ACTION' }
         ];
     }
-
+ 
 
     else if(type == 'weekly cash flow table'){
         column = [

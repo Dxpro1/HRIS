@@ -31,6 +31,76 @@ $(function () {
       username
     );
   });
+// ADD vendor (blank form)
+$(document).on('click', '#add-vendor', function () {
+    generate_modal('vendor form', 'Vendor', 'R', '1', '1', 'form', 'vendorForm', '1', username);
+});
+
+// UPDATE/VIEW vendor (with values)
+$(document).on('click', '.update-vendor', function () {
+    var vendor_id = $(this).data('vendorid');
+    sessionStorage.setItem('vendor_id', vendor_id);
+
+    generate_modal('vendor form', 'Vendor', 'R', '1', '1', 'form', 'vendorForm', '0', username);
+});
+
+
+$(document).on('click', '.delete-vendor', function () {
+    const vendor_id = $(this).data('vendorid');
+
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "This will permanently delete the vendor.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, delete it!'
+     }).then((result) => {
+        if (result.isConfirmed) {
+            // Proceed with delete
+            $.ajax({
+                type: 'POST',
+                url: 'controller.php',
+                data: {
+                    transaction: 'delete vendor',
+                    vendor_id: vendor_id,
+                    username: username
+                },
+                success: function (response) {
+                    console.log('Delete response:', response);
+
+                    if (response === 'Deleted') {
+                        Swal.fire(
+                            'Deleted!',
+                            'Vendor has been successfully deleted.',
+                            'success'
+                        );
+
+                        // Refresh the datatable if needed
+                        if (typeof generate_datatable === 'function') {
+                            generate_datatable('vendor table', '#vendor-datatable', 2, 'asc', [4]);
+                        }
+                    } else {
+                        Swal.fire(
+                            'Error',
+                            'Failed to delete vendor. ' + response,
+                            'error'
+                        );
+                    }
+                },
+                error: function () {
+                    Swal.fire(
+                        'Error',
+                        'An unexpected error occurred while deleting the vendor.',
+                        'error'
+                    );
+                }
+            });
+        }
+    });
+});
+
 
 
 
@@ -7763,6 +7833,8 @@ $(document).on('click','#add-career',function() {
     generate_modal('career form', 'Career', 'R' , '1', '1', 'form', 'careerForm', '1', username);
 });
 
+ 
+
 $(document).on('click','.update-career',function() {
     var careerid = $(this).data('careerid');
     sessionStorage.setItem('careerid', careerid);
@@ -9581,6 +9653,7 @@ $(document).on('click','.unpublish-career',function() {
       username
     );
   });
+  
 
   $(document).on("click", ".delete-training", function () {
     var trainingid = $(this).data("trainingid");
@@ -10787,6 +10860,74 @@ $(document).on('click','.unpublish-career',function() {
     })
     //console.log(id_monitor);
   })
+
+ 
+$(document).on("click", "#add-purchase-order", function () {
+    sessionStorage.setItem("purchase_order_id", "");
+    
+    // The data needs to be passed as an object.
+    var data = { username: username }; 
+
+    generate_modal("purchase order form", "Create Purchase Order", "XL", "1", "1", "form", "purchaseorderForm", "1", data);
+});
+
+$(document).on("click", ".update-purchase-order", function () {
+    var purchase_order_id = $(this).data("purchaseorderid");
+    sessionStorage.setItem("purchase_order_id", purchase_order_id);
+    generate_modal("purchase order form", "Edit Purchase Order", "XL", "1", "1", "form", "purchaseorderForm", "0", username);
+});
+
+$(document).on("click", ".print-purchase-order", function () {
+    var purchase_order_id = $(this).data("purchaseorderid");
+    
+    $.ajax({
+        url: 'system-generation.php',
+        method: 'POST',
+        dataType: 'JSON',
+        data: {type : 'purchase order print', purchase_order_id : purchase_order_id, username : username},
+        success: function(response) {
+            $('#print-area').html(response[0]['PRINT']);
+            window.print();
+        }
+    });
+});
+
+$(document).on("click", ".delete-purchase-order", function () {
+    var purchase_order_id = $(this).data("purchaseorderid");
+    var transaction = "delete purchase order";
+
+    Swal.fire({
+        title: "Delete Purchase Order",
+        text: "Are you sure you want to delete PO " + purchase_order_id + "? This action cannot be undone.",
+        icon: "warning",
+        showCancelButton: !0,
+        confirmButtonText: "Delete",
+        cancelButtonText: "Cancel",
+        confirmButtonClass: "btn btn-danger mt-2",
+        cancelButtonClass: "btn btn-secondary ms-2 mt-2",
+        buttonsStyling: !1,
+    }).then(function (result) {
+        if (result.value) {
+            $.ajax({
+                type: "POST",
+                url: "controller.php",
+                data: {
+                    username: username,
+                    purchase_order_id: purchase_order_id,
+                    transaction: transaction,
+                },
+                success: function (response) {
+                    if (response === "Deleted") {
+                        show_alert("Delete Purchase Order", "The PO has been deleted.", "success");
+                        generate_datatable("purchase order table", "#purchase-order-datatable", 0, "desc", [6]);
+                    } else {
+                        show_alert("Delete Purchase Order Error", response, "error");
+                    }
+                },
+            });
+        }
+    });
+});
 
 
 

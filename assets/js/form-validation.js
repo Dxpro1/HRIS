@@ -1205,6 +1205,7 @@ function initialize_form_validation(formtype){
             }
         });
     }
+  
     else if(formtype == 'role form'){
         $('#roleForm').validate({
             submitHandler: function (form) {
@@ -6177,6 +6178,274 @@ function initialize_form_validation(formtype){
         });
     }
 
+    // Fixed form-validation.js with debugging and better error handling
+else if (formtype == 'vendor form') {
+    $('#vendorForm').validate({
+        submitHandler: function (form) {
+            console.log('Form submission started'); // Debug
+            transaction = 'submit vendor';
+
+            // Get vendor ID and check sessionStorage fallback
+            var vendorId = $('#vendor_id').val();
+            if (!vendorId || vendorId === '' || vendorId === 'undefined') {
+                vendorId = sessionStorage.getItem('vendor_id') || '';
+                console.log('Vendor ID from sessionStorage:', vendorId);
+            }
+            
+            // Set the vendor ID back to the form
+            $('#vendor_id').val(vendorId);
+
+            // Get form data
+            var formData = $(form).serialize() + '&username=' + username + '&transaction=' + transaction;
+            console.log('Form data being sent:', formData); // Debug
+
+            // Validate required fields
+            var vendorName = $('#vendor_name').val().trim();
+            if (!vendorName) {
+                show_alert('Validation Error', 'Vendor name is required.', 'error');
+                return false;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: 'controller.php',
+                data: formData,
+                beforeSend: function () {
+                    console.log('AJAX request started'); // Debug
+                    var submitBtn = document.getElementById('submitform');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        $('#submitform').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span class="sr-only">Loading...</span></div>');
+                    }
+                },
+                success: function (response) {
+                    console.log('Server response:', response); // Debug
+                    
+                    if (response === 'Updated' || response === 'Inserted') {
+                        if (response === 'Inserted') {
+                            show_alert('Insert Vendor Success', 'The vendor has been inserted successfully.', 'success');
+                        } else {
+                            show_alert('Update Vendor Success', 'The vendor has been updated successfully.', 'success');
+                        }
+
+                        // Close modal and refresh table
+                        $('#System-Modal').modal('hide');
+                        
+                        // Refresh datatable if function exists
+                        if (typeof generate_datatable === 'function') {
+                            generate_datatable('vendor table', '#vendor-datatable', 2, 'asc', [3]);
+                        }
+
+                        // Clear session storage
+                        sessionStorage.removeItem('vendor_id');
+                        
+                        // Reset form
+                        $('#vendorForm')[0].reset();
+                        
+                    } else {
+                        console.error('Server error response:', response);
+                        show_alert('Vendor Error', response, 'error');
+                        
+                        if (response.includes('not found')) {
+                            console.error('Vendor ID not found. Current ID:', vendorId);
+                            console.error('Check if the ID exists in the database');
+                        }
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('AJAX error details:');
+                    console.error('Status:', status);
+                    console.error('Error:', error);
+                    console.error('Response text:', xhr.responseText);
+                    console.error('Status code:', xhr.status);
+                    
+                    var errorMessage = 'An error occurred while processing your request.';
+                    
+                    if (xhr.status === 0) {
+                        errorMessage = 'Network error. Please check your connection.';
+                    } else if (xhr.status === 404) {
+                        errorMessage = 'Controller not found (404 error).';
+                    } else if (xhr.status === 500) {
+                        errorMessage = 'Server error (500). Check server logs.';
+                    } else if (xhr.responseText) {
+                        errorMessage = 'Server response: ' + xhr.responseText;
+                    }
+                    
+                    show_alert('Vendor Error', errorMessage, 'error');
+                },
+                complete: function () {
+                    console.log('AJAX request completed'); // Debug
+                    var submitBtn = document.getElementById('submitform');
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        $('#submitform').html('Submit');
+                    }
+                }
+            });
+            
+            return false; // Prevent default form submission
+        },
+        rules: {
+            vendor_name: {
+                required: true,
+                minlength: 2
+            },
+             vendor_type: {
+                required: true
+            },
+            email: {
+                email: true
+            },
+            phone: {
+                digits: true,
+                minlength: 10
+            },
+            bank_account_number: {
+                digits: true
+            }
+        },
+        messages: {
+            vendor_name: {
+                required: 'Please enter the supplier name',
+                minlength: 'Supplier name must be at least 2 characters long'
+            },
+
+              vendor_type: {
+                required: 'Please enter the supplier type',
+             },
+            email: {
+                email: 'Please enter a valid email address'
+            },
+            phone: {
+                digits: 'Please enter only numbers',
+                minlength: 'Phone number must be at least 10 digits'
+            },
+            bank_account_number: {
+                digits: 'Account number must contain only numbers'
+            }
+        },
+        errorPlacement: function (label, element) {
+            label.addClass('text-danger');
+            
+            if (element.hasClass('select2') && element.next('.select2-container').length) {
+                label.insertAfter(element.next('.select2-container'));
+            } else if (element.parent('.input-group').length) {
+                label.insertAfter(element.parent());
+            } else {
+                label.insertAfter(element);
+            }
+        },
+        highlight: function (element) {
+            $(element).addClass('is-invalid');
+            $(element).parent().addClass('has-danger');
+        },
+        unhighlight: function (element) {
+            $(element).removeClass('is-invalid');
+            $(element).parent().removeClass('has-danger');
+        },
+        success: function (label, element) {
+            $(element).removeClass('is-invalid');
+            $(element).parent().removeClass('has-danger');
+            label.remove();
+        }
+    });
+}
+
+// Add to form-validation.js
+else if (formtype == 'purchase order form') {
+    $('#purchaseOrderForm').validate({
+        submitHandler: function (form) {
+            transaction = 'submit purchase order';
+            
+            // Prepare items data
+            const items = [];
+            $('[data-repeater-item]').each(function() {
+                items.push({
+                    item_description: $(this).find('.item-description').val(),
+                    quantity: $(this).find('.item-quantity').val(),
+                    price: $(this).find('.item-price').val()
+                });
+            });
+
+            // Get summary values
+            const gross_amount = parseFloat($('#summary_gross_amount').text().replace('₱', ''));
+            const withholding_tax_amount = parseFloat($('#summary_tax_amount').text().replace('- ₱', ''));
+            const net_amount = parseFloat($('#summary_net_amount').text().replace('₱', ''));
+            
+            // Prepare form data
+            const formData = $(form).serializeArray();
+            formData.push({name: 'transaction', value: transaction});
+            formData.push({name: 'username', value: username});
+            formData.push({name: 'gross_amount', value: gross_amount});
+            formData.push({name: 'withholding_tax_amount', value: withholding_tax_amount});
+            formData.push({name: 'net_amount', value: net_amount});
+            formData.push({name: 'items', value: JSON.stringify(items)});
+
+            $.ajax({
+                type: 'POST',
+                url: 'controller.php',
+                data: formData,
+                beforeSend: function() {
+                    const submitBtn = $('#submit-purchase-order');
+                    submitBtn.prop('disabled', true);
+                    submitBtn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...');
+                },
+                success: function(response) {
+                    if (response === 'Inserted') {
+                        show_alert('Success', 'Purchase order created successfully!', 'success');
+                        setTimeout(() => {
+                            window.location.href = 'purchase-order.php';
+                        }, 2000);
+                    } else {
+                        show_alert('Error', 'Failed to create purchase order: ' + response, 'error');
+                    }
+                },
+                error: function(xhr) {
+                    show_alert('Error', 'An error occurred: ' + xhr.statusText, 'error');
+                },
+                complete: function() {
+                    const submitBtn = $('#submit-purchase-order');
+                    submitBtn.prop('disabled', false);
+                    submitBtn.html('Submit Purchase Order');
+                }
+            });
+        },
+        rules: {
+            vendor_id: { required: true },
+            order_date: { required: true, date: true },
+            'items[0][item_description]': { required: true },
+            'items[0][quantity]': { required: true, min: 1 },
+            'items[0][price]': { required: true, min: 0 }
+        },
+        messages: {
+            vendor_id: "Please select a supplier",
+            order_date: "Please select a valid order date",
+            'items[0][item_description]': "Item description is required",
+            'items[0][quantity]': {
+                required: "Quantity is required",
+                min: "Quantity must be at least 1"
+            },
+            'items[0][price]': {
+                required: "Price is required",
+                min: "Price must be positive"
+            }
+        },
+        errorPlacement: function(error, element) {
+            // Custom error placement for repeater items
+            if (element.attr('name').includes('items')) {
+                error.appendTo(element.closest('.col-lg-5'));
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function(element) {
+            $(element).removeClass('is-invalid');
+        }
+    });
+}
 
     else if(formtype == 'pmw status form'){
         $('#pmwStatusForm').validate({
@@ -12770,6 +13039,8 @@ function initialize_form_validation(formtype){
         });
     }
 
+     
+
     else if(formtype == 'training form'){
         $('#trainingForm').validate({
             submitHandler: function (form) {
@@ -14310,8 +14581,6 @@ $('#updateactivityForm').validate({
         label.remove();
     }
 });
-
-
 
 
 $('#btn_upload_image_item').on('click',function (e) {

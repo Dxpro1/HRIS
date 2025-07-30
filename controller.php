@@ -7515,9 +7515,8 @@ else if ($transaction == 'confirm pmw submission alert') {
     }
   }
 }
-    # -------------------------------------------------------------
+# -------------------------------------------------------------
 # Insert/update career
-// Insert/update career
 else if ($transaction == 'submit career') {
     if (
         isset($_POST['username']) && !empty($_POST['username']) &&
@@ -7581,6 +7580,236 @@ else if ($transaction == 'submit career') {
         echo 'Required fields are missing';
     }
 }
+
+# -------------------------------------------------------------
+else if ($transaction == 'submit vendor') {
+    if (
+        isset($_POST['username']) && !empty($_POST['username']) &&
+        isset($_POST['vendor_name']) && !empty($_POST['vendor_name'])
+    ) {
+        $username = trim($_POST['username']);
+        $vendor_id = isset($_POST['vendor_id']) ? trim($_POST['vendor_id']) : '';
+        $vendor_name = trim($_POST['vendor_name']);
+        $vendor_type = trim($_POST['vendor_type']);
+        $vendor_address = isset($_POST['vendor_address']) ? trim($_POST['vendor_address']) : '';
+        $contact_person = isset($_POST['contact_person']) ? trim($_POST['contact_person']) : '';
+        $email = isset($_POST['email']) ? trim($_POST['email']) : '';
+        $phone = isset($_POST['phone']) ? trim($_POST['phone']) : '';
+        $bank_name = isset($_POST['bank_name']) ? trim($_POST['bank_name']) : '';
+        $bank_account_name = isset($_POST['bank_account_name']) ? trim($_POST['bank_account_name']) : '';
+        $bank_account_number = isset($_POST['bank_account_number']) ? trim($_POST['bank_account_number']) : '';
+
+        $check_data_exist = 0;
+
+        if (!empty($vendor_id) && $vendor_id !== '0' && $vendor_id !== 'null') {
+            if ($api->databaseConnection()) {
+                $sql_check = $api->db_connection->prepare('SELECT COUNT(*) as count FROM tblvendor WHERE VENDOR_ID = :vendor_id');
+                $sql_check->bindParam(':vendor_id', $vendor_id, PDO::PARAM_STR);
+
+                if ($sql_check->execute()) {
+                    $result = $sql_check->fetch(PDO::FETCH_ASSOC);
+                    $check_data_exist = $result['count'];
+                } else {
+                    error_log("SQL check execution failed for vendor_id: $vendor_id");
+                }
+            } else {
+                error_log("Database connection failed while checking for vendor_id: $vendor_id");
+            }
+        }
+
+        if ($check_data_exist > 0) {
+            $update_vendor = $api->update_vendor(
+                $vendor_name,
+                $vendor_type,
+                $vendor_address,
+                $contact_person,
+                $email,
+                $phone,
+                $bank_name,
+                $bank_account_name,
+                $bank_account_number,
+                $vendor_id,
+                $username
+            );
+
+            if ($update_vendor == '1') {
+                error_log("Vendor updated successfully for ID: " . $vendor_id);
+                echo 'Updated';
+            } else {
+                error_log("Vendor update failed: " . $update_vendor);
+                echo $update_vendor;
+            }
+        } else {
+            error_log("Inserting new vendor (ID not found or empty): " . $vendor_name);
+            $insert_vendor = $api->insert_vendor(
+                $vendor_name,
+                $vendor_type,
+                $vendor_address,
+                $contact_person,
+                $email,
+                $phone,
+                $bank_name,
+                $bank_account_name,
+                $bank_account_number,
+                $username
+            );
+
+            if ($insert_vendor == '1') {
+                error_log("Vendor inserted successfully");
+                echo 'Inserted';
+            } else {
+                error_log("Vendor insert failed: " . $insert_vendor);
+                echo $insert_vendor;
+            }
+        }
+    } else {
+        error_log("Missing required fields in submit vendor");
+        echo 'Required fields are missing';
+    }
+}
+
+else if ($transaction == 'vendor details') {
+    if (isset($_POST['vendor_id']) && !empty($_POST['vendor_id'])) {
+        $vendor_id = $_POST['vendor_id'];
+
+        if ($api->databaseConnection()) {
+            $sql = $api->db_connection->prepare("SELECT * FROM tblvendor WHERE VENDOR_ID = :vendor_id");
+            $sql->bindParam(':vendor_id', $vendor_id, PDO::PARAM_STR);
+
+            if ($sql->execute()) {
+                $result = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+                if (!empty($result)) {
+                    echo json_encode($result);
+                } else {
+                    echo json_encode([]);
+                }
+            } else {
+                error_log('SQL error in vendor details: ' . print_r($sql->errorInfo(), true));
+                echo json_encode([]);
+            }
+        } else {
+            error_log('Database connection failed while fetching vendor details');
+            echo json_encode([]);
+        }
+    } else {
+        error_log('Missing vendor_id in vendor details transaction');
+        echo json_encode([]);
+    }
+}
+
+else if ($transaction == 'delete vendor') {
+    if ($api->databaseConnection()) {
+        $vendor_id = $_POST['vendor_id'];
+        $username = $_POST['username'];
+
+        error_log("POST received: vendor_id = $vendor_id, username = $username");
+
+        $delete = $api->delete_vendor($vendor_id, $username);
+
+        echo $delete == '1' ? 'Deleted' : $delete;
+    } else {
+        echo 'Failed to connect to DB';
+    }
+}
+
+// Add to controller.php
+ else if (isset($_POST['transaction']) && $_POST['transaction'] === 'add purchase order') {
+    // Validate required fields
+    $vendor_id = intval($_POST['vendor_id']);
+    $order_date = trim($_POST['order_date']);
+    $status = trim($_POST['status']);
+    $gross_amount = isset($_POST['gross_amount']) ? floatval($_POST['gross_amount']) : 0.0;
+    $withholding_tax_rate = isset($_POST['withholding_tax_rate']) ? floatval($_POST['withholding_tax_rate']) : 0.0;
+    $vat_tax_rate = isset($_POST['vat_tax_rate']) ? floatval($_POST['vat_tax_rate']) : 0.0;
+    $terms = trim($_POST['terms']);
+    $fob = trim($_POST['fob']);
+    $requested_by = trim($_POST['requested_by']);
+    $req_no = trim($_POST['req_no']);
+    $delivery_note = trim($_POST['delivery_note']);
+    $delivery_date = trim($_POST['delivery_date']);
+    $conforme_supplier = trim($_POST['conforme_supplier']);
+    $approved_by_assistant_gm = trim($_POST['approved_by_assistant_gm']);
+    $approved_by_gm = trim($_POST['approved_by_gm']);
+    $username = trim($_POST['username']);
+
+    // Calculate summary (ensure values are computed as on front-end)
+    $withholding_tax_amount = $gross_amount * ($withholding_tax_rate/100.0);
+    $vat_amount = $gross_amount * ($vat_tax_rate/100.0);
+    $net_amount = $gross_amount - $withholding_tax_amount + $vat_amount;
+
+    // Decode items
+    $items = json_decode($_POST['items'], true);
+
+    // Call API
+    $result = $api->insert_purchase_order(
+        $vendor_id, $order_date, $terms, $fob, $delivery_note, $requested_by,
+        $req_no, $gross_amount, $withholding_tax_rate, $withholding_tax_amount,
+        $vat_tax_rate, $vat_amount, $net_amount, $status, $conforme_supplier,
+        $approved_by_assistant_gm, $approved_by_gm, $username, $items, $delivery_date
+    );
+
+    echo $result; // 'Inserted' or error string
+}
+
+
+else if ($transaction === 'get vendor details') {
+    if ($api->databaseConnection()) {
+        $vendor_id = $_POST['vendor_id'] ?? null;
+
+        if (!empty($vendor_id)) {
+            $sql = $api->db_connection->prepare("SELECT VENDOR_NAME, CONTACT_PERSON, EMAIL, PHONE FROM tblvendor WHERE VENDOR_ID = :vendor_id");
+            $sql->bindParam(':vendor_id', $vendor_id);
+
+            if ($sql->execute() && $sql->rowCount() > 0) {
+                $data = $sql->fetch(PDO::FETCH_ASSOC);
+                echo json_encode(['success' => true, 'data' => $data]);
+                exit;
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Vendor not found']);
+                exit;
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Missing vendor ID']);
+            exit;
+        }
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Database connection error']);
+        exit;
+    }
+}
+
+
+else if ($transaction == 'vendor dropdown') {
+    if ($api->databaseConnection()) {
+        $search = $_POST['search'] ?? '';
+        $search = "%$search%";
+
+        $sql = $api->db_connection->prepare("SELECT VENDOR_ID, VENDOR_NAME FROM tblvendor WHERE VENDOR_NAME LIKE :search ORDER BY VENDOR_NAME ASC");
+        $sql->bindParam(':search', $search);
+        $sql->execute();
+
+        $vendors = [];
+        while ($row = $sql->fetch(PDO::FETCH_ASSOC)) {
+            $vendors[] = [
+                'id' => $row['VENDOR_ID'],
+                'text' => $row['VENDOR_NAME']
+            ];
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode($vendors);
+        exit;
+    } else {
+        echo json_encode([]);
+        exit;
+    }
+}
+
+
+
+
+
 
 
 //6/18
@@ -12320,6 +12549,74 @@ else if($transaction == 'delete career'){
         $id_monitoring = $_POST['id_monitoring'];
         $res = $api->delete_pdc_monitoring($id_monitoring);
         echo json_encode($res);
+    }
+
+    # Insert/update purchase order
+    else if($transaction == 'submit purchase order'){
+        if(isset($_POST['username']) && !empty($_POST['username'])){
+            $username = $_POST['username'];
+            $purchase_order_id = $_POST['purchase_order_id'];
+            $vendor_name = $_POST['vendor_name'];
+            $vendor_address = $_POST['vendor_address'];
+            $order_date = $api->check_date('empty', $_POST['order_date'], '', 'Y-m-d', '', '', '');
+            $delivery_date = $api->check_date('empty', $_POST['delivery_date'], '', 'Y-m-d', '', '', '');
+            $subtotal = $_POST['subtotal'];
+            $tax_rate = $_POST['tax_rate'];
+            $tax_amount = $_POST['tax_amount'];
+            $shipping_fee = $_POST['shipping_fee'];
+            $grand_total = $_POST['grand_total'];
+            $notes = $_POST['notes'];
+            $items = isset($_POST['items']) ? $_POST['items'] : [];
+
+            if(empty($purchase_order_id)){
+                # Get system parameter id
+                $system_parameter = $api->get_system_parameter('36', 1); // Assuming 36 is the new parameter for PO
+                $paramnum = $system_parameter[0]['PARAMNUM'];
+                $id = $system_parameter[0]['ID'];
+
+                $insert_purchase_order = $api->insert_purchase_order($id, $vendor_name, $vendor_address, $order_date, $delivery_date, $subtotal, $tax_rate, $tax_amount, $shipping_fee, $grand_total, $notes, $items, $username);
+
+                if($insert_purchase_order == '1'){
+                    $update_system_parameter_value = $api->update_system_parameter_value($paramnum, '36', $username);
+                    if($update_system_parameter_value == '1'){
+                        echo 'Inserted';
+                    }
+                    else{
+                        echo $update_system_parameter_value;
+                    }
+                }
+                else{
+                    echo $insert_purchase_order;
+                }
+            }
+            else{
+                $update_purchase_order = $api->update_purchase_order($purchase_order_id, $vendor_name, $vendor_address, $order_date, $delivery_date, $subtotal, $tax_rate, $tax_amount, $shipping_fee, $grand_total, $notes, $items, $username);
+
+                if($update_purchase_order == '1'){
+                    echo 'Updated';
+                }
+                else{
+                    echo $update_purchase_order;
+                }
+            }
+        }
+    }
+
+    # Delete purchase order
+    else if($transaction == 'delete purchase order'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['purchase_order_id']) && !empty($_POST['purchase_order_id'])){
+            $username = $_POST['username'];
+            $purchase_order_id = $_POST['purchase_order_id'];
+
+            $delete_purchase_order = $api->delete_purchase_order($purchase_order_id, $username);
+
+            if($delete_purchase_order == '1'){
+                echo 'Deleted';
+            }
+            else{
+                echo $delete_purchase_order;
+            }
+        }
     }
 
 

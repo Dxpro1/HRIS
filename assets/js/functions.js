@@ -1455,6 +1455,48 @@ function display_form_details(formtype){
         });
     }
 
+// Fixed function.js with better error handling
+else if (formtype == 'vendor form') {
+    var vendor_id = sessionStorage.getItem('vendor_id');
+
+    if (vendor_id && vendor_id !== 'null' && vendor_id !== '') {
+        transaction = 'vendor details';
+
+        $.ajax({
+            url: 'controller.php',
+            method: 'POST',
+            dataType: 'JSON',
+            data: {vendor_id: vendor_id, transaction: transaction},
+            success: function(response) {
+                console.log('Vendor details response:', response); // ✅ Debug
+                if (response && response.length > 0 && response[0]) {
+                    $('#vendor_id').val(vendor_id);
+                    $('#vendor_name').val(response[0].VENDOR_NAME || '');
+                    $('#vendor_type').val(response[0].VENDOR_TYPE || '');
+                    $('#vendor_address').val(response[0].VENDOR_ADDRESS || '');
+                    $('#contact_person').val(response[0].CONTACT_PERSON || '');
+                    $('#email').val(response[0].EMAIL || '');
+                    $('#phone').val(response[0].PHONE || '');
+                    $('#bank_name').val(response[0].BANK_NAME || '');
+                    $('#bank_account_name').val(response[0].BANK_ACCOUNT_NAME || '');
+                    $('#bank_account_number').val(response[0].BANK_ACCOUNT_NUMBER || '');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Failed to load vendor data:', error);
+            },
+            complete: function() {
+                check_role_permission(formtype, 429);
+            }
+        });
+    } else {
+        $('#vendor_id').val('');
+        check_role_permission(formtype, 429);
+    }
+}
+
+
+
     else if(formtype == 'pmw status form'){
         var employee_id = sessionStorage.getItem('pmw_employee_id');
         var period_id = sessionStorage.getItem('pmw_period_id');
@@ -2868,6 +2910,12 @@ function generate_form(formtype, formid, add, username){
 
                     $('#ticketid').val(ticketid);
                 }
+
+                 else if(formtype == 'vendor form'){
+                    var vendor_id = sessionStorage.getItem('vendor_id');
+
+                    $('#vendor_id').val(vendor_id);
+                }
             }
 
             initialize_elements();
@@ -3854,9 +3902,9 @@ function renderAnniversaryCards(employees) {
         const formattedDate = `${month} ${day}`;
 
         // Default image if profile image is not available
-        const profileImage = employee.PROFILE_IMAGE ?
+         const profileImage = employee.PROFILE_IMAGE ?
             employee.PROFILE_IMAGE :
-            'assets/images/default-avatar.png';
+            './assets/images/default-avatar.png';
 
         // Get years of service
         const yearsOfService = parseInt(employee.years_of_service);
@@ -4380,3 +4428,72 @@ if (typeof formatDate !== 'function') {
     }
 }
 
+
+$(document).ready(function () {
+        // ✅ Initialize Select2 only once (not twice)
+        $('#vendor_id').select2({
+            placeholder: 'Select a supplier',
+            minimumInputLength: 1,
+            width: '100%',
+            ajax: {
+                url: 'controller.php',
+                type: 'POST',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        transaction: 'vendor dropdown',
+                        search: params.term || ''
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.map(function (item) {
+                            return {
+                                id: item.id,        // ✅ your PHP uses 'id' and 'text'
+                                text: item.text     // ✅ required by Select2
+                            };
+                        })
+                    };
+                },
+                cache: true,
+                error: function(xhr, status, error) {
+                    console.error('AJAX error:', error);
+                    console.error('Response:', xhr.responseText);
+                }
+            }
+        });
+
+        // ✅ Fetch full vendor details when a supplier is selected
+       $('#vendor_id').on('change', function () {
+            var vendor_id = $(this).val();
+
+            $.ajax({
+                url: 'controller.php',
+                type: 'POST',
+                data: {
+                    transaction: 'get vendor details',
+                    vendor_id: vendor_id
+                },
+                dataType: 'json',
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Vendor Selected',
+                            html: `<strong>Contact:</strong> ${response.data.CONTACT_PERSON}<br><strong>Email:</strong> ${response.data.EMAIL}<br><strong>Phone:</strong> ${response.data.PHONE}`
+                        });
+                    } else {
+                        Swal.fire('Error', response.message || 'Vendor not found', 'error');
+                    }
+                },
+                error: function () {
+                    Swal.fire('Error', 'Failed to fetch vendor data', 'error');
+                }
+            });
+        });
+
+    });
+    
+
+ 

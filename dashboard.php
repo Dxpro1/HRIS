@@ -47,148 +47,7 @@
         <link href="assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
-        <style>
-/* Existing styles... */
-.branch-header {
-    background: linear-gradient(90deg, #e3f2fd, #918ab5);
-    padding: 10px 20px;
-    border-radius: 10px 10px 0 0;
-    font-weight: 600;
-    color: #1e3a8a;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.position-card {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-    padding: 20px;
-    transition: transform 0.2s ease-in-out;
-    height: 100%;
-    transition: 0.3s ease-in-out;
-    background-color: #fff;
-}
-
-.position-card:hover {
-    transform: translateY(-4px);
-}
-
-.position-title {
-    font-weight: 600;
-    color: #0d47a1;
-}
-
-.position-summary {
-    font-size: 0.9rem;
-    color: #6c757d;
-}
-
-.badge-openings {
-    background: #e3f2fd;
-    color: #0d47a1;
-    border-radius: 50px;
-    font-size: 0.8rem;
-    padding: 4px 12px;
-    font-weight: 500;
-}
-
-.details-btn {
-    border: 1px solid #e0e0e0;
-    padding: 4px 6px;
-    border-radius: 5px;
-    color: #1565c0;
-    font-size: 14px;
-    transition: background 0.2s ease;
-}
-
-.details-btn:hover {
-    background: #f0f0f0;
-}
-
-/* Enhanced Carousel Styles */
-.carousel-controls {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.slide-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-}
-
-.carousel-indicators {
-    position: relative;
-    margin-bottom: 1rem;
-    margin-top: 0;
-}
-
-.carousel-indicators [data-bs-target] {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    margin: 0 4px;
-    background-color: #dee2e6;
-    border: none;
-    opacity: 0.5;
-    transition: all 0.3s ease;
-}
-
-.carousel-indicators [data-bs-target].active {
-    opacity: 1;
-    background-color: #0d6efd;
-    transform: scale(1.2);
-}
-
-.carousel-item {
-    min-height: 400px;
-    transition: transform 0.6s ease-in-out;
-}
-
-.carousel-control-prev,
-.carousel-control-next {
-    width: 5%;
-    opacity: 0.7;
-}
-
-.carousel-control-prev:hover,
-.carousel-control-next:hover {
-    opacity: 1;
-}
-
-/* Progress indicator for active slide */
-.carousel-indicators::after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 0;
-    height: 2px;
-    background: #0d6efd;
-    animation: progress 5s linear infinite;
-    border-radius: 1px;
-}
-
-@keyframes progress {
-    0% { width: 0%; }
-    100% { width: 100%; }
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .carousel-controls {
-        flex-direction: column;
-        gap: 5px;
-    }
-
-    .slide-title {
-        font-size: 1rem;
-    }
-}
-</style>
-
+         <link href="assets/css/dashboard.css"  rel="stylesheet" type="text/css" />
 
     </head>
 
@@ -203,375 +62,372 @@
             ?>
 
         <div class="main-content">
-    <div class="page-content">
-        <div class="container-fluid">
-            <div class="row">
-                <!-- Left column - Welcome and Attendance cards -->
-                <div class="col-xl-5">
-                    <div class="card overflow-hidden">
-                        <div class="bg-primary bg-soft">
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="text-primary p-3">
-                                        <h5 class="text-primary">Welcome!</h5>
-                                        <p>HRIS Dashboard</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body pt-0">
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    <div class="avatar-md profile-user-wid mb-4">
-                                        <img src="<?php echo $profile_image . '?' . rand(); ?>" alt="" class="img-thumbnail rounded-circle">
-                                    </div>
-                                    <h5 class="font-size-15 text-truncate"><?php echo $employee_name; ?></h5>
-                                    <p class="text-muted mb-0 text-truncate"><?php echo $position; ?></p>
-                                </div>
-
-                                <div class="col-sm-8">
-                                    <div class="pt-4">
-                                        <div class="row">
-                                            <div class="col-4">
-                                                <h5 class="font-size-15"><?php echo number_format($emp_sick_leave, 1); ?></h5>
-                                                <p class="text-muted mb-0">Sick Leave</p>
-                                            </div>
-                                            <div class="col-4">
-                                                <h5 class="font-size-15"><?php echo number_format($emp_vacation_leave, 1); ?></h5>
-                                                <p class="text-muted mb-0">Vacation Leave</p>
-                                            </div>
-                                            <div class="col-4">
-                                                <h5 class="font-size-15"><?php echo number_format($emp_emergency_leave, 1); ?></h5>
-                                                <p class="text-muted mb-0">Emergency Leave</p>
+            <div class="page-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <!-- Left column - Welcome and Attendance cards -->
+                        <div class="col-xl-5">
+                            <div class="card overflow-hidden">
+                                <div class="bg-primary bg-soft">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="text-primary p-3">
+                                                <h5 class="text-primary">Welcome!</h5>
+                                                <p>HRIS Dashboard</p>
                                             </div>
                                         </div>
-                                        <div class="mt-4">
-                                            <a href="profile.php" class="btn btn-primary waves-effect waves-light btn-sm">View Profile <i class="mdi mdi-arrow-right ms-1"></i></a>
+                                    </div>
+                                </div>
+                                <div class="card-body pt-0">
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <div class="avatar-md profile-user-wid mb-4">
+                                                <img src="<?php echo $profile_image . '?' . rand(); ?>" alt="" class="img-thumbnail rounded-circle">
+                                            </div>
+                                            <h5 class="font-size-15 text-truncate"><?php echo $employee_name; ?></h5>
+                                            <p class="text-muted mb-0 text-truncate"><?php echo $position; ?></p>
+                                        </div>
+
+                                        <div class="col-sm-8">
+                                            <div class="pt-4">
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        <h5 class="font-size-15"><?php echo number_format($emp_sick_leave, 1); ?></h5>
+                                                        <p class="text-muted mb-0">Sick Leave</p>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <h5 class="font-size-15"><?php echo number_format($emp_vacation_leave, 1); ?></h5>
+                                                        <p class="text-muted mb-0">Vacation Leave</p>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <h5 class="font-size-15"><?php echo number_format($emp_emergency_leave, 1); ?></h5>
+                                                        <p class="text-muted mb-0">Emergency Leave</p>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-4">
+                                                    <a href="profile.php" class="btn btn-primary waves-effect waves-light btn-sm">View Profile <i class="mdi mdi-arrow-right ms-1"></i></a>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-body">
-                            <h4 class="card-title mb-4">Record Attendance</h4>
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <p class="text-muted">Clock In :</p>
-                                    <h4 id="attendance-clock"></h4>
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title mb-4">Record Attendance</h4>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <p class="text-muted">Clock In :</p>
+                                            <h4 id="attendance-clock"></h4>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <p class="text-muted">Clock In IP:</p>
+                                            <h4><?php echo $api->get_ip_address(); ?></h4>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-sm-6">
-                                    <p class="text-muted">Clock In IP:</p>
-                                    <h4><?php echo $api->get_ip_address(); ?></h4>
+                                <div class="card-footer bg-transparent border-top">
+                                    <div class="text-center">
+                                        <?php
+                                            $company_details = $api->get_data_details_one_parameter('company', '1');
+                                            $get_clock_in_total = $api->get_clock_in_total($emp_id, date('Y-m-d'));
+                                            $max_clock_in = $company_details[0]['MAX_CLOCK_IN'];
+                                            $get_health_declaration_count = $api->get_health_declaration_count($emp_id, date('Y-m-d'));
+
+                                            if($record_attendance > 0){
+                                                if($get_clock_in_total < $max_clock_in){
+                                                    $attendance_id = $api->check_attendance_clock_out($emp_id);
+
+                                                    if(!empty($attendance_id)){
+                                                        echo '<button type="button" class="btn btn-danger waves-effect waves-light me-2 w-md mb-2" id="record-attendance" data-attendance="out">Clock Out</button>';
+                                                    }
+                                                    else{
+                                                        echo '<button type="button" class="btn btn-success waves-effect waves-light me-2 w-md mb-2" id="record-attendance" data-attendance="in">Clock In</button>';
+                                                    }
+                                                }
+                                            }
+
+                                            if($health_declaration == 1 && $get_health_declaration_count == 0){
+                                                echo '<button type="button" class="btn btn-primary waves-effect waves-light me-2 w-md mb-2" id="healthdeclaration">Health Declaration</button>';
+                                            }
+
+                                            if($scan_qr_code_attendance > 0){
+                                                echo '<button type="button" class="btn btn-warning waves-effect waves-light me-2 w-md mb-2" id="scan-qr">Scan QR</button>';
+                                            }
+
+                                            if($get_location > 0){
+                                                echo '<button type="button" class="btn btn-info waves-effect waves-light me-2 w-md mb-2" id="get-location">Get Location</button>';
+                                            }
+                                        ?>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-footer bg-transparent border-top">
-                            <div class="text-center">
-                                <?php
-                                    $company_details = $api->get_data_details_one_parameter('company', '1');
-                                    $get_clock_in_total = $api->get_clock_in_total($emp_id, date('Y-m-d'));
-                                    $max_clock_in = $company_details[0]['MAX_CLOCK_IN'];
-                                    $get_health_declaration_count = $api->get_health_declaration_count($emp_id, date('Y-m-d'));
-
-                                    if($record_attendance > 0){
-                                        if($get_clock_in_total < $max_clock_in){
-                                            $attendance_id = $api->check_attendance_clock_out($emp_id);
-
-                                            if(!empty($attendance_id)){
-                                                echo '<button type="button" class="btn btn-danger waves-effect waves-light me-2 w-md mb-2" id="record-attendance" data-attendance="out">Clock Out</button>';
-                                            }
-                                            else{
-                                                echo '<button type="button" class="btn btn-success waves-effect waves-light me-2 w-md mb-2" id="record-attendance" data-attendance="in">Clock In</button>';
-                                            }
-                                        }
-                                    }
-
-                                    if($health_declaration == 1 && $get_health_declaration_count == 0){
-                                        echo '<button type="button" class="btn btn-primary waves-effect waves-light me-2 w-md mb-2" id="healthdeclaration">Health Declaration</button>';
-                                    }
-
-                                    if($scan_qr_code_attendance > 0){
-                                        echo '<button type="button" class="btn btn-warning waves-effect waves-light me-2 w-md mb-2" id="scan-qr">Scan QR</button>';
-                                    }
-
-                                    if($get_location > 0){
-                                        echo '<button type="button" class="btn btn-info waves-effect waves-light me-2 w-md mb-2" id="get-location">Get Location</button>';
-                                    }
-                                ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-                <!-- Right column - Birthday and Employee Growth cards -->
                <!-- Right column - Consolidated Employee Information Carousel -->
-<div class="col-xl-7">
-    <div class="card">
-        <div class="card-body">
-            <!-- Carousel Header with Controls -->
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="card-title mb-0">
-                    <i class="fas fa-users text-primary me-2"></i>
-                     Bulletin Board
-                </h4>
-                <div class="carousel-controls">
-                    <button class="btn btn-sm btn-outline-secondary me-1" id="pauseCarousel" title="Pause/Resume">
-                        <i class="fas fa-pause" id="pauseIcon"></i>
-                    </button>
-                    <div class="btn-group btn-group-sm" role="group">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-target="#employeeInfoCarousel" data-bs-slide="prev">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary" data-bs-target="#employeeInfoCarousel" data-bs-slide="next">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
+                    <div class="col-xl-7">
+                        <div class="card">
+                            <div class="card-body">
+                                <!-- Carousel Header with Controls -->
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h4 class="card-title mb-0">
+                                        <i class="fas fa-users text-primary me-2"></i>
+                                        Bulletin Board
+                                    </h4>
+                                    <div class="carousel-controls">
+                                        <button class="btn btn-sm btn-outline-secondary me-1" id="pauseCarousel" title="Pause/Resume">
+                                            <i class="fas fa-pause" id="pauseIcon"></i>
+                                        </button>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-target="#employeeInfoCarousel" data-bs-slide="prev">
+                                                <i class="fas fa-chevron-left"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-target="#employeeInfoCarousel" data-bs-slide="next">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
 
-            <!-- Bootstrap Carousel -->
-            <div id="employeeInfoCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
-                <!-- Carousel Indicators -->
-                <div class="carousel-indicators">
-                    <button type="button" data-bs-target="#employeeInfoCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Employee Birthdays"></button>
-                    <button type="button" data-bs-target="#employeeInfoCarousel" data-bs-slide-to="1" aria-label="Work Anniversaries"></button>
-                    <button type="button" data-bs-target="#employeeInfoCarousel" data-bs-slide-to="2" aria-label="New Employees"></button>
-                    <button type="button" data-bs-target="#employeeInfoCarousel" data-bs-slide-to="3" aria-label="Newly Permanent Employees"></button>
-                </div>
+                                <!-- Bootstrap Carousel -->
+                                <div id="employeeInfoCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+                                    <!-- Carousel Indicators -->
+                                    <div class="carousel-indicators">
+                                        <button type="button" data-bs-target="#employeeInfoCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Employee Birthdays"></button>
+                                        <button type="button" data-bs-target="#employeeInfoCarousel" data-bs-slide-to="1" aria-label="Work Anniversaries"></button>
+                                        <button type="button" data-bs-target="#employeeInfoCarousel" data-bs-slide-to="2" aria-label="New Employees"></button>
+                                        <button type="button" data-bs-target="#employeeInfoCarousel" data-bs-slide-to="3" aria-label="Newly Permanent Employees"></button>
+                                    </div>
 
-                <div class="carousel-inner">
-                    <!-- Slide 1: Employee Birthdays -->
-                    <div class="carousel-item active">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h5 class="slide-title">
-                                    <i class="fas fa-birthday-cake text-primary me-2"></i>
-                                    Employee Birthdays
-                                </h5>
-                            </div>
-                            <div class="col-md-6 text-end">
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="birthdayMonthDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <span id="selected-month"><?php echo date('F'); ?></span>
+                                    <div class="carousel-inner">
+                                        <!-- Slide 1: Employee Birthdays -->
+                                        <div class="carousel-item active">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <h5 class="slide-title">
+                                                        <i class="fas fa-birthday-cake text-primary me-2"></i>
+                                                        Employee Birthdays
+                                                    </h5>
+                                                </div>
+                                                <div class="col-md-6 text-end">
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="birthdayMonthDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <span id="selected-month"><?php echo date('F'); ?></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu" aria-labelledby="birthdayMonthDropdown">
+                                                            <li><a class="dropdown-item month-option" href="#" data-month="1">January</a></li>
+                                                            <li><a class="dropdown-item month-option" href="#" data-month="2">February</a></li>
+                                                            <li><a class="dropdown-item month-option" href="#" data-month="3">March</a></li>
+                                                            <li><a class="dropdown-item month-option" href="#" data-month="4">April</a></li>
+                                                            <li><a class="dropdown-item month-option" href="#" data-month="5">May</a></li>
+                                                            <li><a class="dropdown-item month-option" href="#" data-month="6">June</a></li>
+                                                            <li><a class="dropdown-item month-option" href="#" data-month="7">July</a></li>
+                                                            <li><a class="dropdown-item month-option" href="#" data-month="8">August</a></li>
+                                                            <li><a class="dropdown-item month-option" href="#" data-month="9">September</a></li>
+                                                            <li><a class="dropdown-item month-option" href="#" data-month="10">October</a></li>
+                                                            <li><a class="dropdown-item month-option" href="#" data-month="11">November</a></li>
+                                                            <li><a class="dropdown-item month-option" href="#" data-month="12">December</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Loading State -->
+                                            <div id="birthday-loader" class="text-center py-5">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                <p class="mt-3">Loading birthday data...</p>
+                                            </div>
+
+                                            <!-- Birthday Cards Container -->
+                                            <div id="birthday-container" class="mt-4" style="display: none;">
+                                                <div class="row" id="birthday-cards">
+                                                    <!-- Birthday cards will be dynamically inserted here -->
+                                                </div>
+                                            </div>
+
+                                            <!-- No Birthdays Message -->
+                                            <div id="no-birthdays" class="text-center py-5" style="display: none;">
+                                                <i class="fas fa-calendar-times text-muted" style="font-size: 48px;"></i>
+                                                <p class="mt-3">No birthdays found for this month.</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Slide 2: Work Anniversaries -->
+                                        <div class="carousel-item">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <h5 class="slide-title">
+                                                        <i class="fas fa-award text-success me-2"></i>
+                                                        Work Anniversaries
+                                                    </h5>
+                                                </div>
+                                                <div class="col-md-6 text-end">
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-sm btn-outline-success dropdown-toggle" type="button" id="anniversaryMonthDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <span id="selected-anniversary-month"><?php echo date('F'); ?></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu" aria-labelledby="anniversaryMonthDropdown">
+                                                            <li><a class="dropdown-item anniversary-month-option" href="#" data-month="1">January</a></li>
+                                                            <li><a class="dropdown-item anniversary-month-option" href="#" data-month="2">February</a></li>
+                                                            <li><a class="dropdown-item anniversary-month-option" href="#" data-month="3">March</a></li>
+                                                            <li><a class="dropdown-item anniversary-month-option" href="#" data-month="4">April</a></li>
+                                                            <li><a class="dropdown-item anniversary-month-option" href="#" data-month="5">May</a></li>
+                                                            <li><a class="dropdown-item anniversary-month-option" href="#" data-month="6">June</a></li>
+                                                            <li><a class="dropdown-item anniversary-month-option" href="#" data-month="7">July</a></li>
+                                                            <li><a class="dropdown-item anniversary-month-option" href="#" data-month="8">August</a></li>
+                                                            <li><a class="dropdown-item anniversary-month-option" href="#" data-month="9">September</a></li>
+                                                            <li><a class="dropdown-item anniversary-month-option" href="#" data-month="10">October</a></li>
+                                                            <li><a class="dropdown-item anniversary-month-option" href="#" data-month="11">November</a></li>
+                                                            <li><a class="dropdown-item anniversary-month-option" href="#" data-month="12">December</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Loading State -->
+                                            <div id="anniversary-loader" class="text-center py-5">
+                                                <div class="spinner-border text-success" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                <p class="mt-3">Loading work anniversary data...</p>
+                                            </div>
+
+                                            <!-- Anniversary Cards Container -->
+                                            <div id="anniversary-container" class="mt-4" style="display: none;">
+                                                <div class="row" id="anniversary-cards">
+                                                </div>
+                                            </div>
+
+                                            <!-- No Anniversaries Message -->
+                                            <div id="no-anniversaries" class="text-center py-5" style="display: none;">
+                                                <i class="fas fa-calendar-times text-muted" style="font-size: 48px;"></i>
+                                                <p class="mt-3">No work anniversaries found for this month.</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Slide 3: New Employees -->
+                                        <div class="carousel-item">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <h5 class="slide-title">
+                                                        <i class="fas fa-user-plus text-info me-2"></i>
+                                                        New Employees
+                                                    </h5>
+                                                </div>
+                                                <div class="col-md-6 text-end">
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-sm btn-outline-info dropdown-toggle" type="button" id="newEmployeeMonthDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <span id="selected-new-employee-month"><?php echo date('F'); ?></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu" aria-labelledby="newEmployeeMonthDropdown">
+                                                            <li><a class="dropdown-item new-employee-month-option" href="#" data-month="1">January</a></li>
+                                                            <li><a class="dropdown-item new-employee-month-option" href="#" data-month="2">February</a></li>
+                                                            <li><a class="dropdown-item new-employee-month-option" href="#" data-month="3">March</a></li>
+                                                            <li><a class="dropdown-item new-employee-month-option" href="#" data-month="4">April</a></li>
+                                                            <li><a class="dropdown-item new-employee-month-option" href="#" data-month="5">May</a></li>
+                                                            <li><a class="dropdown-item new-employee-month-option" href="#" data-month="6">June</a></li>
+                                                            <li><a class="dropdown-item new-employee-month-option" href="#" data-month="7">July</a></li>
+                                                            <li><a class="dropdown-item new-employee-month-option" href="#" data-month="8">August</a></li>
+                                                            <li><a class="dropdown-item new-employee-month-option" href="#" data-month="9">September</a></li>
+                                                            <li><a class="dropdown-item new-employee-month-option" href="#" data-month="10">October</a></li>
+                                                            <li><a class="dropdown-item new-employee-month-option" href="#" data-month="11">November</a></li>
+                                                            <li><a class="dropdown-item new-employee-month-option" href="#" data-month="12">December</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Loading State -->
+                                            <div id="new-employee-loader" class="text-center py-5">
+                                                <div class="spinner-border text-info" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                <p class="mt-3">Loading new employee data...</p>
+                                            </div>
+
+                                            <!-- New Employee Cards Container -->
+                                            <div id="new-employee-container" class="mt-4" style="display: none;">
+                                                <div class="row" id="new-employee-cards">
+                                                    <!-- New employee cards will be dynamically inserted here -->
+                                                </div>
+                                            </div>
+
+                                            <!-- No New Employees Message -->
+                                            <div id="no-new-employees" class="text-center py-5" style="display: none;">
+                                                <i class="fas fa-user-slash text-muted" style="font-size: 48px;"></i>
+                                                <p class="mt-3">No new employees joined this month.</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Slide 4: Newly Permanent Employees -->
+                                        <div class="carousel-item">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <h5 class="slide-title">
+                                                        <i class="fas fa-certificate text-success me-2"></i>
+                                                        Newly Permanent Employees
+                                                    </h5>
+                                                </div>
+                                                <div class="col-md-6 text-end">
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-sm btn-outline-success dropdown-toggle" type="button" id="permanentEmployeeMonthDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <span id="selected-permanent-employee-month"><?php echo date('F'); ?></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu" aria-labelledby="permanentEmployeeMonthDropdown">
+                                                            <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="1">January</a></li>
+                                                            <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="2">February</a></li>
+                                                            <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="3">March</a></li>
+                                                            <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="4">April</a></li>
+                                                            <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="5">May</a></li>
+                                                            <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="6">June</a></li>
+                                                            <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="7">July</a></li>
+                                                            <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="8">August</a></li>
+                                                            <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="9">September</a></li>
+                                                            <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="10">October</a></li>
+                                                            <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="11">November</a></li>
+                                                            <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="12">December</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Loading State -->
+                                            <div id="permanent-employee-loader" class="text-center py-5">
+                                                <div class="spinner-border text-success" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                <p class="mt-3">Loading newly permanent employee data...</p>
+                                            </div>
+
+                                            <!-- Newly Permanent Employee Cards Container -->
+                                            <div id="permanent-employee-container" class="mt-4" style="display: none;">
+                                                <div class="row" id="permanent-employee-cards">
+                                                    <!-- Newly permanent employee cards will be dynamically inserted here -->
+                                                </div>
+                                            </div>
+
+                                            <!-- No Newly Permanent Employees Message -->
+                                            <div id="no-permanent-employees" class="text-center py-5" style="display: none;">
+                                                <i class="fas fa-certificate text-muted" style="font-size: 48px;"></i>
+                                                <p class="mt-3">No employees became permanent this month.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Carousel Controls -->
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#employeeInfoCarousel" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Previous</span>
                                     </button>
-                                    <ul class="dropdown-menu" aria-labelledby="birthdayMonthDropdown">
-                                        <li><a class="dropdown-item month-option" href="#" data-month="1">January</a></li>
-                                        <li><a class="dropdown-item month-option" href="#" data-month="2">February</a></li>
-                                        <li><a class="dropdown-item month-option" href="#" data-month="3">March</a></li>
-                                        <li><a class="dropdown-item month-option" href="#" data-month="4">April</a></li>
-                                        <li><a class="dropdown-item month-option" href="#" data-month="5">May</a></li>
-                                        <li><a class="dropdown-item month-option" href="#" data-month="6">June</a></li>
-                                        <li><a class="dropdown-item month-option" href="#" data-month="7">July</a></li>
-                                        <li><a class="dropdown-item month-option" href="#" data-month="8">August</a></li>
-                                        <li><a class="dropdown-item month-option" href="#" data-month="9">September</a></li>
-                                        <li><a class="dropdown-item month-option" href="#" data-month="10">October</a></li>
-                                        <li><a class="dropdown-item month-option" href="#" data-month="11">November</a></li>
-                                        <li><a class="dropdown-item month-option" href="#" data-month="12">December</a></li>
-                                    </ul>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#employeeInfoCarousel" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Next</span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Loading State -->
-                        <div id="birthday-loader" class="text-center py-5">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                            <p class="mt-3">Loading birthday data...</p>
-                        </div>
-
-                        <!-- Birthday Cards Container -->
-                        <div id="birthday-container" class="mt-4" style="display: none;">
-                            <div class="row" id="birthday-cards">
-                                <!-- Birthday cards will be dynamically inserted here -->
-                            </div>
-                        </div>
-
-                        <!-- No Birthdays Message -->
-                        <div id="no-birthdays" class="text-center py-5" style="display: none;">
-                            <i class="fas fa-calendar-times text-muted" style="font-size: 48px;"></i>
-                            <p class="mt-3">No birthdays found for this month.</p>
-                        </div>
                     </div>
-
-                    <!-- Slide 2: Work Anniversaries -->
-                    <div class="carousel-item">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h5 class="slide-title">
-                                    <i class="fas fa-award text-success me-2"></i>
-                                    Work Anniversaries
-                                </h5>
-                            </div>
-                            <div class="col-md-6 text-end">
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-success dropdown-toggle" type="button" id="anniversaryMonthDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <span id="selected-anniversary-month"><?php echo date('F'); ?></span>
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="anniversaryMonthDropdown">
-                                        <li><a class="dropdown-item anniversary-month-option" href="#" data-month="1">January</a></li>
-                                        <li><a class="dropdown-item anniversary-month-option" href="#" data-month="2">February</a></li>
-                                        <li><a class="dropdown-item anniversary-month-option" href="#" data-month="3">March</a></li>
-                                        <li><a class="dropdown-item anniversary-month-option" href="#" data-month="4">April</a></li>
-                                        <li><a class="dropdown-item anniversary-month-option" href="#" data-month="5">May</a></li>
-                                        <li><a class="dropdown-item anniversary-month-option" href="#" data-month="6">June</a></li>
-                                        <li><a class="dropdown-item anniversary-month-option" href="#" data-month="7">July</a></li>
-                                        <li><a class="dropdown-item anniversary-month-option" href="#" data-month="8">August</a></li>
-                                        <li><a class="dropdown-item anniversary-month-option" href="#" data-month="9">September</a></li>
-                                        <li><a class="dropdown-item anniversary-month-option" href="#" data-month="10">October</a></li>
-                                        <li><a class="dropdown-item anniversary-month-option" href="#" data-month="11">November</a></li>
-                                        <li><a class="dropdown-item anniversary-month-option" href="#" data-month="12">December</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Loading State -->
-                        <div id="anniversary-loader" class="text-center py-5">
-                            <div class="spinner-border text-success" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                            <p class="mt-3">Loading work anniversary data...</p>
-                        </div>
-
-                        <!-- Anniversary Cards Container -->
-                        <div id="anniversary-container" class="mt-4" style="display: none;">
-                            <div class="row" id="anniversary-cards">
-                             </div>
-                        </div>
-
-                        <!-- No Anniversaries Message -->
-                        <div id="no-anniversaries" class="text-center py-5" style="display: none;">
-                            <i class="fas fa-calendar-times text-muted" style="font-size: 48px;"></i>
-                            <p class="mt-3">No work anniversaries found for this month.</p>
-                        </div>
-                    </div>
-
-                    <!-- Slide 3: New Employees -->
-                    <div class="carousel-item">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h5 class="slide-title">
-                                    <i class="fas fa-user-plus text-info me-2"></i>
-                                    New Employees
-                                </h5>
-                            </div>
-                            <div class="col-md-6 text-end">
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-info dropdown-toggle" type="button" id="newEmployeeMonthDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <span id="selected-new-employee-month"><?php echo date('F'); ?></span>
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="newEmployeeMonthDropdown">
-                                        <li><a class="dropdown-item new-employee-month-option" href="#" data-month="1">January</a></li>
-                                        <li><a class="dropdown-item new-employee-month-option" href="#" data-month="2">February</a></li>
-                                        <li><a class="dropdown-item new-employee-month-option" href="#" data-month="3">March</a></li>
-                                        <li><a class="dropdown-item new-employee-month-option" href="#" data-month="4">April</a></li>
-                                        <li><a class="dropdown-item new-employee-month-option" href="#" data-month="5">May</a></li>
-                                        <li><a class="dropdown-item new-employee-month-option" href="#" data-month="6">June</a></li>
-                                        <li><a class="dropdown-item new-employee-month-option" href="#" data-month="7">July</a></li>
-                                        <li><a class="dropdown-item new-employee-month-option" href="#" data-month="8">August</a></li>
-                                        <li><a class="dropdown-item new-employee-month-option" href="#" data-month="9">September</a></li>
-                                        <li><a class="dropdown-item new-employee-month-option" href="#" data-month="10">October</a></li>
-                                        <li><a class="dropdown-item new-employee-month-option" href="#" data-month="11">November</a></li>
-                                        <li><a class="dropdown-item new-employee-month-option" href="#" data-month="12">December</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Loading State -->
-                        <div id="new-employee-loader" class="text-center py-5">
-                            <div class="spinner-border text-info" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                            <p class="mt-3">Loading new employee data...</p>
-                        </div>
-
-                        <!-- New Employee Cards Container -->
-                        <div id="new-employee-container" class="mt-4" style="display: none;">
-                            <div class="row" id="new-employee-cards">
-                                <!-- New employee cards will be dynamically inserted here -->
-                            </div>
-                        </div>
-
-                        <!-- No New Employees Message -->
-                        <div id="no-new-employees" class="text-center py-5" style="display: none;">
-                            <i class="fas fa-user-slash text-muted" style="font-size: 48px;"></i>
-                            <p class="mt-3">No new employees joined this month.</p>
-                        </div>
-                    </div>
-
-                    <!-- Slide 4: Newly Permanent Employees -->
-                    <div class="carousel-item">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h5 class="slide-title">
-                                    <i class="fas fa-certificate text-success me-2"></i>
-                                    Newly Permanent Employees
-                                </h5>
-                            </div>
-                            <div class="col-md-6 text-end">
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-success dropdown-toggle" type="button" id="permanentEmployeeMonthDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <span id="selected-permanent-employee-month"><?php echo date('F'); ?></span>
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="permanentEmployeeMonthDropdown">
-                                        <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="1">January</a></li>
-                                        <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="2">February</a></li>
-                                        <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="3">March</a></li>
-                                        <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="4">April</a></li>
-                                        <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="5">May</a></li>
-                                        <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="6">June</a></li>
-                                        <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="7">July</a></li>
-                                        <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="8">August</a></li>
-                                        <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="9">September</a></li>
-                                        <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="10">October</a></li>
-                                        <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="11">November</a></li>
-                                        <li><a class="dropdown-item permanent-employee-month-option" href="#" data-month="12">December</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Loading State -->
-                        <div id="permanent-employee-loader" class="text-center py-5">
-                            <div class="spinner-border text-success" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                            <p class="mt-3">Loading newly permanent employee data...</p>
-                        </div>
-
-                        <!-- Newly Permanent Employee Cards Container -->
-                        <div id="permanent-employee-container" class="mt-4" style="display: none;">
-                            <div class="row" id="permanent-employee-cards">
-                                <!-- Newly permanent employee cards will be dynamically inserted here -->
-                            </div>
-                        </div>
-
-                        <!-- No Newly Permanent Employees Message -->
-                        <div id="no-permanent-employees" class="text-center py-5" style="display: none;">
-                            <i class="fas fa-certificate text-muted" style="font-size: 48px;"></i>
-                            <p class="mt-3">No employees became permanent this month.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Carousel Controls -->
-                <button class="carousel-control-prev" type="button" data-bs-target="#employeeInfoCarousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#employeeInfoCarousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 
 
                     <div class="card border-0 shadow-sm mt-4">
@@ -910,8 +766,7 @@
         <script src="assets/libs/html5-qr-code/html5-qrcode.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
-        // Enhanced carousel functionality
-        document.addEventListener('DOMContentLoaded', function() {
+         document.addEventListener('DOMContentLoaded', function() {
             const carousel = document.querySelector('#employeeInfoCarousel');
             const pauseBtn = document.querySelector('#pauseCarousel');
             const pauseIcon = document.querySelector('#pauseIcon');

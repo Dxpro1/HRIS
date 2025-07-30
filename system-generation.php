@@ -1947,6 +1947,88 @@ else if($formtype == 'pmw status form'){
                         </div>';
 
             }
+            else if($formtype == 'vendor form'){
+                $form .= '
+                    <input type="hidden" id="vendor_id" name="vendor_id">
+                  <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="vendor_name" class="form-label">Supplier Name <span class="required">*</span></label>
+                                <input type="text" class="form-control" id="vendor_name" name="vendor_name" required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="vendor_type" class="form-label">Vendor Type <span class="required">*</span></label>
+                                <select class="form-control form-select" id="vendor_type" name="vendor_type" required>
+                                    <option value="">-- Select Type --</option>
+                                    <option value="IT Supplier">IT Supplier</option>
+                                    <option value="Office Supplier">Office Supplier</option>
+                                    <option value="Service Provider">Service Provider</option>
+                                    <option value="Consultant">Consultant</option>
+                                    <option value="Others">Others</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="vendor_address" class="form-label">Address</label>
+                                <textarea class="form-control" id="vendor_address" name="vendor_address" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="contact_person" class="form-label">Contact Person</label>
+                                <input type="text" class="form-control" id="contact_person" name="contact_person">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                 <label for="email" class="form-label">Email <span class="required">*</span></label>
+                                        <input id="email" name="email" class="form-control email-inputmask maxlength" maxlength="50" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Phone</label>
+                                <input type="text" class="form-control" id="phone" name="phone">
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <h5 class="font-size-16 mb-3">Bank Details</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="bank_name" class="form-label">Bank Name</label>
+                                <input type="text" class="form-control" id="bank_name" name="bank_name">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="bank_account_name" class="form-label">Account Name</label>
+                                <input type="text" class="form-control" id="bank_account_name" name="bank_account_name">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="bank_account_number" class="form-label">Account Number</label>
+                                <input type="text" class="form-control" id="bank_account_number" name="bank_account_number">
+                            </div>
+                        </div>
+                    </div>';
+            }
+
             else if($formtype == 'import employee leave form'){
                 $form .= '<div class="row">
                             <div class="col-md-12">
@@ -4006,6 +4088,7 @@ else if($formtype == 'pmw status form'){
                                 </div>
                             </div>';
             }
+ 
             else if($formtype == 'training form'){
                 $form .= '<div class="row">
                                 <div class="col-md-6">
@@ -4379,6 +4462,105 @@ else if($formtype == 'pmw status form'){
                         </div>';
             }
 
+            # Purchase order form
+            else if($formtype == 'purchase order form'){
+                $form .= '<input type="hidden" id="purchase_order_id" name="purchase_order_id">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="vendor_name" class="form-label">Vendor Name <span class="required">*</span></label>
+                                    <input type="text" class="form-control" id="vendor_name" name="vendor_name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="order_date" class="form-label">Order Date <span class="required">*</span></label>
+                                    <input type="date" class="form-control" id="order_date" name="order_date" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="vendor_address" class="form-label">Vendor Address</label>
+                                    <textarea class="form-control" id="vendor_address" name="vendor_address" rows="2"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="delivery_date" class="form-label">Expected Delivery Date</label>
+                                    <input type="date" class="form-control" id="delivery_date" name="delivery_date">
+                                </div>
+                            </div>
+                        </div>
+                        <hr/>
+                        <h5 class="font-size-16 mb-3">Order Items</h5>
+                        <div class="repeater">
+                            <div data-repeater-list="items">
+                                <div data-repeater-item class="row mb-3">
+                                    <div class="col-lg-5">
+                                        <label for="item_description">Description</label>
+                                        <input type="text" name="item_description" class="form-control item-description"/>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <label for="quantity">Quantity</label>
+                                        <input type="number" name="quantity" class="form-control item-quantity" value="1" min="1"/>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <label for="price">Unit Price</label>
+                                        <input type="number" name="price" class="form-control item-price" value="0.00" step="0.01" min="0"/>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <label>Total</label>
+                                        <p class="form-control-static item-total">₱0.00</p>
+                                    </div>
+                                    <div class="col-lg-1 d-flex align-items-end">
+                                        <button data-repeater-delete type="button" class="btn btn-danger waves-effect waves-light">
+                                            <i class="bx bx-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button data-repeater-create type="button" class="btn btn-success mt-3 mt-lg-0 waves-effect waves-light">
+                                <i class="bx bx-plus me-1"></i> Add Item
+                            </button>
+                        </div>
+                        <hr class="mt-4"/>
+                        <div class="row justify-content-end">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="subtotal" class="form-label">Subtotal</label>
+                                    <input type="text" class="form-control" id="subtotal" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="tax_rate" class="form-label">Tax Rate (%)</label>
+                                    <input type="number" class="form-control" id="tax_rate" name="tax_rate" value="12.00" step="0.01">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="tax_amount" class="form-label">Tax Amount</label>
+                                    <input type="text" class="form-control" id="tax_amount" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="shipping_fee" class="form-label">Shipping Fee</label>
+                                    <input type="number" class="form-control" id="shipping_fee" name="shipping_fee" value="0.00" step="0.01">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="grand_total" class="form-label">Grand Total</label>
+                                    <input type="text" class="form-control" id="grand_total" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="notes" class="form-label">Notes / Terms</label>
+                                    <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        ';
+            }
+
             $form .= '</form>';
 
             $response[] = array(
@@ -4678,6 +4860,87 @@ else if($formtype == 'pmw status form'){
                     </div>
                 </div>';
             }
+
+            else if($type == 'purchase order print'){
+            if(isset($_POST['purchase_order_id'])){
+                $purchase_order_id = $_POST['purchase_order_id'];
+                $po = $api->get_data_details_one_parameter('purchase order', $purchase_order_id)[0];
+                $po_items = $api->get_data_details_one_parameter('purchase order items', $purchase_order_id);
+                $company = $api->get_data_details_one_parameter('company', '1')[0];
+
+                $print = '<div class="p-8">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <img src="'. $company['LOGO'] .'" alt="logo" height="40"/>
+                                    <h5 class="mt-3">'. $company['COMPANY_NAME'] .'</h5>
+                                    <p class="text-muted">'. $company['ADDRESS'] .'<br/>'. $company['EMAIL'] .'</p>
+                                </div>
+                                <div class="col-lg-6 text-end">
+                                    <h3>Purchase Order</h3>
+                                    <p><b>PO #:</b> '. $po['PURCHASE_ORDER_ID'] .'</p>
+                                    <p><b>Date:</b> '. $api->check_date('empty', $po['ORDER_DATE'], '', 'F d, Y', '', '', '') .'</p>
+                                </div>
+                            </div>
+                            <hr class="my-4">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <p class="font-weight-bold"><strong>Vendor:</strong></p>
+                                    <p>'. $po['VENDOR_NAME'] .'<br>'. nl2br($po['VENDOR_ADDRESS']) .'</p>
+                                </div>
+                                <div class="col-lg-6 text-end">
+                                    <p class="font-weight-bold"><strong>Ship To:</strong></p>
+                                    <p>'. $company['COMPANY_NAME'] .'<br>'. $company['ADDRESS'] .'</p>
+                                </div>
+                            </div>
+                            <div class="py-2 mt-3">
+                                <h3 class="font-size-15 fw-bold">Order Summary</h3>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 70px;">No.</th>
+                                            <th>Item</th>
+                                            <th class="text-end">Price</th>
+                                            <th class="text-end">Quantity</th>
+                                            <th class="text-end">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>';
+                                    $counter = 1;
+                                    foreach($po_items as $item){
+                                        $total = $item['QUANTITY'] * $item['UNIT_PRICE'];
+                                        $print .= '<tr>
+                                                    <td>'. $counter .'</td>
+                                                    <td>'. $item['ITEM_DESCRIPTION'] .'</td>
+                                                    <td class="text-end">₱'. number_format($item['UNIT_PRICE'], 2) .'</td>
+                                                    <td class="text-end">'. $item['QUANTITY'] .'</td>
+                                                    <td class="text-end">₱'. number_format($total, 2) .'</td>
+                                                </tr>';
+                                        $counter++;
+                                    }
+                $print .= '         </tbody>
+                                </table>
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <div class="w-25">
+                                    <p class="clearfix">Subtotal: <span class="float-end">₱'. number_format($po['SUBTOTAL'], 2) .'</span></p>
+                                    <p class="clearfix">Tax ('. $po['TAX_RATE'] .'%): <span class="float-end">₱'. number_format($po['TAX_AMOUNT'], 2) .'</span></p>
+                                    <p class="clearfix">Shipping: <span class="float-end">₱'. number_format($po['SHIPPING_FEE'], 2) .'</span></p>
+                                    <hr>
+                                    <h4 class="clearfix">Grand Total: <span class="float-end">₱'. number_format($po['GRAND_TOTAL'], 2) .'</span></h4>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <p class="font-weight-bold">Notes:</p>
+                                <p>'. nl2br($po['NOTES']) .'</p>
+                            </div>
+                        </div>';
+
+                $response[] = array('PRINT' => $print);
+                echo json_encode($response);
+            }
+        }
 
             $response[] = array(
                 'ELEMENT' => $element
@@ -5242,6 +5505,67 @@ else if($formtype == 'pmw status form'){
         else{
             echo $sql->errorInfo()[2];
         }
+    }
+}
+ 
+// In system-generation.php:
+else if($type == 'purchase order table'){
+    $update_purchase_order = $api->check_role_permissions($username, 156);
+    $delete_purchase_order = $api->check_role_permissions($username, 156);
+    $print_purchase_order  = $api->check_role_permissions($username, 156);
+
+    // Adjust the SQL:
+    $sql = $api->db_connection->prepare("
+        SELECT 
+            po.PURCHASE_ORDER_ID, 
+            v.VENDOR_NAME, 
+            po.ORDER_DATE, 
+            po.DELIVERY_DATE, 
+            po.NET_AMOUNT,
+            po.STATUS
+        FROM tblpurchaseorder po
+        JOIN tblvendor v ON po.VENDOR_ID = v.VENDOR_ID
+        ORDER BY po.PURCHASE_ORDER_ID DESC
+    ");
+
+    $response = [];
+
+    if($sql->execute()){
+        while($row = $sql->fetch(PDO::FETCH_ASSOC)){
+            $purchase_order_id = $row['PURCHASE_ORDER_ID'];
+            $vendor_name       = $row['VENDOR_NAME'];
+            $order_date        = $api->check_date('empty', $row['ORDER_DATE'], '', 'm/d/Y', '', '', '');
+            $delivery_date     = $api->check_date('empty', $row['DELIVERY_DATE'], '', 'm/d/Y', '', '', '');
+            $grand_total       = '₱' . number_format($row['NET_AMOUNT'], 2);
+            $status            = $row['STATUS'];
+
+            // ACTION buttons — always add a VIEW button, others based on roles
+            $action = '<button class="btn btn-secondary waves-effect waves-light view-purchase-order" data-purchaseorderid="'. $purchase_order_id .'" title="View PO"><i class="bx bx-show"></i></button> ';
+
+            if($update_purchase_order > 0){
+                $action .= '<button class="btn btn-info waves-effect waves-light update-purchase-order" data-purchaseorderid="'. $purchase_order_id .'" title="Edit PO"><i class="bx bx-pencil"></i></button> ';
+            }
+            if($print_purchase_order > 0){
+                $action .= '<button class="btn btn-primary waves-effect waves-light print-purchase-order" data-purchaseorderid="'. $purchase_order_id .'" title="Print PO"><i class="bx bx-printer"></i></button> ';
+            }
+            if($delete_purchase_order > 0){
+                $action .= '<button class="btn btn-danger waves-effect waves-light delete-purchase-order" data-purchaseorderid="'. $purchase_order_id .'" title="Delete PO"><i class="bx bx-trash"></i></button>';
+            }
+
+            $response[] = array(
+                'PURCHASE_ORDER_ID' => $purchase_order_id,
+                'VENDOR_NAME'       => $vendor_name,
+                'ORDER_DATE'        => $order_date,
+                'EXPECTED_DELIVERY_DATE' => $delivery_date,
+                'GRAND_TOTAL'       => $grand_total,
+                'STATUS'            => $status,
+                'ACTION'            => '<div class="d-flex gap-2">'. $action .'</div>',
+            );
+        }
+        echo json_encode($response);
+    }
+    else{
+        echo $sql->errorInfo()[2];
     }
 }
 
@@ -13182,6 +13506,27 @@ else if($type == 'publish documents table'){
 
 
                     }
+                    else if ($type == 'vendor dropdown') {
+    if ($api->databaseConnection()) {
+        $search = $_POST['search'] ?? '';
+        $sql = $api->db_connection->prepare("SELECT VENDOR_ID, VENDOR_NAME FROM tblvendor WHERE VENDOR_NAME LIKE :search ORDER BY VENDOR_NAME ASC");
+        $search = "%$search%";
+        $sql->bindParam(':search', $search);
+
+        $sql->execute();
+        $vendors = [];
+
+        while ($row = $sql->fetch()) {
+            $vendors[] = [
+                'VENDOR_ID' => $row['VENDOR_ID'],
+                'VENDOR_NAME' => $row['VENDOR_NAME']
+            ];
+        }
+
+        echo json_encode($vendors);
+    }
+}
+
                     else if ($type == "inventory item inquiry table") {
 
 
@@ -14707,6 +15052,48 @@ else if($type == 'publish documents table'){
             }
         }
     }
+
+    else if ($type == 'vendor table') {
+    if ($api->databaseConnection()) {
+        $sql = $api->db_connection->prepare('SELECT VENDOR_ID, VENDOR_NAME, CONTACT_PERSON, EMAIL, PHONE FROM tblvendor');
+
+        if ($sql->execute()) {
+            $response = [];
+
+            while ($row = $sql->fetch()) {
+                $vendor_id = trim($row['VENDOR_ID']);
+                $vendor_name = trim($row['VENDOR_NAME']);
+                $contact_person = trim($row['CONTACT_PERSON']);
+                $email = trim($row['EMAIL']);
+                $phone = trim($row['PHONE']);
+
+                $encrypted_id = $api->encrypt_data($vendor_id);
+               $delete_vendor = '<button type="button" class="btn btn-danger waves-effect waves-light delete-vendor" data-vendorid="' . $vendor_id . '" title="Delete Vendor">
+                                    <i class="bx bx-trash font-size-16 align-middle"></i>
+                                </button>';
+
+
+               $response[] = array(
+                    'VENDOR_NAME' => $vendor_name,
+                    'CONTACT_PERSON' => $contact_person ?: '-',
+                    'EMAIL' => $email ?: '-',
+                    'PHONE' => $phone ?: '-',
+                    'ACTION' => '<button type="button" class="btn btn-primary update-vendor" data-vendorid="'. $vendor_id .'" title="View Details">
+                                    <i class="bx bx-show font-size-16 align-middle"></i>
+                                </button>' .  $delete_vendor
+                );
+
+            }
+
+            echo json_encode($response);
+        } else {
+            echo json_encode(['error' => 'SQL error: ' . print_r($sql->errorInfo(), true)]);
+        }
+    } else {
+        echo json_encode(['error' => 'DB connection failed']);
+    }
+}
+
 #6/18
 # PMW Monitoring Table (Server-Side)
 else if($type == 'pmw monitoring table'){
@@ -15062,7 +15449,7 @@ else if($type == 'pmw monitoring table'){
 }
 
 
-     else if($type == 'overtime recommendation table'){
+  else if($type == 'overtime recommendation table'){
         if ($api->databaseConnection()) {
 
             # Get role permission
@@ -15078,10 +15465,10 @@ else if($type == 'pmw monitoring table'){
 
 
             if($view_pending_recommendation > 0){
-                $sql = $api->db_connection->prepare("SELECT OVERTIME_ID, EMPLOYEE_ID, TITLE, STATUS, HOLIDAY_TYPE, OVERTIME_DATE, START_TIME, END_TIME FROM tblovertime WHERE STATUS = '0' ORDER BY OVERTIME_DATE DESC");
+               $sql = $api->db_connection->prepare("SELECT OVERTIME_ID, EMPLOYEE_ID, TITLE, STATUS, HOLIDAY_TYPE, OVERTIME_DATE, START_TIME, END_TIME, DECISION_BY, REJECTION_REASON, CANCELLATION_REASON, DECISION_DATE, DECISION_TIME FROM tblovertime WHERE STATUS = '1' ORDER BY OVERTIME_DATE DESC");
             }
             else{
-                $sql = $api->db_connection->prepare("SELECT OVERTIME_ID, EMPLOYEE_ID, TITLE, STATUS, HOLIDAY_TYPE, OVERTIME_DATE, START_TIME, END_TIME FROM tblovertime WHERE STATUS = '0' AND EMPLOYEE_ID IN (SELECT SUBORDINATE_ID FROM tblemployeesubordinate WHERE EMPLOYEE_ID = :employee_id) ORDER BY OVERTIME_DATE DESC");
+                $sql = $api->db_connection->prepare("SELECT OVERTIME_ID, EMPLOYEE_ID, TITLE, STATUS, HOLIDAY_TYPE, OVERTIME_DATE, START_TIME, END_TIME FROM tblovertime WHERE STATUS = '1' AND EMPLOYEE_ID IN (SELECT SUBORDINATE_ID FROM tblemployeesubordinate WHERE EMPLOYEE_ID = :employee_id) ORDER BY OVERTIME_DATE DESC");
                 $sql->bindParam(':employee_id', $employee_id);
             }
 
@@ -15178,6 +15565,9 @@ else if($type == 'pmw monitoring table'){
                             'HOLIDAY_TYPE' => $holiday_type,
                             'STATUS' => $overtime_status,
                             'ACTION' => '<div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-primary waves-effect waves-light update-overtime" data-overtimeid="'. $overtime_id.'" title="View Details">
+                                        <i class="bx bx-show font-size-16 align-middle"></i>
+                                    </button>
                                 ' . $recommend . $reject .'
                             </div>'
                     );
@@ -15190,6 +15580,7 @@ else if($type == 'pmw monitoring table'){
             }
         }
     }
+
 
     else if($type == 'overtime summary table'){
     if(isset($_POST['parameter1']) && !empty($_POST['parameter1']) && isset($_POST['parameter2']) && !empty($_POST['parameter2']) && isset($_POST['parameter3']) && !empty($_POST['parameter3'])){
@@ -15300,7 +15691,7 @@ else if($type == 'pmw monitoring table'){
 }
 
 
-    else if($type == 'overtime approval table'){
+   else if($type == 'overtime approval table'){
         if ($api->databaseConnection()) {
 
             # Get role permission
@@ -15312,8 +15703,7 @@ else if($type == 'pmw monitoring table'){
             $employee_id = $employee_details[0]['EMPLOYEE_ID'];
 
             if($view_all_approval_overtime > 0){
-                $sql = $api->db_connection->prepare("SELECT OVERTIME_ID, EMPLOYEE_ID, TITLE, STATUS, HOLIDAY_TYPE, OVERTIME_DATE, START_TIME, END_TIME FROM tblovertime WHERE STATUS = '1' ORDER BY OVERTIME_DATE DESC");
-            }
+$sql = $api->db_connection->prepare("SELECT OVERTIME_ID, EMPLOYEE_ID, TITLE, STATUS, HOLIDAY_TYPE, OVERTIME_DATE, START_TIME, END_TIME, DECISION_BY, REJECTION_REASON, CANCELLATION_REASON, DECISION_DATE, DECISION_TIME FROM tblovertime WHERE STATUS = '1' ORDER BY OVERTIME_DATE DESC");            }
             else{
                 $sql = $api->db_connection->prepare("SELECT OVERTIME_ID, EMPLOYEE_ID, TITLE, STATUS, HOLIDAY_TYPE, OVERTIME_DATE, START_TIME, END_TIME FROM tblovertime
                 WHERE STATUS = '1'
