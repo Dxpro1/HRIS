@@ -7752,6 +7752,75 @@ else if ($transaction == 'delete vendor') {
     echo $result; // 'Inserted' or error string
 }
 
+// In controller.php
+
+else if (isset($_POST['transaction']) && $_POST['transaction'] === 'get purchase order details') {
+    if (isset($_POST['purchase_order_id']) && !empty($_POST['purchase_order_id'])) {
+        $purchase_order_id = $_POST['purchase_order_id'];
+        $result = $api->get_purchase_order_details($purchase_order_id);
+        if ($result === "Database connection failed") {
+            http_response_code(503);
+            echo json_encode(['error' => $result]);
+        } elseif ($result === false || $result['details'] === null) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Purchase Order not found or could not be retrieved.']);
+        } else {
+            if (!isset($result['items']) || !is_array($result['items'])) {
+                $result['items'] = [];
+            }
+            echo json_encode($result);
+        }
+    } else {
+        http_response_code(400);
+        echo json_encode(['error' => 'Missing Purchase Order ID.']);
+    }
+}
+
+// In controller.php
+
+# Generate purchase order print view
+else if ($transaction == 'generate purchase order print') {
+    if (isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['purchase_order_id']) && !empty($_POST['purchase_order_id'])) {
+        $purchase_order_id = $_POST['purchase_order_id'];
+        
+        $html = $api->generate_purchase_order_print($purchase_order_id);
+
+        echo json_encode(['print_view' => $html]);
+    }
+}
+
+else if (isset($_POST['transaction']) && $_POST['transaction'] === 'get vendors') {
+    $searchTerm = $_POST['search'] ?? '';
+    error_log("Controller: Processing 'get vendors' with search: " . $searchTerm);
+
+    $vendors = $api->get_vendors($searchTerm);
+
+    if ($vendors === "Database connection failed") {
+        http_response_code(503);
+        echo json_encode(['error' => $vendors]);
+    } elseif ($vendors === false || !is_array($vendors)) {
+        error_log("Controller: Error or no vendors found for search: " . $searchTerm);
+        echo json_encode([]); // Return empty array on error or no results
+    } else {
+        // Data is already formatted by the API method for Select2
+        echo json_encode($vendors);
+    }
+}
+// In controller.php
+
+else if (isset($_POST['transaction']) && $_POST['transaction'] === 'delete purchase order') {
+    if (isset($_POST['purchase_order_id']) && !empty($_POST['purchase_order_id'])) {
+        $purchase_order_id = $_POST['purchase_order_id'];
+        // Assuming $username is available globally or passed from the request
+        $username = $_POST['username']; // Make sure username is sent via AJAX
+        $result = $api->delete_purchase_order($purchase_order_id, $username);
+        echo $result; // Should echo 'Deleted' or an error message
+    } else {
+        http_response_code(400); // Bad Request
+        echo json_encode(['error' => 'Missing Purchase Order ID.']);
+    }
+}
+
 
 else if ($transaction === 'get vendor details') {
     if ($api->databaseConnection()) {
@@ -12601,6 +12670,70 @@ else if($transaction == 'delete career'){
             }
         }
     }
+
+    // In controller.php
+
+else if (isset($_POST['transaction']) && $_POST['transaction'] === 'update purchase order') {
+    // Basic validation for essential fields
+    if (
+        !isset($_POST['purchase_order_id']) || empty($_POST['purchase_order_id']) ||
+        !isset($_POST['vendor_id']) || empty($_POST['vendor_id']) || $_POST['vendor_id'] == 'null' ||
+        !isset($_POST['order_date']) || empty($_POST['order_date'])
+    ) {
+        http_response_code(400); // Bad Request
+        echo json_encode(['error' => 'Missing required fields for update (PO ID, Vendor, Order Date).']);
+        exit;
+    }
+
+    $purchase_order_id = intval($_POST['purchase_order_id']);
+    $vendor_id = intval($_POST['vendor_id']);
+    $order_date = trim($_POST['order_date']);
+    $status = trim($_POST['status']);
+    
+    // Ensure numeric fields are correctly cast, providing defaults if not set or invalid
+    $gross_amount = isset($_POST['gross_amount']) ? floatval($_POST['gross_amount']) : 0.0;
+    $withholding_tax_rate = isset($_POST['withholding_tax_rate']) ? floatval($_POST['withholding_tax_rate']) : 0.0;
+    $vat_tax_rate = isset($_POST['vat_tax_rate']) ? floatval($_POST['vat_tax_rate']) : 0.0;
+    
+    // Recalculate tax amounts to ensure consistency
+    $withholding_tax_amount = $gross_amount * ($withholding_tax_rate / 100.0);
+    $vat_amount = $gross_amount * ($vat_tax_rate / 100.0);
+    $net_amount = $gross_amount - $withholding_tax_amount + $vat_amount;
+
+    $terms = trim($_POST['terms']);
+    $fob = trim($_POST['fob']);
+    $requested_by = trim($_POST['requested_by']);
+    $req_no = trim($_POST['req_no']);
+    $delivery_note = trim($_POST['delivery_note']);
+    $delivery_date = !empty($_POST['delivery_date']) ? trim($_POST['delivery_date']) : null; // Allow null for empty date
+
+    $conforme_supplier = trim($_POST['conforme_supplier']);
+    $approved_by_assistant_gm = trim($_POST['approved_by_assistant_gm']);
+    $approved_by_gm = trim($_POST['approved_by_gm']);
+    
+    $username = $_POST['username']; // Make sure username is sent via AJAX
+
+    // Decode items
+    $items = [];
+    if (isset($_POST['items']) && !empty($_POST['items'])) {
+        $items = json_decode($_POST['items'], true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Invalid JSON format for items.']);
+            exit;
+        }
+    }
+
+    // Call API update method
+    $result = $api->update_purchase_order(
+        $purchase_order_id, $vendor_id, $order_date, $terms, $fob, $delivery_note, $requested_by,
+        $req_no, $gross_amount, $withholding_tax_rate, $withholding_tax_amount,
+        $vat_tax_rate, $vat_amount, $net_amount, $status, $conforme_supplier,
+        $approved_by_assistant_gm, $approved_by_gm, $username, $items, $delivery_date
+    );
+
+    echo $result; // Should echo 'Updated' or an error message
+}
 
     # Delete purchase order
     else if($transaction == 'delete purchase order'){

@@ -464,12 +464,36 @@
                         </a>
                     </li>';
         }
+
+
          if($pmw_page < 1){
             $menu .= '<li>
                         <a href="pmw-monitoring.php" class="waves-effect">
                             <i class="bx bx-repeat"></i>
                             <span key="t-human-resource-modules">PMW Monitoring</span>
                         </a>
+                    </li>';
+        }
+        
+        if($career_page > 0){
+           $menu .= '<li>
+                        <a href="javascript: void(0);" class="has-arrow waves-effect">
+                            <i class="bx  bx-receipt"></i>
+                            <span key="t-human-resource-modules">Purchase Order</span>
+                        </a>
+                        <ul class="sub-menu" aria-expanded="false">';
+
+                        if($employee_list_page > 0){
+                            $menu .= '<li><a href="purchase-order.php" key="t-human-resource">Dashboard</a></li>';
+                        }
+
+                        if($employee_list_page > 0){
+                            $menu .= '<li><a href="vendors.php" key="t-human-resource">Vendor</a></li>';
+                        }
+
+                      
+
+            $menu .= '</ul>
                     </li>';
         }
 

@@ -10931,6 +10931,132 @@ $(document).on("click", ".delete-purchase-order", function () {
 
 
 
+// Existing handler for edit button
+$(document).on('click', '.update-purchase-order', function(e) {
+    e.preventDefault(); // Prevent default link behavior if button is inside an <a>
+    
+    let poId = $(this).data('purchaseorderid');
+    console.log("Edit button clicked. PO ID:", poId);
+    
+    // Redirect to the edit page, passing the ID
+    window.location.href = 'purchase-order-edit.php?id=' + poId; 
+});
+
+// For View Action (if not redirecting)
+$(document).on('click', '.view-purchase-order', function() {
+    let poId = $(this).data('purchaseorderid');
+    // Example: Load data into a modal
+    $.ajax({
+        url: 'controller.php',
+        method: 'POST',
+        dataType: 'json',
+        data: { transaction: 'get purchase order details', purchase_order_id: poId },
+        success: function(response) {
+            if (response && response.details) {
+                console.log('PO Details:', response);
+                // Populate a modal or display information
+                $('#poViewModalLabel').text('Purchase Order #' + response.details.PURCHASE_ORDER_ID);
+                // You'll need to create a modal structure in your HTML
+                // Populate modal with response.details and response.items
+                $('#System-Modal').modal('show'); // Assuming a generic modal ID
+            } else {
+                Swal.fire('Error', 'Could not load purchase order details.', 'error');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("AJAX error for view:", error, xhr.responseText);
+            Swal.fire('Error', 'An error occurred while fetching PO details.', 'error');
+        }
+    });
+});
+
+// In assets/js/click-events.js
+
+// In assets/js/click-events.js
+
+$(document).on("click", ".print-purchase-order", function () {
+    var purchase_order_id = $(this).data("purchaseorderid");
+
+    Swal.fire({
+        title: 'Generating Print View...',
+        text: 'Please wait.',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    $.ajax({
+        url: 'controller.php',
+        method: 'POST',
+        dataType: 'JSON',
+        data: {
+            transaction: 'generate purchase order print',
+            purchase_order_id: purchase_order_id,
+            username: username
+        },
+        success: function(response) {
+            Swal.close();
+            if (response.print_view && response.print_view[0] && response.print_view[0]['PRINT']) {
+                var newWindow = window.open('', '_blank');
+                
+                // This is the corrected line that accesses the HTML content
+                newWindow.document.write(response.print_view[0]['PRINT']);
+
+                newWindow.document.close();
+                setTimeout(function() {
+                    newWindow.focus();
+                    newWindow.print();
+                }, 500);
+            } else {
+                Swal.fire('Error', 'Could not generate the print view.', 'error');
+            }
+        },
+        error: function() {
+            Swal.close();
+            Swal.fire('Error', 'An AJAX error occurred. Please check the console.', 'error');
+        }
+    });
+});
+
+// For Delete Action (you already have this, but ensure it's sending username)
+$(document).on('click', '.delete-purchase-order', function() {
+    let poId = $(this).data('purchaseorderid');
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this purchase order!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                // Make sure 'username' is correctly available here
+                data: { transaction: 'delete purchase order', purchase_order_id: poId, username: $('#username').text().trim() }, 
+                success: function(response) {
+                    if (response === 'Deleted') {
+                        Swal.fire('Deleted!', 'Purchase Order has been deleted.', 'success').then(() => {
+                            // Refresh the datatable
+                            $('#purchase-order-datatable').DataTable().ajax.reload();
+                        });
+                    } else {
+                        Swal.fire('Error', response || 'Deletion failed.', 'error');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX error for delete:", error, xhr.responseText);
+                    Swal.fire('Error', 'An error occurred during deletion.', 'error');
+                }
+            });
+        }
+    });
+});
+
+
+
 
 
 

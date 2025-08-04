@@ -22,7 +22,7 @@
 
                             <a href="dashboard.php" class="logo logo-light">
                                 <span class="logo-sm">
-                                    <img src="<?php echo $logo_icon_light; ?>" alt="" height="24">
+                                    <img src="./assets/images/application-settings/logo-icon-light.png" alt="" height="24">
                                 </span>
                                 <span class="logo-lg">
                                     <img src="<?php echo $logo_light; ?>" alt="" height="40">
