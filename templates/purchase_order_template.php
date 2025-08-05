@@ -200,7 +200,7 @@
                 <td><?= htmlspecialchars($po_details['TERMS']) ?></td>
                 <td><?= htmlspecialchars($po_details['FOB']) ?></td>
                 <td><?= htmlspecialchars($po_details['DELIVERY_NOTE']) ?></td>
-                <td><?= htmlspecialchars($requester_name) ?></td>
+                <td><?= htmlspecialchars($po_details['REQUESTED_BY']) ?></td>
                 <td><?= htmlspecialchars($po_details['REQ_NO']) ?></td>
             </tr>
         </table>

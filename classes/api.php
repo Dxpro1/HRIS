@@ -17474,14 +17474,7 @@ public function get_total_ob_paid_hours($employee_id, $parameter_1, $parameter_2
         $sql_items->bindParam(':purchase_order_id', $purchase_order_id);
         $sql_items->execute();
         $po_items = $sql_items->fetchAll(PDO::FETCH_ASSOC);
-
-        $requester_name = $po_details['CREATED_BY'];
-        if (!empty($po_details['CREATED_BY'])) {
-            $requester_details = $this->get_data_details_one_parameter('employee profile', $po_details['CREATED_BY']);
-            if ($requester_details) {
-                $requester_name = $this->get_full_name($requester_details[0]['FIRST_NAME'], $requester_details[0]['MIDDLE_NAME'], $requester_details[0]['LAST_NAME'], $requester_details[0]['SUFFIX'])[0]['FULL_NAME'];
-            }
-        }
+ 
 
         // --- NEW: Fetch and prepare the company logo ---
         $application_settings = $this->get_data_details_one_parameter('application settings', '1');
