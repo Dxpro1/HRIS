@@ -5540,7 +5540,7 @@ else if($type == 'purchase order table'){
             $status            = $row['STATUS'];
 
             // ACTION buttons — always add a VIEW button, others based on roles
-            $action = '<button class="btn btn-secondary waves-effect waves-light view-purchase-order" data-purchaseorderid="'. $purchase_order_id .'" title="View PO"><i class="bx bx-show"></i></button> ';
+            $action = ' ';
 
             if($update_purchase_order > 0){
                 $action .= '<button class="btn btn-info waves-effect waves-light update-purchase-order" data-purchaseorderid="'. $purchase_order_id .'" title="Edit PO"><i class="bx bx-pencil"></i></button> ';

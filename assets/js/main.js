@@ -491,13 +491,7 @@ if ($("#employee-list-datatable").length) {
     generate_datatable('career table', '#career-datatable', 3, 'asc', [5]);
     }
 
-    if ($('#vendor-datatable').length) {
-    generate_datatable('vendor table', '#vendor-datatable', 0, 'asc', [4]);
-}
 
-   // In main.js
-
-   // In main.js
    $(document).ready(function () {
     if ($('#pmw-monitoring-datatable').length) {
 
@@ -831,8 +825,13 @@ if ($("#employee-list-datatable").length) {
       );
     }
 
+    //Purchase Order 
     if ($("#purchase-order-datatable").length) {
       generate_datatable("purchase order table", "#purchase-order-datatable", 0, "desc", [6]);
+    }
+    
+    if ($('#vendor-datatable').length) {
+    generate_datatable('vendor table', '#vendor-datatable', 0, 'asc', [4]);
     }
 
 

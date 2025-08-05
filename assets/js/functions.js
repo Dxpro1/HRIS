@@ -1455,47 +1455,45 @@ function display_form_details(formtype){
         });
     }
 
-// Fixed function.js with better error handling
-else if (formtype == 'vendor form') {
-    var vendor_id = sessionStorage.getItem('vendor_id');
+// PURCHASE ORDER (VENDOR) = RCMERCADO
+    else if (formtype == 'vendor form') {
+        var vendor_id = sessionStorage.getItem('vendor_id');
 
-    if (vendor_id && vendor_id !== 'null' && vendor_id !== '') {
-        transaction = 'vendor details';
+        if (vendor_id && vendor_id !== 'null' && vendor_id !== '') {
+            transaction = 'vendor details';
 
-        $.ajax({
-            url: 'controller.php',
-            method: 'POST',
-            dataType: 'JSON',
-            data: {vendor_id: vendor_id, transaction: transaction},
-            success: function(response) {
-                console.log('Vendor details response:', response); // ✅ Debug
-                if (response && response.length > 0 && response[0]) {
-                    $('#vendor_id').val(vendor_id);
-                    $('#vendor_name').val(response[0].VENDOR_NAME || '');
-                    $('#vendor_type').val(response[0].VENDOR_TYPE || '');
-                    $('#vendor_address').val(response[0].VENDOR_ADDRESS || '');
-                    $('#contact_person').val(response[0].CONTACT_PERSON || '');
-                    $('#email').val(response[0].EMAIL || '');
-                    $('#phone').val(response[0].PHONE || '');
-                    $('#bank_name').val(response[0].BANK_NAME || '');
-                    $('#bank_account_name').val(response[0].BANK_ACCOUNT_NAME || '');
-                    $('#bank_account_number').val(response[0].BANK_ACCOUNT_NUMBER || '');
+            $.ajax({
+                url: 'controller.php',
+                method: 'POST',
+                dataType: 'JSON',
+                data: {vendor_id: vendor_id, transaction: transaction},
+                success: function(response) {
+                    console.log('Vendor details response:', response); // ✅ Debug
+                    if (response && response.length > 0 && response[0]) {
+                        $('#vendor_id').val(vendor_id);
+                        $('#vendor_name').val(response[0].VENDOR_NAME || '');
+                        $('#vendor_type').val(response[0].VENDOR_TYPE || '');
+                        $('#vendor_address').val(response[0].VENDOR_ADDRESS || '');
+                        $('#contact_person').val(response[0].CONTACT_PERSON || '');
+                        $('#email').val(response[0].EMAIL || '');
+                        $('#phone').val(response[0].PHONE || '');
+                        $('#bank_name').val(response[0].BANK_NAME || '');
+                        $('#bank_account_name').val(response[0].BANK_ACCOUNT_NAME || '');
+                        $('#bank_account_number').val(response[0].BANK_ACCOUNT_NUMBER || '');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Failed to load vendor data:', error);
+                },
+                complete: function() {
+                    check_role_permission(formtype, 429);
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error('Failed to load vendor data:', error);
-            },
-            complete: function() {
-                check_role_permission(formtype, 429);
-            }
-        });
-    } else {
-        $('#vendor_id').val('');
-        check_role_permission(formtype, 429);
+            });
+        } else {
+            $('#vendor_id').val('');
+            check_role_permission(formtype, 429);
+        }
     }
-}
-
-
 
     else if(formtype == 'pmw status form'){
         var employee_id = sessionStorage.getItem('pmw_employee_id');
@@ -1529,7 +1527,6 @@ else if (formtype == 'vendor form') {
             }
         });
     }
-
 
     else if(formtype == 'office shift form'){
         transaction = 'company details';
@@ -4429,6 +4426,9 @@ if (typeof formatDate !== 'function') {
 }
 
 
+
+
+// ✅ Fetch full vendor details when a supplier is selected
 $(document).ready(function () {
         // ✅ Initialize Select2 only once (not twice)
         $('#vendor_id').select2({
@@ -4463,8 +4463,6 @@ $(document).ready(function () {
                 }
             }
         });
-
-        // ✅ Fetch full vendor details when a supplier is selected
        $('#vendor_id').on('change', function () {
             var vendor_id = $(this).val();
 

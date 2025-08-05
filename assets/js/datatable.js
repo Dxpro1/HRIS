@@ -49,17 +49,6 @@ else if(type == 'career table'){
         ];
     }
 
-    else if (type == 'vendor table') {
-    column = [
-        { 'data': 'VENDOR_NAME' },
-        { 'data': 'CONTACT_PERSON' },
-        { 'data': 'EMAIL' },
-        { 'data': 'PHONE' },
-        { 'data': 'ACTION' }
-    ];
-}
-
-
     else if(type == 'permission table'){
         column = [
             { 'data' : 'PERMISSION_ID' },
@@ -479,7 +468,7 @@ else if(type == 'career table'){
 
         ];
     }
-
+    // ==========changes Rcmercado===============
     else if(type == 'purchase order table'){
     column = [
         { 'data' : 'PURCHASE_ORDER_ID' },
@@ -489,10 +478,17 @@ else if(type == 'career table'){
         { 'data' : 'GRAND_TOTAL' },
         { 'data' : 'STATUS' },
         { 'data' : 'ACTION' }
-    ];
-}
-
-
+        ];
+    }
+    else if (type == 'vendor table') {
+    column = [
+        { 'data': 'VENDOR_NAME' },
+        { 'data': 'CONTACT_PERSON' },
+        { 'data': 'EMAIL' },
+        { 'data': 'PHONE' },
+        { 'data': 'ACTION' }
+       ];
+    }
 
 	else if(type == 'meeting table'){
         column = [

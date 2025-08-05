@@ -16968,37 +16968,36 @@ public function get_total_ob_paid_hours($employee_id, $parameter_1, $parameter_2
                 ORDER BY c.CAREER_ORDER ASC, c.POSITION ASC
             ');
 
-            if ($sql->execute()) {
-                while ($row = $sql->fetch(PDO::FETCH_ASSOC)) {
-                    $branch_name = trim($row['BRANCH_NAME']);
+                if ($sql->execute()) {
+                    while ($row = $sql->fetch(PDO::FETCH_ASSOC)) {
+                        $branch_name = trim($row['BRANCH_NAME']);
 
-                    // Get designation label from system code
-                    $designation_details = $this->get_data_details_one_parameter('designation', $row['POSITION']);
-                    $designation_label = $designation_details[0]['DESIGNATION'] ?? $row['POSITION']; // fallback to code
+                        // Get designation label from system code
+                        $designation_details = $this->get_data_details_one_parameter('designation', $row['POSITION']);
+                        $designation_label = $designation_details[0]['DESIGNATION'] ?? $row['POSITION']; // fallback to code
 
-                    if (!isset($careers_by_branch[$branch_name])) {
-                        $careers_by_branch[$branch_name] = [];
+                        if (!isset($careers_by_branch[$branch_name])) {
+                            $careers_by_branch[$branch_name] = [];
+                        }
+
+                        $careers_by_branch[$branch_name][] = [
+                            'CAREER_ID' => $row['CAREER_ID'],
+                            'POSITION' => $designation_label, // human-readable
+                            'AVAILABLE_POSITION' => (int)$row['AVAILABLE_POSITION'],
+                            'SUMMARY' => $row['SUMMARY']
+                        ];
                     }
-
-                    $careers_by_branch[$branch_name][] = [
-                        'CAREER_ID' => $row['CAREER_ID'],
-                        'POSITION' => $designation_label, // human-readable
-                        'AVAILABLE_POSITION' => (int)$row['AVAILABLE_POSITION'],
-                        'SUMMARY' => $row['SUMMARY']
-                    ];
                 }
+            } catch (Exception $e) {
+                error_log("Error fetching careers by branch: " . $e->getMessage());
             }
-        } catch (Exception $e) {
-            error_log("Error fetching careers by branch: " . $e->getMessage());
         }
+
+        return $careers_by_branch;
     }
 
-    return $careers_by_branch;
-}
-
-
-
-  public function insert_vendor($vendor_name, $vendor_type, $vendor_address, $contact_person, $email, $phone, $bank_name, $bank_account_name, $bank_account_number, $username) {
+    //PURCHASE ORDER - (INSERT VENDOR) 
+    public function insert_vendor($vendor_name, $vendor_type, $vendor_address, $contact_person, $email, $phone, $bank_name, $bank_account_name, $bank_account_number, $username) {
         if ($this->databaseConnection()) {
             $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
 
@@ -17053,6 +17052,7 @@ public function get_total_ob_paid_hours($employee_id, $parameter_1, $parameter_2
         }
     }
 
+    //PURCHASE ORDER - (UPDATE VENDOR) 
     public function update_vendor($vendor_name, $vendor_type, $vendor_address, $contact_person, $email, $phone, $bank_name, $bank_account_name, $bank_account_number, $vendor_id, $username) {
         if ($this->databaseConnection()) {
             $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
@@ -17100,6 +17100,7 @@ public function get_total_ob_paid_hours($employee_id, $parameter_1, $parameter_2
         }
     }
 
+    //PURCHASE ORDER - (GET ID VENDOR) 
     public function get_vendor_by_id($vendor_id) {
         if ($this->databaseConnection()) {
             $sql = $this->db_connection->prepare("SELECT * FROM tblvendor WHERE VENDOR_ID = :vendor_id");
@@ -17123,39 +17124,40 @@ public function get_total_ob_paid_hours($employee_id, $parameter_1, $parameter_2
         }
     }
 
-public function delete_vendor($vendor_id, $username) {
-    error_log("DEBUG: delete_vendor() called. ID = " . $vendor_id . ", by user = " . $username);
+    //PURCHASE ORDER - (DELETE VENDOR) 
+    public function delete_vendor($vendor_id, $username) {
+        error_log("DEBUG: delete_vendor() called. ID = " . $vendor_id . ", by user = " . $username);
 
-    if (!$this->db_connection) {
-        error_log("DEBUG: DB connection not found.");
-        return 'No DB Connection';
-    }
-
-    try {
-        $sql = $this->db_connection->prepare("DELETE FROM tblvendor WHERE VENDOR_ID = :id");
-        $sql->bindParam(':id', $vendor_id, PDO::PARAM_INT); // or use PARAM_STR if it's string
-
-        if ($sql->execute()) {
-            $rows = $sql->rowCount(); // Count affected rows
-            error_log("DEBUG: Rows affected = $rows");
-            return $rows > 0 ? '1' : 'No rows deleted';
-        } else {
-            error_log("DEBUG: SQL execution failed: " . print_r($sql->errorInfo(), true));
-            return 'Delete failed';
+        if (!$this->db_connection) {
+            error_log("DEBUG: DB connection not found.");
+            return 'No DB Connection';
         }
-    } catch (Exception $e) {
-        error_log("DEBUG: Exception during delete: " . $e->getMessage());
-        return 'Exception: ' . $e->getMessage();
+
+        try {
+            $sql = $this->db_connection->prepare("DELETE FROM tblvendor WHERE VENDOR_ID = :id");
+            $sql->bindParam(':id', $vendor_id, PDO::PARAM_INT); // or use PARAM_STR if it's string
+
+            if ($sql->execute()) {
+                $rows = $sql->rowCount(); // Count affected rows
+                error_log("DEBUG: Rows affected = $rows");
+                return $rows > 0 ? '1' : 'No rows deleted';
+            } else {
+                error_log("DEBUG: SQL execution failed: " . print_r($sql->errorInfo(), true));
+                return 'Delete failed';
+            }
+        } catch (Exception $e) {
+            error_log("DEBUG: Exception during delete: " . $e->getMessage());
+            return 'Exception: ' . $e->getMessage();
+        }
     }
-}
 
 
-// Add to api.php
-public function insert_purchase_order(
-    $vendor_id, $order_date, $terms, $fob, $delivery_note, $requested_by, $req_no,
-    $gross_amount, $withholding_tax_rate, $withholding_tax_amount, $vat_tax_rate, $vat_amount, $net_amount,
-    $status, $conforme_supplier, $approved_by_assistant_gm, $approved_by_gm, $username, $items, $delivery_date
-) {
+    //PURCHASE ORDER - (INSERT PURCHASE RECORD) 
+    public function insert_purchase_order(
+        $vendor_id, $order_date, $terms, $fob, $delivery_note, $requested_by, $req_no,
+        $gross_amount, $withholding_tax_rate, $withholding_tax_amount, $vat_tax_rate, $vat_amount, $net_amount,
+        $status, $conforme_supplier, $approved_by_assistant_gm, $approved_by_gm, $username, $items, $delivery_date
+    ) {
     if ($this->databaseConnection()) {
         try {
             // Start transaction
@@ -17167,8 +17169,8 @@ public function insert_purchase_order(
                 return "System parameter not found or invalid format.";
             }
 
-            $purchase_order_id = $system_parameter[0]['PARAMNUM']; // ✅ Correct numeric ID
-            $paramnum = $purchase_order_id; // Used to update PARAMNUM
+            $purchase_order_id = $system_parameter[0]['PARAMNUM']; 
+            $paramnum = $purchase_order_id; 
             
             // Insert PO header
             $sql = $this->db_connection->prepare("INSERT INTO tblpurchaseorder (
@@ -17236,13 +17238,10 @@ public function insert_purchase_order(
     return "Database Connection Error";
 }
 
-
-// In api.php
-
-  public function get_purchase_order_details($purchase_order_id) {
+//PURCHASE ORDER - (Fetch Header and Vendor Details) 
+    public function get_purchase_order_details($purchase_order_id) {
         if ($this->databaseConnection()) {
             try {
-                // --- Fetch Header and Vendor Details ---
                 $sql_header = $this->db_connection->prepare("
                     SELECT
                         po.*,
@@ -17288,236 +17287,224 @@ public function insert_purchase_order(
         }
     }
 
-
-
-// In api.php
-
-public function get_vendors($searchTerm = '') {
-    if ($this->databaseConnection()) {
-        try {
-            $sql = $this->db_connection->prepare("
-                SELECT VENDOR_ID, VENDOR_NAME 
-                FROM tblvendor 
-                WHERE VENDOR_NAME LIKE :search 
-                ORDER BY VENDOR_NAME
-            ");
-            $searchParam = '%' . $searchTerm . '%'; 
-            $sql->bindParam(':search', $searchParam);
-            $sql->execute();
-            $vendors = $sql->fetchAll(PDO::FETCH_ASSOC);
-            
-            // FIX: Return the database results directly.
-            // The JavaScript on the edit page will handle the final formatting.
-            return $vendors;
-
-        } catch (Exception $e) {
-            error_log("API Error (get_vendors): " . $e->getMessage());
-            return []; // Return empty array on error
-        }
-    }
-    error_log("API Error (get_vendors): Database connection failed.");
-    return []; // Return empty array on connection failure
-}
-// In api.php
-
-public function delete_purchase_order($purchase_order_id, $username) {
-    if ($this->databaseConnection()) {
-        try {
-            $this->db_connection->beginTransaction();
-
-            // 1. Delete items first (foreign key constraint)
-            $delete_items_sql = $this->db_connection->prepare("DELETE FROM tblpurchaseorderitem WHERE PURCHASE_ORDER_ID = :purchase_order_id");
-            $delete_items_sql->bindParam(':purchase_order_id', $purchase_order_id, PDO::PARAM_INT);
-            if (!$delete_items_sql->execute()) {
-                $this->db_connection->rollBack();
-                error_log("API Error (delete_purchase_order items): " . print_r($delete_items_sql->errorInfo(), true));
-                return "Failed to delete purchase order items.";
-            }
-
-            // 2. Delete the header
-            $delete_header_sql = $this->db_connection->prepare("DELETE FROM tblpurchaseorder WHERE PURCHASE_ORDER_ID = :purchase_order_id");
-            $delete_header_sql->bindParam(':purchase_order_id', $purchase_order_id, PDO::PARAM_INT);
-            if (!$delete_header_sql->execute()) {
-                $this->db_connection->rollBack();
-                error_log("API Error (delete_purchase_order header): " . print_r($delete_header_sql->errorInfo(), true));
-                return "Failed to delete purchase order header.";
-            }
-
-            // Log the action
-            $this->insert_logs($username, 'Delete Purchase Order', "User {$username} deleted Purchase Order ID: {$purchase_order_id}");
-
-            $this->db_connection->commit();
-            return 'Deleted';
-        } catch (Exception $e) {
-            $this->db_connection->rollBack();
-            error_log("API Exception (delete_purchase_order): " . $e->getMessage());
-            return "An error occurred during deletion.";
-        }
-    } else {
-        return "Database connection failed";
-    }
-}
-
-// In api.php
-
-public function update_purchase_order(
-    $purchase_order_id, $vendor_id, $order_date, $terms, $fob, $delivery_note, $requested_by, $req_no,
-    $gross_amount, $withholding_tax_rate, $withholding_tax_amount, $vat_tax_rate, $vat_amount, $net_amount,
-    $status, $conforme_supplier, $approved_by_assistant_gm, $approved_by_gm, $username, $items, $delivery_date
-) {
-    if ($this->databaseConnection()) {
-        try {
-            $this->db_connection->beginTransaction();
-
-            // Update PO header
-            $sql_update_header = $this->db_connection->prepare("
-                UPDATE tblpurchaseorder SET
-                    VENDOR_ID = :vendor_id, ORDER_DATE = :order_date, TERMS = :terms, FOB = :fob,
-                    DELIVERY_NOTE = :delivery_note, REQUESTED_BY = :requested_by, REQ_NO = :req_no,
-                    GROSS_AMOUNT = :gross_amount, WITHHOLDING_TAX_RATE = :withholding_tax_rate,
-                    WITHHOLDING_TAX_AMOUNT = :withholding_tax_amount, VAT_TAX_RATE = :vat_tax_rate,
-                    VAT_TAX_AMOUNT = :vat_amount, NET_AMOUNT = :net_amount, STATUS = :status,
-                    CONFORME_SUPPLIER = :conforme_supplier, APPROVED_BY_ASSISTANT_GM = :approved_by_assistant_gm,
-                    APPROVED_BY_GM = :approved_by_gm, DELIVERY_DATE = :delivery_date
-                WHERE PURCHASE_ORDER_ID = :purchase_order_id
-            ");
-
-            $sql_update_header->bindParam(':purchase_order_id', $purchase_order_id, PDO::PARAM_INT);
-            $sql_update_header->bindParam(':vendor_id', $vendor_id, PDO::PARAM_INT);
-            $sql_update_header->bindParam(':order_date', $order_date);
-            $sql_update_header->bindParam(':terms', $terms);
-            $sql_update_header->bindParam(':fob', $fob);
-            $sql_update_header->bindParam(':delivery_note', $delivery_note);
-            $sql_update_header->bindParam(':requested_by', $requested_by);
-            $sql_update_header->bindParam(':req_no', $req_no);
-            $sql_update_header->bindParam(':gross_amount', $gross_amount);
-            $sql_update_header->bindParam(':withholding_tax_rate', $withholding_tax_rate);
-            $sql_update_header->bindParam(':withholding_tax_amount', $withholding_tax_amount);
-            $sql_update_header->bindParam(':vat_tax_rate', $vat_tax_rate);
-            $sql_update_header->bindParam(':vat_amount', $vat_amount);
-            $sql_update_header->bindParam(':net_amount', $net_amount);
-            $sql_update_header->bindParam(':status', $status);
-            $sql_update_header->bindParam(':conforme_supplier', $conforme_supplier);
-            $sql_update_header->bindParam(':approved_by_assistant_gm', $approved_by_assistant_gm);
-            $sql_update_header->bindParam(':approved_by_gm', $approved_by_gm);
-            $sql_update_header->bindParam(':delivery_date', $delivery_date);
-
-            if (!$sql_update_header->execute()) {
-                $this->db_connection->rollBack();
-                error_log("API Error (update_purchase_order header): " . print_r($sql_update_header->errorInfo(), true));
-                return "Failed to update purchase order header.";
-            }
-
-            // Handle PO Items: Delete existing and insert new
-            // 1. Delete all current items for this PO
-            $delete_items_sql = $this->db_connection->prepare("DELETE FROM tblpurchaseorderitem WHERE PURCHASE_ORDER_ID = :purchase_order_id");
-            $delete_items_sql->bindParam(':purchase_order_id', $purchase_order_id, PDO::PARAM_INT);
-            if (!$delete_items_sql->execute()) {
-                $this->db_connection->rollBack();
-                error_log("API Error (update_purchase_order delete items): " . print_r($delete_items_sql->errorInfo(), true));
-                return "Failed to clear existing purchase order items.";
-            }
-
-            // 2. Insert new items
-            if (!empty($items)) {
-                $sql_insert_item = $this->db_connection->prepare("INSERT INTO tblpurchaseorderitem
-                    (PURCHASE_ORDER_ID, ITEM_DESCRIPTION, QUANTITY, UNIT_PRICE, DELIVERY_DATE)
-                    VALUES (:purchase_order_id, :item_description, :quantity, :unit_price, :delivery_date)
+    //PURCHASE ORDER - (Fetch Header and Vendor Details) 
+    public function get_vendors($searchTerm = '') {
+        if ($this->databaseConnection()) {
+            try {
+                $sql = $this->db_connection->prepare("
+                    SELECT VENDOR_ID, VENDOR_NAME 
+                    FROM tblvendor 
+                    WHERE VENDOR_NAME LIKE :search 
+                    ORDER BY VENDOR_NAME
                 ");
-                foreach ($items as $item) {
-                    // Basic validation for item fields
-                    if (!isset($item['item_description']) || !isset($item['quantity']) || !isset($item['price'])) {
-                        $this->db_connection->rollBack();
-                        return "Invalid item data provided.";
-                    }
+                $searchParam = '%' . $searchTerm . '%'; 
+                $sql->bindParam(':search', $searchParam);
+                $sql->execute();
+                $vendors = $sql->fetchAll(PDO::FETCH_ASSOC);
+                
+                // FIX: Return the database results directly.
+                // The JavaScript on the edit page will handle the final formatting.
+                return $vendors;
 
-                    $sql_insert_item->bindParam(':purchase_order_id', $purchase_order_id, PDO::PARAM_INT);
-                    $sql_insert_item->bindParam(':item_description', $item['item_description']);
-                    $sql_insert_item->bindParam(':quantity', $item['quantity'], PDO::PARAM_INT);
-                    $sql_insert_item->bindParam(':unit_price', $item['price']);
-                    $sql_insert_item->bindParam(':delivery_date', $delivery_date); // Or per item if available
+            } catch (Exception $e) {
+                error_log("API Error (get_vendors): " . $e->getMessage());
+                return []; // Return empty array on error
+            }
+        }
+        error_log("API Error (get_vendors): Database connection failed.");
+        return []; // Return empty array on connection failure
+    }
 
-                    if (!$sql_insert_item->execute()) {
-                        $this->db_connection->rollBack();
-                        error_log("API Error (update_purchase_order insert item): " . print_r($sql_insert_item->errorInfo(), true));
-                        return "Failed to insert purchase order item.";
+    //PURCHASE ORDER - (UPDATE PO) 
+    public function update_purchase_order(
+        $purchase_order_id, $vendor_id, $order_date, $terms, $fob, $delivery_note, $requested_by, $req_no,
+        $gross_amount, $withholding_tax_rate, $withholding_tax_amount, $vat_tax_rate, $vat_amount, $net_amount,
+        $status, $conforme_supplier, $approved_by_assistant_gm, $approved_by_gm, $username, $items, $delivery_date
+        ) {
+        if ($this->databaseConnection()) {
+            try {
+                $this->db_connection->beginTransaction();
+
+                // Update PO header
+                $sql_update_header = $this->db_connection->prepare("
+                    UPDATE tblpurchaseorder SET
+                        VENDOR_ID = :vendor_id, ORDER_DATE = :order_date, TERMS = :terms, FOB = :fob,
+                        DELIVERY_NOTE = :delivery_note, REQUESTED_BY = :requested_by, REQ_NO = :req_no,
+                        GROSS_AMOUNT = :gross_amount, WITHHOLDING_TAX_RATE = :withholding_tax_rate,
+                        WITHHOLDING_TAX_AMOUNT = :withholding_tax_amount, VAT_TAX_RATE = :vat_tax_rate,
+                        VAT_TAX_AMOUNT = :vat_amount, NET_AMOUNT = :net_amount, STATUS = :status,
+                        CONFORME_SUPPLIER = :conforme_supplier, APPROVED_BY_ASSISTANT_GM = :approved_by_assistant_gm,
+                        APPROVED_BY_GM = :approved_by_gm, DELIVERY_DATE = :delivery_date
+                    WHERE PURCHASE_ORDER_ID = :purchase_order_id
+                ");
+
+                $sql_update_header->bindParam(':purchase_order_id', $purchase_order_id, PDO::PARAM_INT);
+                $sql_update_header->bindParam(':vendor_id', $vendor_id, PDO::PARAM_INT);
+                $sql_update_header->bindParam(':order_date', $order_date);
+                $sql_update_header->bindParam(':terms', $terms);
+                $sql_update_header->bindParam(':fob', $fob);
+                $sql_update_header->bindParam(':delivery_note', $delivery_note);
+                $sql_update_header->bindParam(':requested_by', $requested_by);
+                $sql_update_header->bindParam(':req_no', $req_no);
+                $sql_update_header->bindParam(':gross_amount', $gross_amount);
+                $sql_update_header->bindParam(':withholding_tax_rate', $withholding_tax_rate);
+                $sql_update_header->bindParam(':withholding_tax_amount', $withholding_tax_amount);
+                $sql_update_header->bindParam(':vat_tax_rate', $vat_tax_rate);
+                $sql_update_header->bindParam(':vat_amount', $vat_amount);
+                $sql_update_header->bindParam(':net_amount', $net_amount);
+                $sql_update_header->bindParam(':status', $status);
+                $sql_update_header->bindParam(':conforme_supplier', $conforme_supplier);
+                $sql_update_header->bindParam(':approved_by_assistant_gm', $approved_by_assistant_gm);
+                $sql_update_header->bindParam(':approved_by_gm', $approved_by_gm);
+                $sql_update_header->bindParam(':delivery_date', $delivery_date);
+
+                if (!$sql_update_header->execute()) {
+                    $this->db_connection->rollBack();
+                    error_log("API Error (update_purchase_order header): " . print_r($sql_update_header->errorInfo(), true));
+                    return "Failed to update purchase order header.";
+                }
+
+                // Handle PO Items: Delete existing and insert new
+                // 1. Delete all current items for this PO
+                $delete_items_sql = $this->db_connection->prepare("DELETE FROM tblpurchaseorderitem WHERE PURCHASE_ORDER_ID = :purchase_order_id");
+                $delete_items_sql->bindParam(':purchase_order_id', $purchase_order_id, PDO::PARAM_INT);
+                if (!$delete_items_sql->execute()) {
+                    $this->db_connection->rollBack();
+                    error_log("API Error (update_purchase_order delete items): " . print_r($delete_items_sql->errorInfo(), true));
+                    return "Failed to clear existing purchase order items.";
+                }
+
+                // 2. Insert new items
+                if (!empty($items)) {
+                    $sql_insert_item = $this->db_connection->prepare("INSERT INTO tblpurchaseorderitem
+                        (PURCHASE_ORDER_ID, ITEM_DESCRIPTION, QUANTITY, UNIT, UNIT_PRICE, DELIVERY_DATE)
+                        VALUES (:purchase_order_id, :item_description, :quantity, :unit, :unit_price, :delivery_date)
+                    ");
+                    foreach ($items as $item) {
+                        // Basic validation for item fields
+                        if (!isset($item['item_description']) || !isset($item['quantity']) || !isset($item['unit']) || !isset($item['price'])) {
+                            $this->db_connection->rollBack();
+                            return "Invalid item data provided.";
+                        }
+
+                        $sql_insert_item->bindParam(':purchase_order_id', $purchase_order_id, PDO::PARAM_INT);
+                        $sql_insert_item->bindParam(':item_description', $item['item_description']);
+                        $sql_insert_item->bindParam(':quantity', $item['quantity'], PDO::PARAM_INT);
+                        $sql_insert_item->bindParam(':unit', $item['unit']);
+                        $sql_insert_item->bindParam(':unit_price', $item['price']);
+                        $sql_insert_item->bindParam(':delivery_date', $delivery_date); // Or per item if available
+
+                        if (!$sql_insert_item->execute()) {
+                            $this->db_connection->rollBack();
+                            error_log("API Error (update_purchase_order insert item): " . print_r($sql_insert_item->errorInfo(), true));
+                            return "Failed to insert purchase order item.";
+                        }
                     }
                 }
-            } else {
-                // If there are no items submitted, we might want to return an error or allow it based on business logic.
-                // For now, we proceed if the header update was successful.
+                // Log the action
+                $this->insert_logs($username, 'Update Purchase Order', "User {$username} updated Purchase Order ID: {$purchase_order_id}");
+
+                $this->db_connection->commit();
+                return 'Updated';
+            } catch (Exception $e) {
+                $this->db_connection->rollBack();
+                error_log("API Exception (update_purchase_order): " . $e->getMessage());
+                return "An error occurred during update.";
             }
-
-            // Log the action
-            $this->insert_logs($username, 'Update Purchase Order', "User {$username} updated Purchase Order ID: {$purchase_order_id}");
-
-            $this->db_connection->commit();
-            return 'Updated';
-        } catch (Exception $e) {
-            $this->db_connection->rollBack();
-            error_log("API Exception (update_purchase_order): " . $e->getMessage());
-            return "An error occurred during update.";
-        }
-    } else {
-        return "Database connection failed";
-    }
-}
-
-
-// In classes/api.php
-
-// In classes/api.php
-
-public function generate_purchase_order_print($purchase_order_id) {
-    if (!$this->databaseConnection()) {
-        return 'Database connection failed.';
-    }
-
-    // --- Fetch Purchase Order Data (same as before) ---
-    $sql_po = $this->db_connection->prepare("SELECT po.*, v.* FROM tblpurchaseorder po 
-                                            JOIN tblvendor v ON po.VENDOR_ID = v.VENDOR_ID 
-                                            WHERE po.PURCHASE_ORDER_ID = :purchase_order_id");
-    $sql_po->bindParam(':purchase_order_id', $purchase_order_id);
-    $sql_po->execute();
-    $po_details = $sql_po->fetch(PDO::FETCH_ASSOC);
-
-    if (!$po_details) return 'Purchase Order not found.';
-
-    $sql_items = $this->db_connection->prepare("SELECT * FROM tblpurchaseorderitem WHERE PURCHASE_ORDER_ID = :purchase_order_id");
-    $sql_items->bindParam(':purchase_order_id', $purchase_order_id);
-    $sql_items->execute();
-    $po_items = $sql_items->fetchAll(PDO::FETCH_ASSOC);
-
-    $requester_name = $po_details['CREATED_BY'];
-    if (!empty($po_details['CREATED_BY'])) {
-        $requester_details = $this->get_data_details_one_parameter('employee profile', $po_details['CREATED_BY']);
-        if ($requester_details) {
-            $requester_name = $this->get_full_name($requester_details[0]['FIRST_NAME'], $requester_details[0]['MIDDLE_NAME'], $requester_details[0]['LAST_NAME'], $requester_details[0]['SUFFIX'])[0]['FULL_NAME'];
+        } else {
+            return "Database connection failed";
         }
     }
 
-    // --- NEW: Fetch and prepare the company logo ---
-    $application_settings = $this->get_data_details_one_parameter('application settings', '1');
-    $logo_path = $application_settings[0]['PO'] ?? null;
-    $logo_base64 = '';
-    if ($logo_path && file_exists($logo_path)) {
-        $type = pathinfo($logo_path, PATHINFO_EXTENSION);
-        $data = file_get_contents($logo_path);
-        // Embed the image directly into the HTML to ensure it always prints
-        $logo_base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-    }
-    
-    // --- Load the template file using output buffering ---
-    ob_start(); 
-    
-    // The variables $po_details, $po_items, $requester_name, and $logo_base64 are now available to the template
-    require 'templates/purchase_order_template.php';
+    //PURCHASE ORDER - (DELETE PO) 
+    public function delete_purchase_order($purchase_order_id, $username) {
+        if ($this->databaseConnection()) {
+            try {
+                $this->db_connection->beginTransaction();
 
-    $html = ob_get_clean(); 
-    
-    $response[] = array('PRINT' => $html);
-    return $response;
-}
+                // 1. Delete items first (foreign key constraint)
+                $delete_items_sql = $this->db_connection->prepare("DELETE FROM tblpurchaseorderitem WHERE PURCHASE_ORDER_ID = :purchase_order_id");
+                $delete_items_sql->bindParam(':purchase_order_id', $purchase_order_id, PDO::PARAM_INT);
+                if (!$delete_items_sql->execute()) {
+                    $this->db_connection->rollBack();
+                    error_log("API Error (delete_purchase_order items): " . print_r($delete_items_sql->errorInfo(), true));
+                    return "Failed to delete purchase order items.";
+                }
+
+                // 2. Delete the header
+                $delete_header_sql = $this->db_connection->prepare("DELETE FROM tblpurchaseorder WHERE PURCHASE_ORDER_ID = :purchase_order_id");
+                $delete_header_sql->bindParam(':purchase_order_id', $purchase_order_id, PDO::PARAM_INT);
+                if (!$delete_header_sql->execute()) {
+                    $this->db_connection->rollBack();
+                    error_log("API Error (delete_purchase_order header): " . print_r($delete_header_sql->errorInfo(), true));
+                    return "Failed to delete purchase order header.";
+                }
+
+                // Log the action
+                $this->insert_logs($username, 'Delete Purchase Order', "User {$username} deleted Purchase Order ID: {$purchase_order_id}");
+
+                $this->db_connection->commit();
+                return 'Deleted';
+            } catch (Exception $e) {
+                $this->db_connection->rollBack();
+                error_log("API Exception (delete_purchase_order): " . $e->getMessage());
+                return "An error occurred during deletion.";
+            }
+        } else {
+            return "Database connection failed";
+        }
+    }
+
+    //PURCHASE ORDER - (PRINT PO) 
+    public function generate_purchase_order_print($purchase_order_id) {
+        if (!$this->databaseConnection()) {
+            return 'Database connection failed.';
+        }
+
+        $sql_po = $this->db_connection->prepare("SELECT po.*, v.* FROM tblpurchaseorder po 
+                                                JOIN tblvendor v ON po.VENDOR_ID = v.VENDOR_ID 
+                                                WHERE po.PURCHASE_ORDER_ID = :purchase_order_id");
+        $sql_po->bindParam(':purchase_order_id', $purchase_order_id);
+        $sql_po->execute();
+        $po_details = $sql_po->fetch(PDO::FETCH_ASSOC);
+
+        if (!$po_details) return 'Purchase Order not found.';
+
+        $sql_items = $this->db_connection->prepare("SELECT * FROM tblpurchaseorderitem WHERE PURCHASE_ORDER_ID = :purchase_order_id");
+        $sql_items->bindParam(':purchase_order_id', $purchase_order_id);
+        $sql_items->execute();
+        $po_items = $sql_items->fetchAll(PDO::FETCH_ASSOC);
+
+        $requester_name = $po_details['CREATED_BY'];
+        if (!empty($po_details['CREATED_BY'])) {
+            $requester_details = $this->get_data_details_one_parameter('employee profile', $po_details['CREATED_BY']);
+            if ($requester_details) {
+                $requester_name = $this->get_full_name($requester_details[0]['FIRST_NAME'], $requester_details[0]['MIDDLE_NAME'], $requester_details[0]['LAST_NAME'], $requester_details[0]['SUFFIX'])[0]['FULL_NAME'];
+            }
+        }
+
+        // --- NEW: Fetch and prepare the company logo ---
+        $application_settings = $this->get_data_details_one_parameter('application settings', '1');
+        $logo_path = $application_settings[0]['PO'] ?? null;
+        $logo_base64 = '';
+        if ($logo_path && file_exists($logo_path)) {
+            $type = pathinfo($logo_path, PATHINFO_EXTENSION);
+            $data = file_get_contents($logo_path);
+            // Embed the image directly into the HTML to ensure it always prints
+            $logo_base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        }
+        
+        // --- Load the template file using output buffering ---
+        ob_start(); 
+        
+        // The variables $po_details, $po_items, $requester_name, and $logo_base64 are now available to the template
+        require 'templates/purchase_order_template.php';
+
+        $html = ob_get_clean(); 
+        
+        $response[] = array('PRINT' => $html);
+        return $response;
+    }
 /**
  * Get total count of all published positions
  * @return int - Total number of published positions
@@ -25305,15 +25292,9 @@ public function get_hr_events($start_date = null, $end_date = null) {
     return false;
 }
 
-
-
-
-
-
-
     # -------------------------------------------------------------
 
-	 # -------------------------------------------------------------
+	# -------------------------------------------------------------
     #
     # Name       : generate_car_search_parameter_options
     # Purpose    : Generates car search parameter options of dropdown

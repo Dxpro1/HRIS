@@ -357,9 +357,9 @@ $('#purchaseOrderForm').submit(function(e){
     data.items = JSON.stringify(itemsArray || []); // Ensure it's always a string, even if empty
     data.transaction = 'add purchase order';
     // Make sure 'username' variable holds the actual string value
-var username = $('#username').text().trim();
-// ... and then when building your data object:
-data.username = username;
+    var username = $('#username').text().trim();
+    // ... and then when building your data object:
+    data.username = username;
 
 
 
