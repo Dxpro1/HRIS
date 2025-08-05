@@ -279,128 +279,109 @@
         <script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
         <script src="assets/libs/jquery.repeater/jquery.repeater.min.js"></script>
         <script>
-$(document).ready(function () {
-  $('.repeater').repeater({
-    initEmpty: false,
-    show: function () {
-      $(this).slideDown();
-      updateSummary();
-    },
-    hide: function (deleteElement) {
-      $(this).slideUp(deleteElement, updateSummary);
-    },
-    isFirstItemUndeletable: true
-  });
+        $(document).ready(function () {
+        // --- Repeater and Summary Calculation Logic (no changes needed here) ---
+        $('.repeater').repeater({
+            initEmpty: false,
+            show: function () {
+            $(this).slideDown();
+            updateSummary();
+            },
+            hide: function (deleteElement) {
+            $(this).slideUp(deleteElement, updateSummary);
+            },
+            isFirstItemUndeletable: true
+        });
 
-  function updateSummary() {
-    let gross = 0.0;
+        function updateSummary() {
+            let gross = 0.0;
+            $('[data-repeater-item]').each(function () {
+            const qty = parseFloat($(this).find('.item-quantity').val()) || 0;
+            const price = parseFloat($(this).find('.item-price').val()) || 0;
+            const total = qty * price;
+            $(this).find('.item-total').text(`₱${total.toFixed(2)}`);
+            gross += total;
+            });
 
-    $('[data-repeater-item]').each(function () {
-      const qty = parseFloat($(this).find('.item-quantity').val()) || 0;
-      const price = parseFloat($(this).find('.item-price').val()) || 0;
-      const total = qty * price;
-      $(this).find('.item-total').text(`₱${total.toFixed(2)}`);
-      gross += total;
-    });
+            const wt = parseFloat($('#withholding_tax_rate').val()) || 0;
+            const vat = parseFloat($('#vat_tax_rate').val()) || 0;
+            const wtAmount = gross * (wt / 100);
+            const vatAmount = gross * (vat / 100);
+            const net = gross - wtAmount + vatAmount;
 
-    const wt = parseFloat($('#withholding_tax_rate').val()) || 0;
-    const vat = parseFloat($('#vat_tax_rate').val()) || 0;
-
-    const wtAmount = gross * (wt / 100);
-    const vatAmount = gross * (vat / 100);
-    const net = gross - wtAmount + vatAmount;
-
-    $('#summary_gross_amount').text(`₱${gross.toFixed(2)}`);
-    $('#summary_tax_rate_text').text(wt.toFixed(2));
-    $('#summary_tax_amount').text(`- ₱${wtAmount.toFixed(2)}`);
-    $('#summary_vat_rate_text').text(vat.toFixed(2));
-    $('#summary_vat_amount').text(`+ ₱${vatAmount.toFixed(2)}`);
-    $('#summary_net_amount').text(`₱${net.toFixed(2)}`);
-  }
-
-  $(document).on('input', '.item-quantity, .item-price, #withholding_tax_rate, #vat_tax_rate', updateSummary);
-  updateSummary();
-});
-
-
-
- 
-
-$('#purchaseOrderForm').submit(function(e){
-    e.preventDefault();
-    let formData = $(this).serializeArray();
-
-    let itemsArray = []; // Use a different name to avoid confusion
-    formData.forEach(function(f){
-        let itemMatch = f.name.match(/^items\[(\d+)\]\[(.+)\]$/);
-        if(itemMatch){
-            let idx = itemMatch[1];
-            let field = itemMatch[2];
-            if(!itemsArray[idx]) itemsArray[idx] = {};
-            itemsArray[idx][field] = f.value;
+            $('#summary_gross_amount').text(`₱${gross.toFixed(2)}`);
+            $('#summary_tax_rate_text').text(wt.toFixed(2));
+            $('#summary_tax_amount').text(`- ₱${wtAmount.toFixed(2)}`);
+            $('#summary_vat_rate_text').text(vat.toFixed(2));
+            $('#summary_vat_amount').text(`+ ₱${vatAmount.toFixed(2)}`);
+            $('#summary_net_amount').text(`₱${net.toFixed(2)}`);
         }
-    });
 
-    let data = {};
-    formData.forEach(function(f){
-        if(!f.name.match(/^items\[\d+\]\[.+\]$/)){
-            data[f.name] = f.value;
-        }
-    });
+        $(document).on('input', '.item-quantity, .item-price, #withholding_tax_rate, #vat_tax_rate', updateSummary);
+        updateSummary();
 
-    // === ADDED DEBUGGING HERE ===
-    console.log('Raw itemsArray:', itemsArray);
-    console.log('Stringified items:', JSON.stringify(itemsArray));
-    console.log('All other data fields:', data);
-    // === END DEBUGGING ===
+        // --- CORRECTED FORM SUBMISSION LOGIC ---
+        $('#purchaseOrderForm').submit(function(e){
+            e.preventDefault();
+            let formData = $(this).serializeArray();
+            let username = $('#username').text().trim();
 
-    data.items = JSON.stringify(itemsArray || []); // Ensure it's always a string, even if empty
-    data.transaction = 'add purchase order';
-    // Make sure 'username' variable holds the actual string value
-    var username = $('#username').text().trim();
-    // ... and then when building your data object:
-    data.username = username;
+            // Structure items from repeater
+            let itemsArray = [];
+            let otherFormData = {};
 
+            formData.forEach(function(field){
+                let itemMatch = field.name.match(/^items\[(\d+)\]\[(.+)\]$/);
+                if(itemMatch){
+                    let index = itemMatch[1];
+                    let fieldName = itemMatch[2];
+                    if(!itemsArray[index]) { itemsArray[index] = {}; }
+                    itemsArray[index][fieldName] = field.value;
+                } else {
+                    otherFormData[field.name] = field.value;
+                }
+            });
 
+            // --- THIS IS THE FIX ---
+            // 1. Recalculate the gross amount from the items array
+            let grossAmount = 0.0;
+            (itemsArray || []).forEach(item => {
+                const quantity = parseFloat(item.quantity) || 0;
+                const price = parseFloat(item.price) || 0;
+                grossAmount += quantity * price;
+            });
 
+            // 2. Add the calculated gross_amount to the data being sent
+            let submitData = otherFormData;
+            submitData.gross_amount = grossAmount.toFixed(2);
+            // --- END OF FIX ---
 
-    console.log('Final submitData object:', data);
+            submitData.items = JSON.stringify(itemsArray || []);
+            submitData.transaction = 'add purchase order';
+            submitData.username = username;
 
-    // Check if data is actually structured as expected before ajax
-    if (!data.vendor_id || data.vendor_id === '' || data.vendor_id === 'null') {
-        console.error('Validation Error: vendor_id is missing.');
-        // Optionally show a user-friendly message
-        return false; // Prevent submission
-    }
-    if (!data.order_date || data.order_date === '' || data.order_date === 'null') {
-        console.error('Validation Error: order_date is missing.');
-        return false;
-    }
-    // Add checks for other critical fields if needed
-
-    $.ajax({
-        type: 'POST',
-        url: 'controller.php',
-        data: data, // Send the 'data' object now
-        success: function(response){
-            console.log('AJAX Success Response:', response);
-            if(response === 'Inserted'){
-                Swal.fire('Success','Purchase Order has been added.','success').then(() => {
-                    window.location = 'purchase-order.php';
-                });
-            }else{
-                Swal.fire('Error', response || 'An unexpected error occurred.','error');
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error('AJAX Error:', status, error, xhr.responseText);
-            Swal.fire('AJAX Error', `Request failed: ${error}`, 'error');
-        }
-    });
-});
-
+            // AJAX call to submit the form
+            $.ajax({
+                type: 'POST',
+                url: 'controller.php',
+                data: submitData,
+                success: function(response){
+                    if(response === 'Inserted'){
+                        Swal.fire('Success','Purchase Order has been added.','success').then(() => {
+                            window.location = 'purchase-order.php';
+                        });
+                    } else {
+                        Swal.fire('Error', response || 'An unexpected error occurred.','error');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire('AJAX Error', `Request failed: ${error}`, 'error');
+                }
+            });
+        });
+        });
         </script>
- 
+
        
     </body>
 </html>
