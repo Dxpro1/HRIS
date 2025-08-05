@@ -11,7 +11,7 @@
     $add_attendance_record = $api->check_role_permissions($username, 137);
     $import_attendance_record = $api->check_role_permissions($username, 140);
     $import_employee_leave = $api->check_role_permissions($username, 282);
-    $add_purchase_order = $api->check_role_permissions($username, 282);
+    $add_purchase_order = $api->check_role_permissions($username, 136);
 
 	if($page_access == 0){
 		header('location: 404-page.php');

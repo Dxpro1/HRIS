@@ -1486,12 +1486,12 @@ function display_form_details(formtype){
                     console.error('Failed to load vendor data:', error);
                 },
                 complete: function() {
-                    check_role_permission(formtype, 429);
+                    check_role_permission(formtype, 136);
                 }
             });
         } else {
             $('#vendor_id').val('');
-            check_role_permission(formtype, 429);
+            check_role_permission(formtype, 136);
         }
     }
 

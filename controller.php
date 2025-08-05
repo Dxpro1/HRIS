@@ -7491,95 +7491,95 @@ else if ($transaction == 'confirm pmw submission alert') {
     # -------------------------------------------------------------
 
     # View document file
-     else if ($transaction == 'view document file') {
-  if (isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['documentid']) && !empty($_POST['documentid'])) {
-    $username = $_POST['username'];
-    $document_id = $_POST['documentid'];
-    $document_details = $api->get_data_details_one_parameter('document', $document_id);
-    $document_name = str_replace('.', '', $document_details[0]['DOCUMENT_NAME']);
-    $document_name = str_replace(' ', '_', $document_name);
-    $document_path = $document_details[0]['DOCUMENT_PATH'];
-    $document_extension = $document_details[0]['DOCUMENT_EXTENSION'];
-    $temp_file_name = $document_path . '.dat';
-    $actual_file_name = $document_path . '.' . $document_extension;
-    if (file_exists($actual_file_name)) {
-      unlink($actual_file_name);
-    }
-    if (copy($temp_file_name, $actual_file_name)) {
-      $response[] = array(
-        'LINK' => $actual_file_name,
-        'FILE_NAME' => $document_name,
-        'FILE_EXTENSION' => $document_extension // Add this line
-      );
-      echo json_encode($response);
-    }
-  }
-}
-# -------------------------------------------------------------
-# Insert/update career
-else if ($transaction == 'submit career') {
-    if (
-        isset($_POST['username']) && !empty($_POST['username']) &&
-        isset($_POST['position']) && !empty($_POST['position']) &&
-        isset($_POST['branch']) && !empty($_POST['branch']) &&
-        isset($_POST['availableposition']) &&
-        isset($_POST['careersummary']) && !empty($_POST['careersummary'])
-    ) {
-        $username = trim($_POST['username']);
-        $career_id = isset($_POST['careerid']) ? trim($_POST['careerid']) : '';
-        $position = trim($_POST['position']);
-        $available_position = intval($_POST['availableposition']);
-        $career_summary = trim($_POST['careersummary']);
-        $branch = trim($_POST['branch']);
+    else if ($transaction == 'view document file') {
+        if (isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['documentid']) && !empty($_POST['documentid'])) {
+            $username = $_POST['username'];
+            $document_id = $_POST['documentid'];
+            $document_details = $api->get_data_details_one_parameter('document', $document_id);
+            $document_name = str_replace('.', '', $document_details[0]['DOCUMENT_NAME']);
+            $document_name = str_replace(' ', '_', $document_name);
+            $document_path = $document_details[0]['DOCUMENT_PATH'];
+            $document_extension = $document_details[0]['DOCUMENT_EXTENSION'];
+            $temp_file_name = $document_path . '.dat';
+            $actual_file_name = $document_path . '.' . $document_extension;
+            if (file_exists($actual_file_name)) {
+            unlink($actual_file_name);
+            }
+            if (copy($temp_file_name, $actual_file_name)) {
+            $response[] = array(
+                'LINK' => $actual_file_name,
+                'FILE_NAME' => $document_name,
+                'FILE_EXTENSION' => $document_extension // Add this line
+            );
+            echo json_encode($response);
+            }
+        }
+        }
+    # -------------------------------------------------------------
+    # Insert/update career
+    else if ($transaction == 'submit career') {
+        if (
+            isset($_POST['username']) && !empty($_POST['username']) &&
+            isset($_POST['position']) && !empty($_POST['position']) &&
+            isset($_POST['branch']) && !empty($_POST['branch']) &&
+            isset($_POST['availableposition']) &&
+            isset($_POST['careersummary']) && !empty($_POST['careersummary'])
+        ) {
+            $username = trim($_POST['username']);
+            $career_id = isset($_POST['careerid']) ? trim($_POST['careerid']) : '';
+            $position = trim($_POST['position']);
+            $available_position = intval($_POST['availableposition']);
+            $career_summary = trim($_POST['careersummary']);
+            $branch = trim($_POST['branch']);
 
-        $check_data_exist = 0;
+            $check_data_exist = 0;
 
-        // Only check if career ID is not empty and not default placeholder
-        if (!empty($career_id) && $career_id !== '0' && $career_id !== 'null') {
-            if ($api->databaseConnection()) {
-                $sql_check = $api->db_connection->prepare('SELECT COUNT(*) as count FROM tblcareer WHERE CAREER_ID = :career_id');
-                $sql_check->bindParam(':career_id', $career_id, PDO::PARAM_STR);
+            // Only check if career ID is not empty and not default placeholder
+            if (!empty($career_id) && $career_id !== '0' && $career_id !== 'null') {
+                if ($api->databaseConnection()) {
+                    $sql_check = $api->db_connection->prepare('SELECT COUNT(*) as count FROM tblcareer WHERE CAREER_ID = :career_id');
+                    $sql_check->bindParam(':career_id', $career_id, PDO::PARAM_STR);
 
-                if ($sql_check->execute()) {
-                    $result = $sql_check->fetch(PDO::FETCH_ASSOC);
-                    $check_data_exist = $result['count'];
+                    if ($sql_check->execute()) {
+                        $result = $sql_check->fetch(PDO::FETCH_ASSOC);
+                        $check_data_exist = $result['count'];
+                    } else {
+                        error_log("SQL check execution failed for career_id: $career_id");
+                    }
                 } else {
-                    error_log("SQL check execution failed for career_id: $career_id");
+                    error_log("Database connection failed while checking for career_id: $career_id");
+                }
+            }
+
+            // If record exists in DB, proceed to update
+            if ($check_data_exist > 0) {
+                $update_career = $api->update_career($position, $branch, $career_summary, $available_position, $career_id, $username);
+
+                if ($update_career == '1') {
+                    error_log("Career updated successfully for ID: " . $career_id);
+                    echo 'Updated';
+                } else {
+                    error_log("Career update failed: " . $update_career);
+                    echo $update_career;
                 }
             } else {
-                error_log("Database connection failed while checking for career_id: $career_id");
-            }
-        }
+                // Proceed with insert if no valid existing record
+                error_log("Inserting new career (ID not found or empty): " . $position);
+                $insert_career = $api->insert_career($position, $branch, $career_summary, $available_position, $username);
 
-        // If record exists in DB, proceed to update
-        if ($check_data_exist > 0) {
-            $update_career = $api->update_career($position, $branch, $career_summary, $available_position, $career_id, $username);
-
-            if ($update_career == '1') {
-                error_log("Career updated successfully for ID: " . $career_id);
-                echo 'Updated';
-            } else {
-                error_log("Career update failed: " . $update_career);
-                echo $update_career;
+                if ($insert_career == '1') {
+                    error_log("Career inserted successfully");
+                    echo 'Inserted';
+                } else {
+                    error_log("Career insert failed: " . $insert_career);
+                    echo $insert_career;
+                }
             }
         } else {
-            // Proceed with insert if no valid existing record
-            error_log("Inserting new career (ID not found or empty): " . $position);
-            $insert_career = $api->insert_career($position, $branch, $career_summary, $available_position, $username);
-
-            if ($insert_career == '1') {
-                error_log("Career inserted successfully");
-                echo 'Inserted';
-            } else {
-                error_log("Career insert failed: " . $insert_career);
-                echo $insert_career;
-            }
+            error_log("Missing required fields in submit career");
+            echo 'Required fields are missing';
         }
-    } else {
-        error_log("Missing required fields in submit career");
-        echo 'Required fields are missing';
     }
-}
 
 
 //6/18
@@ -12655,6 +12655,35 @@ else if($transaction == 'delete career'){
             exit;
         }
     }
+
+      # -------------------------------------------------------------
+    #   Dashboard functions
+    # -------------------------------------------------------------
+
+    # Get Purchase Order Summary
+    else if ($transaction == 'get purchase order summary') {
+        $details = $api->get_purchase_order_summary();
+        echo json_encode($details);
+    }
+
+    # Get Monthly Purchase Orders
+    else if ($transaction == 'get monthly purchase orders') {
+        $details = $api->get_monthly_purchase_orders();
+        echo json_encode($details);
+    }
+
+    # Get Top Vendors
+    else if ($transaction == 'get top vendors') {
+        $details = $api->get_top_vendors_by_po_amount();
+        echo json_encode($details);
+    }
+
+    # Get Vendor Type Distribution
+    else if ($transaction == 'get vendor type distribution') {
+        $details = $api->get_vendor_type_distribution();
+        echo json_encode($details);
+    }
+
 
 
 

@@ -17505,6 +17505,91 @@ public function get_total_ob_paid_hours($employee_id, $parameter_1, $parameter_2
         $response[] = array('PRINT' => $html);
         return $response;
     }
+
+    # -------------------------------------------------------------
+    #   Dashboard Functions
+    # -------------------------------------------------------------
+
+    # Dashboard - Get Purchase Order Summary Counts
+    public function get_purchase_order_summary(){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare("
+                SELECT
+                    COUNT(PURCHASE_ORDER_ID) as total_pos,
+                    SUM(NET_AMOUNT) as total_amount,
+                    SUM(CASE WHEN STATUS = 'Pending Approval' THEN 1 ELSE 0 END) as pending_pos,
+                    SUM(CASE WHEN STATUS = 'Approved' THEN 1 ELSE 0 END) as approved_pos,
+                    SUM(CASE WHEN STATUS = 'Fulfilled' THEN 1 ELSE 0 END) as fulfilled_pos,
+                    SUM(CASE WHEN STATUS = 'Cancelled' THEN 1 ELSE 0 END) as cancelled_pos
+                FROM tblpurchaseorder
+            ");
+            if($sql->execute()){
+                return $sql->fetch(PDO::FETCH_ASSOC);
+            }
+            return false;
+        }
+        return false;
+    }
+
+    # Dashboard - Get Monthly Purchase Order Data for the last 12 months
+    public function get_monthly_purchase_orders(){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare("
+                SELECT
+                    DATE_FORMAT(ORDER_DATE, '%Y-%m') as month,
+                    COUNT(PURCHASE_ORDER_ID) as po_count,
+                    SUM(NET_AMOUNT) as total_amount
+                FROM tblpurchaseorder
+                WHERE ORDER_DATE >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+                GROUP BY month
+                ORDER BY month ASC
+            ");
+            if($sql->execute()){
+                return $sql->fetchAll(PDO::FETCH_ASSOC);
+            }
+            return false;
+        }
+        return false;
+    }
+
+    # Dashboard - Get Top 5 Vendors by Purchase Order Amount
+    public function get_top_vendors_by_po_amount(){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare("
+                SELECT
+                    v.VENDOR_NAME,
+                    SUM(po.NET_AMOUNT) as total_spent
+                FROM tblpurchaseorder po
+                JOIN tblvendor v ON po.VENDOR_ID = v.VENDOR_ID
+                GROUP BY v.VENDOR_NAME
+                ORDER BY total_spent DESC
+                LIMIT 5
+            ");
+            if($sql->execute()){
+                return $sql->fetchAll(PDO::FETCH_ASSOC);
+            }
+            return false;
+        }
+        return false;
+    }
+
+    # Dashboard - Get Vendor Type Distribution
+    public function get_vendor_type_distribution(){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare("
+                SELECT VENDOR_TYPE, COUNT(VENDOR_ID) as vendor_count
+                FROM tblvendor
+                GROUP BY VENDOR_TYPE
+                ORDER BY vendor_count DESC
+            ");
+            if($sql->execute()){
+                return $sql->fetchAll(PDO::FETCH_ASSOC);
+            }
+            return false;
+        }
+        return false;
+    }
+
 /**
  * Get total count of all published positions
  * @return int - Total number of published positions
@@ -25328,18 +25413,7 @@ public function get_hr_events($start_date = null, $end_date = null) {
             }
         }
     }
-    # -------------------------------------------------------------
-
-
-    # -------------------------------------------------------------
-    #
-    # Name       : insert_purchase_order
-    # Purpose    : Inserts a new purchase order and its items.
-    #
-    # Returns    : String
-    #
-    # -------------------------------------------------------------
-
+  
      
    
 }

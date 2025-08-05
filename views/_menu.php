@@ -475,7 +475,7 @@
                     </li>';
         }
         
-        if($career_page > 0){
+        if($attendance_record_page > 0){
            $menu .= '<li>
                         <a href="javascript: void(0);" class="has-arrow waves-effect">
                             <i class="bx  bx-receipt"></i>
@@ -484,7 +484,10 @@
                         <ul class="sub-menu" aria-expanded="false">';
 
                         if($employee_list_page > 0){
-                            $menu .= '<li><a href="purchase-order.php" key="t-human-resource">Dashboard</a></li>';
+                            $menu .= '<li><a href="dashboard-purchasing.php" key="t-human-resource">Dashboard</a></li>';
+                        }
+                        if($employee_list_page > 0){
+                            $menu .= '<li><a href="purchase-order.php" key="t-human-resource">Create PO</a></li>';
                         }
 
                         if($employee_list_page > 0){
