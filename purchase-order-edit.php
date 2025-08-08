@@ -3,10 +3,8 @@
 require('session.php');
 require('config/config.php');
 require('classes/api.php');
-    
 $api = new Api;
 $page_title = 'Edit Purchase Order';
-
 // --- Permissions Check ---
 $page_access = $api->check_role_permissions($username, 136);
 if($page_access == 0){
@@ -14,16 +12,15 @@ if($page_access == 0){
     exit;
 }
 $edit_purchase_order_permission = $api->check_role_permissions($username, 156);
-
 // --- Get ID from URL ---
 $purchase_order_id_to_edit = null;
 if (isset($_GET['id']) && !empty($_GET['id'])) {
     $purchase_order_id_to_edit = $_GET['id']; // Keep as string for varchar(50)
     if ($edit_purchase_order_permission == 0) {
-        $page_title = 'View Purchase Order'; 
+        $page_title = 'View Purchase Order';
     }
 } else {
-    header('location: purchase-order.php'); 
+    header('location: purchase-order.php');
     exit;
 }
 ?>
@@ -39,8 +36,8 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
         <link href="assets/css/bootstrap.min.css" id="bootstrap-style" rel="stylesheet" type="text/css" />
         <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
     </head>
-
    <body data-sidebar="dark">
     <?php require('views/_preloader.php'); ?>
     <div id="layout-wrapper">
@@ -48,7 +45,6 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
             require('views/_nav_header.php');
             require('views/_menu.php');
         ?>
-
         <div class="main-content">
             <div class="page-content">
                 <div class="container-fluid">
@@ -68,7 +64,6 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
                     </div>
                         <form id="purchaseOrderForm" method="post" action="#">
                             <input type="hidden" id="purchase_order_id" name="purchase_order_id" value="<?php echo $purchase_order_id_to_edit; ?>">
-
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="card mb-4">
@@ -98,8 +93,6 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- FIXED: Corrected repeater HTML structure -->
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="card mb-4">
@@ -142,8 +135,6 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Tax Configuration and Summary sections remain the same -->
                             <div class="row">
                                 <div class="col-lg-6">
                                     <div class="card mb-4">
@@ -184,8 +175,6 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Additional Details and Approvers sections remain the same -->
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="card mb-4">
@@ -217,31 +206,25 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
                                     </div>
                                 </div>
                             </div>
-
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="card mb-4">
                                         <div class="card-body">
                                             <h5 class="card-title mb-3">Approvers</h5>
                                             <div class="row">
-                                                <div class="col-md-4 mb-3">
+                                                <div class="col-md-6 mb-3">
                                                     <label for="conforme_supplier" class="form-label">Conforme Supplier</label>
                                                     <input type="text" class="form-control" id="conforme_supplier" name="conforme_supplier">
                                                 </div>
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="approved_by_assistant_gm" class="form-label">Approved by Assistant GM</label>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="approved_by_assistant_gm" class="form-label">Approver</label>
                                                     <input type="text" class="form-control" id="approved_by_assistant_gm" name="approved_by_assistant_gm">
-                                                </div>
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="approved_by_gm" class="form-label">Approved by GM</label>
-                                                    <input type="text" class="form-control" id="approved_by_gm" name="approved_by_gm">
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="d-flex gap-2">
@@ -258,10 +241,8 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
                 <?php require('views/_footer.php'); ?>
             </div>
         </div>
-        
         <?php require('views/_scripts.php'); ?>
-        
-       <script src="assets/js/click-events.js"></script>
+        <script src="assets/js/click-events.js"></script>
         <script src="assets/js/form-validation.js"></script>
         <script src="assets/js/datatable.js"></script>
         <script src="assets/libs/select2/js/select2.min.js"></script>
@@ -283,260 +264,324 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
         <script src="assets/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
         <script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
         <script src="assets/libs/jquery.repeater/jquery.repeater.min.js"></script>
-
-    
-// Replace the entire JavaScript section with this completely fixed version
-
-// Replace the entire JavaScript section with this completely fixed version
-
-// Replace the entire JavaScript section with this simplified version
-
-<script>
-let currentMode = 'edit';
-let currentPOId = null;
-let isFormInitialized = false;
-
-function initializeVendorSelect2() {
-    if ($('#vendor_id').hasClass('select2-hidden-accessible')) {
-        $('#vendor_id').select2('destroy');
-    }
-    $('#vendor_id').select2({
-        placeholder: "Choose a supplier",
-        allowClear: true,
-        minimumInputLength: 1, // Add minimum input length for search
-        width: '100%',
-        ajax: {
-            url: 'controller.php',
-            type: 'POST', // Change to POST to match working version
-            dataType: 'json',
-            delay: 250,
-            data: function(params) {
-                return {
-                    transaction: 'vendor dropdown', // Use same transaction as working version
-                    search: params.term || ''
-                };
-            },
-            processResults: function(data) {
-                if (data.error) {
-                    Swal.fire('Error', data.error, 'error');
-                    return { results: [] };
-                }
-                // Map the results to the correct format
-                return {
-                    results: data.map(function (item) {
-                        return {
-                            id: item.id,        // your PHP uses 'id' and 'text'
-                            text: item.text     // required by Select2
-                        };
-                    })
-                };
-            },
-            cache: true,
-            error: function(xhr, status, error) {
-                console.error('AJAX error:', error);
-                console.error('Response:', xhr.responseText);
-            }
+        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+        <script>
+$(document).ready(function () {
+    // Initialize vendor select2
+    function initializeVendorSelect2() {
+        if ($('#vendor_id').hasClass('select2-hidden-accessible')) {
+            $('#vendor_id').select2('destroy');
         }
-    });
-
-    // Optional: Add the vendor details fetch functionality like in the working version
-    $('#vendor_id').off('change.vendorDetails').on('change.vendorDetails', function () {
-        var vendor_id = $(this).val();
-        
-        if (vendor_id) {
-            $.ajax({
+        $('#vendor_id').select2({
+            placeholder: "Choose a supplier",
+            allowClear: true,
+            minimumInputLength: 1,
+            width: '100%',
+            ajax: {
                 url: 'controller.php',
                 type: 'POST',
-                data: {
-                    transaction: 'get vendor details',
-                    vendor_id: vendor_id
-                },
                 dataType: 'json',
-                success: function (response) {
-                    if (response.success) {
-                        // Optional: Show vendor details (you can remove this if not needed)
-                        // Swal.fire({
-                        //     icon: 'info',
-                        //     title: 'Vendor Selected',
-                        //     html: `<strong>Contact:</strong> ${response.data.CONTACT_PERSON}<br><strong>Email:</strong> ${response.data.EMAIL}<br><strong>Phone:</strong> ${response.data.PHONE}`
-                        // });
-                    }
+                delay: 250,
+                data: function(params) {
+                    return {
+                        transaction: 'vendor dropdown',
+                        search: params.term || ''
+                    };
                 },
-                error: function () {
-                    console.log('Failed to fetch vendor details');
+                processResults: function(data) {
+                    if (data.error) {
+                        Swal.fire('Error', data.error, 'error');
+                        return { results: [] };
+                    }
+                    return {
+                        results: data.map(function (item) {
+                            return {
+                                id: item.id,
+                                text: item.text
+                            };
+                        })
+                    };
+                },
+                cache: true,
+                error: function(xhr, status, error) {
+                    console.error('AJAX error:', error);
+                    console.error('Response:', xhr.responseText);
                 }
-            });
-        }
-    });
-}
+            }
+        });
+    }
+    initializeVendorSelect2();
 
-function initializeRepeaterOnce() {
-    const $repeater = $('.repeater');
+    // Repeater helpers
+    const $list = $('.repeater').find('[data-repeater-list]');
+    const itemSelector = '[data-repeater-item]';
     
-    // Check if repeater is already initialized by checking for specific data attribute
-    if ($repeater.attr('data-repeater-initialized') === 'true') {
-        return;
+    function getBaseName($el) {
+        const name = $el.attr('name') || '';
+        const m = name.match(/\[([^[]+)\]$/);
+        return m ? m[1] : name;
     }
     
-    // Mark as being initialized BEFORE actual initialization
-    $repeater.attr('data-repeater-initialized', 'true');
+    function storeBaseNames($row) {
+        $row.find('input,select,textarea').each(function () {
+            const $this = $(this);
+            if (!$this.data('base-name')) {
+                $this.data('base-name', getBaseName($this));
+            }
+        });
+    }
     
-    $repeater.repeater({
-        initEmpty: false,
-        isFirstItemUndeletable: true,
-        show: function () {
-            $(this).slideDown();
-            updateSummary();
-        },
-        hide: function (deleteElement) {
-            $(this).slideUp(deleteElement);
-            updateSummary();
-        }
-    });
-}
-
-function loadPurchaseOrderDataForEditing(poId) {
-    $.ajax({
-        url: 'controller.php',
-        method: 'POST',
-        dataType: 'json',
-        data: {
-            transaction: 'get purchase order details',
-            purchase_order_id: poId
-        },
-        success: function(response) {
-            if (response.error || !response.details) {
-                Swal.fire('Error', response.error || 'Could not load data.', 'error').then(() => {
-                    window.location.href = 'purchase-order.php';
+    function reIndexRows() {
+        $list.find(itemSelector).each(function (idx) {
+            $(this).find('input,select,textarea').each(function () {
+                const $el = $(this);
+                const base = $el.data('base-name') || getBaseName($el);
+                if (!base) return;
+                $el.attr('name', `items[${idx}][${base}]`);
+            });
+        });
+    }
+    
+    function safeClearWidgetData($el) {
+        $el.find('*').each(function() {
+            try { $(this).removeData(); } catch (e) { }
+            if ($(this).attr('id')) $(this).removeAttr('id');
+        });
+    }
+    
+    // Initialize row with autocomplete
+    function initRow($row) {
+        storeBaseNames($row);
+        const $desc = $row.find('.item-description');
+        const $unit = $row.find('.item-unit');
+        const $price = $row.find('.item-price');
+        const $qty = $row.find('.item-quantity');
+        const $total = $row.find('.item-total');
+        
+        try {
+            if ($desc.data('ui-autocomplete')) {
+                $desc.autocomplete('destroy');
+            }
+        } catch (e) { }
+        
+        $desc.autocomplete({
+            minLength: 1,
+            delay: 250,
+            source: function (request, response) {
+                $.ajax({
+                    url: 'controller.php',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        transaction: 'product search',
+                        search: request.term
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return {
+                                label: item.text,
+                                value: item.text,
+                                id: item.id,
+                                unit: item.unit || '',
+                                price: item.price || ''
+                            };
+                        }));
+                    },
+                    error: function (xhr, st, err) {
+                        console.error('product search error', err, xhr.responseText);
+                        response([]);
+                    }
                 });
+            },
+            select: function (event, ui) {   
+                $desc.val(ui.item.value);
+                if ($unit.length) $unit.val(ui.item.unit || '');
+                if ($price.length) {
+                    const p = parseFloat(ui.item.price || 0) || 0;
+                    $price.val(p.toFixed(2));
+                }
+                updateRowTotal($row);
+                updateSummary();
+                return false;
+            }
+        });
+        
+        $row.find('[data-repeater-delete]').off('click').on('click', function (e) {
+            e.preventDefault();
+            const $rows = $list.find(itemSelector);
+            if ($rows.length <= 1) {
+                $row.find('input, textarea').val('');
+                updateRowTotal($row);
+                updateSummary();
+                reIndexRows();
                 return;
             }
-            
-            const details = response.details;
-            const items = response.items || [];
-            
-            // Populate header fields
-            $('#purchase_order_id').val(details.PURCHASE_ORDER_ID);
-            
-            if (details.VENDOR_ID_FK && details.VENDOR_NAME) {
-                $('#vendor_id').empty();
-                var newOption = new Option(details.VENDOR_NAME, details.VENDOR_ID_FK, true, true);
-                $('#vendor_id').append(newOption).trigger('change');
-            }
-            
-            $('#status_vendor').val(details.STATUS || '');
-            $('#order_date').val(details.ORDER_DATE || '');
-            $('#delivery_date').val(details.DELIVERY_DATE || '');
-            $('#withholding_tax_rate').val(details.WITHHOLDING_TAX_RATE || '2.00');
-            $('#vat_tax_rate').val(details.VAT_TAX_RATE || '12.00');
-            $('#terms').val(details.TERMS || '');
-            $('#fob').val(details.FOB || '');
-            $('#delivery_note').val(details.DELIVERY_NOTE || '');
-            $('#requested_by').val(details.REQUESTED_BY || '');
-            $('#req_no').val(details.REQ_NO || '');
-            $('#conforme_supplier').val(details.CONFORME_SUPPLIER || '');
-            $('#approved_by_assistant_gm').val(details.APPROVED_BY_ASSISTANT_GM || '');
-            $('#approved_by_gm').val(details.APPROVED_BY_GM || '');
-
-            // Handle items - populate existing rows instead of recreating repeater
-            if (items && items.length > 0) {
-                // Get all existing repeater items
-                const $existingItems = $('.repeater [data-repeater-item]');
-                
-                items.forEach(function(item, index) {
-                    let $targetItem;
-                    
-                    if (index < $existingItems.length) {
-                        // Use existing row
-                        $targetItem = $existingItems.eq(index);
-                    } else {
-                        // Add new row if needed
-                        $('[data-repeater-create]').click();
-                        $targetItem = $('.repeater [data-repeater-item]').last();
-                    }
-                    
-                    // Populate the row
-                    $targetItem.find('input[name*="item_description"]').val(item.ITEM_DESCRIPTION || '');
-                    $targetItem.find('input[name*="quantity"]').val(item.QUANTITY || '1');
-                    $targetItem.find('input[name*="unit"]').val(item.UNIT || '');
-                    $targetItem.find('input[name*="price"]').val(item.UNIT_PRICE || '0.00');
-                });
-                
-                // Remove extra rows if we have more rows than items
-                if ($existingItems.length > items.length) {
-                    for (let i = items.length; i < $existingItems.length; i++) {
-                        $existingItems.eq(i).find('[data-repeater-delete]').click();
-                    }
-                }
-            }
-            
+            $row.remove();
+            reIndexRows();
             updateSummary();
-        },
-        error: function(xhr) {
-            Swal.fire('Error', 'An error occurred while fetching PO data.', 'error').then(() => {
-                window.location.href = 'purchase-order.php';
-            });
-        }
-    });
-}
-
-function updateSummary() {
-    let gross = 0.0;
-    $('.repeater [data-repeater-item]').each(function() {
-        const qty = parseFloat($(this).find('input[name*="quantity"]').val()) || 0;
-        const price = parseFloat($(this).find('input[name*="price"]').val()) || 0;
-        const total = qty * price;
-        $(this).find('.item-total').text('₱' + total.toFixed(2));
-        gross += total;
-    });
-    
-    const wtRate = parseFloat($('#withholding_tax_rate').val()) || 0;
-    const vatRate = parseFloat($('#vat_tax_rate').val()) || 0;
-    const wtAmount = gross * (wtRate / 100);
-    const vatAmount = gross * (vatRate / 100);
-    const net = gross - wtAmount + vatAmount;
-    
-    $('#summary_gross_amount').text('₱' + gross.toFixed(2));
-    $('#summary_tax_rate_text').text(wtRate.toFixed(2));
-    $('#summary_tax_amount').text('- ₱' + wtAmount.toFixed(2));
-    $('#summary_vat_rate_text').text(vatRate.toFixed(2));
-    $('#summary_vat_amount').text('+ ₱' + vatAmount.toFixed(2));
-    $('#summary_net_amount').text('₱' + net.toFixed(2));
-}
-
-function initializePurchaseOrderForm(poIdToLoad) {
-    if (isFormInitialized) return;
-    
-    // Initialize components
-    initializeVendorSelect2();
-    
-    // Initialize repeater ONLY ONCE
-    initializeRepeaterOnce();
-    
-    if (poIdToLoad) {
-        currentMode = 'edit';
-        currentPOId = poIdToLoad;
-        // Small delay to ensure repeater is ready
-        setTimeout(function() {
-            loadPurchaseOrderDataForEditing(poIdToLoad);
-        }, 500);
-        $('#submitform').html('Update Purchase Order');
-    }
-
-    // Bind event handlers
-    $(document).off('input', '.item-quantity, .item-price, #withholding_tax_rate, #vat_tax_rate')
-        .on('input', '.item-quantity, .item-price, #withholding_tax_rate, #vat_tax_rate', updateSummary);
-
-    // Form submission handler
-    $('#purchaseOrderForm').off('submit').on('submit', function(e){
-        e.preventDefault();
-        if (!$(this).valid()) return false;
+        });
         
-        let formDataArray = $(this).serializeArray();
+        $qty.add($price).off('input').on('input', function () {
+            updateRowTotal($row);
+            updateSummary();
+        });
+        
+        updateRowTotal($row);
+        reIndexRows();
+    }
+    
+    function updateRowTotal($row) {
+        const qty = parseFloat($row.find('.item-quantity').val()) || 0;
+        const price = parseFloat($row.find('.item-price').val()) || 0;
+        const total = qty * price;
+        $row.find('.item-total').text('₱' + total.toFixed(2));
+    }
+    
+    function updateSummary() {
+        let gross = 0.0;
+        $list.find(itemSelector).each(function () {
+            const qty = parseFloat($(this).find('.item-quantity').val()) || 0;
+            const price = parseFloat($(this).find('.item-price').val()) || 0;
+            const total = qty * price;
+            $(this).find('.item-total').text(`₱${total.toFixed(2)}`);
+            gross += total;
+        });
+        
+        const wt = parseFloat($('#withholding_tax_rate').val()) || 0;
+        const vat = parseFloat($('#vat_tax_rate').val()) || 0;
+        const wtAmount = gross * (wt / 100);
+        const vatAmount = gross * (vat / 100);
+        const net = gross - wtAmount + vatAmount;
+        
+        $('#summary_gross_amount').text(`₱${gross.toFixed(2)}`);
+        $('#summary_tax_rate_text').text(wt.toFixed(2));
+        $('#summary_tax_amount').text(`- ₱${wtAmount.toFixed(2)}`);
+        $('#summary_vat_rate_text').text(vat.toFixed(2));
+        $('#summary_vat_amount').text(`+ ₱${vatAmount.toFixed(2)}`);
+        $('#summary_net_amount').text(`₱${net.toFixed(2)}`);
+    }
+    
+    // Add new row
+    $(document).on('click', '[data-repeater-create]', function (e) {
+        e.preventDefault();
+        const $template = $list.find(itemSelector).first();
+        let $new = $template.clone(false);
+        safeClearWidgetData($new);
+        
+        $new.find('input, textarea').each(function () {
+            const $i = $(this);
+            const base = $i.data('base-name') || getBaseName($i);
+            if ($i.hasClass('item-quantity')) $i.val('1');
+            else if ($i.hasClass('item-price')) $i.val(parseFloat(0).toFixed(2));
+            else $i.val('');
+        });
+        
+        $list.append($new);
+        initRow($new);
+        reIndexRows();
+        updateSummary();
+    });
+    
+    // Initialize existing rows
+    $list.find(itemSelector).each(function () {
+        initRow($(this));
+    });
+    
+    // Update summary on tax changes
+    $(document).on('input', '#withholding_tax_rate, #vat_tax_rate', updateSummary);
+    
+    // Load existing purchase order data
+    const currentPOId = <?php echo json_encode($purchase_order_id_to_edit); ?>;
+    
+    function loadPurchaseOrderDataForEditing(poId) {
+        $.ajax({
+            url: 'controller.php',
+            method: 'POST',
+            dataType: 'json',
+            data: {
+                transaction: 'get purchase order details',
+                purchase_order_id: poId
+            },
+            success: function(response) {
+                if (response.error || !response.details) {
+                    Swal.fire('Error', response.error || 'Could not load data.', 'error').then(() => {
+                        window.location.href = 'purchase-order.php';
+                    });
+                    return;
+                }
+                
+                const details = response.details;
+                const items = response.items || [];
+                
+                // Populate header fields
+                $('#purchase_order_id').val(details.PURCHASE_ORDER_ID);
+                if (details.VENDOR_ID_FK && details.VENDOR_NAME) {
+                    $('#vendor_id').empty();
+                    var newOption = new Option(details.VENDOR_NAME, details.VENDOR_ID_FK, true, true);
+                    $('#vendor_id').append(newOption).trigger('change');
+                }
+                $('#status_vendor').val(details.STATUS || '');
+                $('#order_date').val(details.ORDER_DATE || '');
+                $('#delivery_date').val(details.DELIVERY_DATE || '');
+                $('#withholding_tax_rate').val(details.WITHHOLDING_TAX_RATE || '2.00');
+                $('#vat_tax_rate').val(details.VAT_TAX_RATE || '12.00');
+                $('#terms').val(details.TERMS || '');
+                $('#fob').val(details.FOB || '');
+                $('#delivery_note').val(details.DELIVERY_NOTE || '');
+                $('#requested_by').val(details.REQUESTED_BY || '');
+                $('#req_no').val(details.REQ_NO || '');
+                $('#conforme_supplier').val(details.CONFORME_SUPPLIER || '');
+                $('#approved_by_assistant_gm').val(details.APPROVED_BY_ASSISTANT_GM || '');
+                
+                // Populate items
+                if (items && items.length > 0) {
+                    // Clear existing rows
+                    $list.find(itemSelector).not(':first').remove();
+                    
+                    items.forEach(function(item, index) {
+                        let $row;
+                        if (index === 0) {
+                            $row = $list.find(itemSelector).first();
+                        } else {
+                            $('[data-repeater-create]').click();
+                            $row = $list.find(itemSelector).last();
+                        }
+                        
+                        $row.find('.item-description').val(item.ITEM_DESCRIPTION || '');
+                        $row.find('.item-quantity').val(item.QUANTITY || '1');
+                        $row.find('.item-unit').val(item.UNIT || '');
+                        $row.find('.item-price').val(item.UNIT_PRICE || '0.00');
+                        
+                        // Re-initialize autocomplete for this row
+                        initRow($row);
+                    });
+                }
+                
+                updateSummary();
+            },
+            error: function(xhr) {
+                Swal.fire('Error', 'An error occurred while fetching PO data.', 'error').then(() => {
+                    window.location.href = 'purchase-order.php';
+                });
+            }
+        });
+    }
+    
+    // Load data
+    loadPurchaseOrderDataForEditing(currentPOId);
+    
+    // Form submission for update
+    $('#purchaseOrderForm').off('submit').on('submit', function (e) {
+        e.preventDefault();
+        reIndexRows();
+        
+        let formData = $(this).serializeArray();
+        let username = '<?php echo $username; ?>';
+        
+        // Structure items from repeater
         let itemsArray = [];
         let otherFormData = {};
-        
-        formDataArray.forEach(function(field){
+        formData.forEach(function (field) {
             let itemMatch = field.name.match(/^items\[(\d+)\]\[(.+)\]$/);
             if (itemMatch) {
                 let index = itemMatch[1];
@@ -548,18 +593,19 @@ function initializePurchaseOrderForm(poIdToLoad) {
             }
         });
         
-        let gross = 0.0;
+        // Calculate gross
+        let grossAmount = 0.0;
         (itemsArray || []).forEach(item => {
-            if(item) {
-               gross += (parseFloat(item.quantity) || 0) * (parseFloat(item.price) || 0);
-            }
+            const quantity = parseFloat(item.quantity) || 0;
+            const price = parseFloat(item.price) || 0;
+            grossAmount += quantity * price;
         });
         
         let submitData = otherFormData;
-        submitData.items = JSON.stringify(itemsArray.filter(Boolean));
-        submitData.gross_amount = gross;
-        submitData.username = '<?php echo $username; ?>';
+        submitData.gross_amount = grossAmount.toFixed(2);
+        submitData.items = JSON.stringify(itemsArray || []);
         submitData.transaction = 'update purchase order';
+        submitData.username = username;
         submitData.purchase_order_id = currentPOId;
         
         $.ajax({
@@ -569,31 +615,26 @@ function initializePurchaseOrderForm(poIdToLoad) {
             beforeSend: function() {
                 $('#submitform').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status"></span> Updating...');
             },
-            success: function(response) {
+            success: function (response) {
                 if (response === 'Updated') {
                     Swal.fire('Success', 'Purchase Order updated successfully.', 'success').then(() => {
-                        window.location.href = 'purchase-order.php';
+                        window.location = 'purchase-order.php';
                     });
                 } else {
-                    Swal.fire('Error', response || 'An error occurred.', 'error');
+                    Swal.fire('Error', response || 'An unexpected error occurred.', 'error');
                     $('#submitform').prop('disabled', false).html('Update Purchase Order');
                 }
             },
-            error: function() {
-                Swal.fire('AJAX Error', 'An error occurred during the request.', 'error');
+            error: function (xhr, status, error) {
+                Swal.fire('AJAX Error', `Request failed: ${error}`, 'error');
                 $('#submitform').prop('disabled', false).html('Update Purchase Order');
             }
         });
     });
     
-    isFormInitialized = true;
-}
-
-$(document).ready(function() {
-    const phpPoId = <?php echo json_encode($purchase_order_id_to_edit); ?>;
-    initializePurchaseOrderForm(phpPoId);
+    // Run initial summary
+    updateSummary();
 });
-</script>
-
+        </script>
     </body>
 </html>

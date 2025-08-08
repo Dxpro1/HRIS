@@ -1495,6 +1495,33 @@ function display_form_details(formtype){
         }
     }
 
+    // Add this inside the display_form_details function
+
+else if(formtype == 'product form'){
+    var product_id = sessionStorage.getItem('product_id');
+    var transaction = 'get product details';
+
+    if (product_id) {
+        $.ajax({
+            url: 'controller.php',
+            method: 'POST',
+            dataType: 'JSON',
+            data: {product_id : product_id, transaction : transaction},
+            success: function(response) {
+                $('#product_id').val(product_id);
+                $('#product_name').val(response.PRODUCT_NAME);
+                $('#product_description').val(response.PRODUCT_DESCRIPTION);
+                $('#unit_price').val(response.UNIT_PRICE);
+            },
+            complete: function(){
+                // Assuming you have a permission ID for updating products
+                // check_role_permission(formtype, YOUR_UPDATE_PERMISSION_ID);
+            }
+        });
+    }
+}
+
+
     else if(formtype == 'pmw status form'){
         var employee_id = sessionStorage.getItem('pmw_employee_id');
         var period_id = sessionStorage.getItem('pmw_period_id');
@@ -4475,15 +4502,7 @@ $(document).ready(function () {
                 },
                 dataType: 'json',
                 success: function (response) {
-                    if (response.success) {
-                        Swal.fire({
-                            icon: 'info',
-                            title: 'Vendor Selected',
-                            html: `<strong>Contact:</strong> ${response.data.CONTACT_PERSON}<br><strong>Email:</strong> ${response.data.EMAIL}<br><strong>Phone:</strong> ${response.data.PHONE}`
-                        });
-                    } else {
-                        Swal.fire('Error', response.message || 'Vendor not found', 'error');
-                    }
+              
                 },
                 error: function () {
                     Swal.fire('Error', 'Failed to fetch vendor data', 'error');
@@ -4492,6 +4511,10 @@ $(document).ready(function () {
         });
 
     });
+
+
+     
+
     
 
  

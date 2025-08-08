@@ -1990,7 +1990,7 @@ else if($formtype == 'pmw status form'){
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                 <label for="email" class="form-label">Email <span class="required">*</span></label>
+                                 <label for="email" class="form-label">Email </label>
                                         <input id="email" name="email" class="form-control email-inputmask maxlength" maxlength="50" autocomplete="off">
                             </div>
                         </div>
@@ -2026,6 +2026,40 @@ else if($formtype == 'pmw status form'){
                                 <input type="text" class="form-control" id="bank_account_number" name="bank_account_number">
                             </div>
                         </div>
+                    </div>';
+            }
+
+              else if($formtype == 'product form'){
+                $form .= '
+                    <input type="hidden" id="product_id" name="product_id">
+                  <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="vendor_name" class="form-label">Product Name <span class="required">*</span></label>
+                                <input type="text" class="form-control" id="product_name" name="product_name" required>
+                            </div>
+                        </div>
+                            <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="product_description" class="form-label">Term</label>
+                                <input type="text" class="form-control" id="product_description" name="product_description" rows="3"></input>
+                            </div>
+                        </div>
+
+
+                    </div>
+               
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="contact_person" class="form-label">Unit Price</label>
+                                <input type="number" class="form-control" id="unit_price" name="unit_price">
+                            </div>
+                        </div>
+ 
+                    </div>
+
                     </div>';
             }
 
@@ -13507,25 +13541,50 @@ else if($type == 'publish documents table'){
 
                     }
                     else if ($type == 'vendor dropdown') {
+                        if ($api->databaseConnection()) {
+                            $search = $_POST['search'] ?? '';
+                            $sql = $api->db_connection->prepare("SELECT VENDOR_ID, VENDOR_NAME FROM tblvendor WHERE VENDOR_NAME LIKE :search ORDER BY VENDOR_NAME ASC");
+                            $search = "%$search%";
+                            $sql->bindParam(':search', $search);
+
+                            $sql->execute();
+                            $vendors = [];
+
+                            while ($row = $sql->fetch()) {
+                                $vendors[] = [
+                                    'VENDOR_ID' => $row['VENDOR_ID'],
+                                    'VENDOR_NAME' => $row['VENDOR_NAME']
+                                ];
+                            }
+
+                            echo json_encode($vendors);
+                        }
+                    }
+
+                    else if ($type == 'product search') {
     if ($api->databaseConnection()) {
         $search = $_POST['search'] ?? '';
-        $sql = $api->db_connection->prepare("SELECT VENDOR_ID, VENDOR_NAME FROM tblvendor WHERE VENDOR_NAME LIKE :search ORDER BY VENDOR_NAME ASC");
         $search = "%$search%";
+        
+        $sql = $api->db_connection->prepare("
+            SELECT PRODUCT_ID, PRODUCT_NAME 
+            FROM tblproduct 
+            WHERE PRODUCT_NAME LIKE :search 
+            ORDER BY PRODUCT_NAME ASC
+            LIMIT 10
+        ");
         $sql->bindParam(':search', $search);
-
         $sql->execute();
-        $vendors = [];
 
-        while ($row = $sql->fetch()) {
-            $vendors[] = [
-                'VENDOR_ID' => $row['VENDOR_ID'],
-                'VENDOR_NAME' => $row['VENDOR_NAME']
-            ];
+        $products = [];
+        while ($row = $sql->fetch(PDO::FETCH_ASSOC)) {
+            $products[] = $row['PRODUCT_NAME'];
         }
 
-        echo json_encode($vendors);
+        echo json_encode($products);
     }
 }
+
 
                     else if ($type == "inventory item inquiry table") {
 
@@ -15093,6 +15152,56 @@ else if($type == 'publish documents table'){
         echo json_encode(['error' => 'DB connection failed']);
     }
 }
+
+// In system-generation.php
+
+# Product table
+else if($type == 'product table'){
+    if ($api->databaseConnection()) {
+        # Get role permissions (adjust permission IDs as needed)
+        $update_product = $api->check_role_permissions($username, 136); 
+        $delete_product = $api->check_role_permissions($username, 136);
+
+        $sql = $api->db_connection->prepare('SELECT PRODUCT_ID, PRODUCT_NAME, PRODUCT_DESCRIPTION, UNIT_PRICE FROM tblproduct ORDER BY PRODUCT_NAME');
+
+        if($sql->execute()){
+            $response = [];
+            while($row = $sql->fetch(PDO::FETCH_ASSOC)){
+                $product_id = $row['PRODUCT_ID'];
+                $product_name = $row['PRODUCT_NAME'];
+                $product_description = $row['PRODUCT_DESCRIPTION'];
+                $unit_price = number_format($row['UNIT_PRICE'], 2);
+
+                $update = '';
+                $delete = '';
+
+                if($update_product > 0){
+                    $update = '<button type="button" class="btn btn-primary waves-effect waves-light update-product" data-productid="'. $product_id .'" title="Update Product">
+                                <i class="bx bx-edit font-size-16 align-middle"></i>
+                            </button>';
+                }
+
+                if($delete_product > 0){
+                    $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-product" data-productid="'. $product_id .'" title="Delete Product">
+                                <i class="bx bx-trash font-size-16 align-middle"></i>
+                            </button>';
+                }
+
+                $response[] = array(
+                    'PRODUCT_NAME' => $product_name,
+                    'PRODUCT_DESCRIPTION' => $product_description,
+                    'UNIT_PRICE' => '₱' . $unit_price,
+                    'ACTION' => '<div class="d-flex gap-2">'. $update . $delete .'</div>'
+                );
+            }
+            echo json_encode($response);
+        }
+        else{
+            echo json_encode(['error' => 'SQL error: ' . print_r($sql->errorInfo(), true)]);
+        }
+    }
+}
+
 
 #6/18
 # PMW Monitoring Table (Server-Side)

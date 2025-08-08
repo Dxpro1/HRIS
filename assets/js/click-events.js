@@ -102,6 +102,61 @@ $(document).on('click', '.delete-vendor', function () {
 });
 
 
+// In assets/js/click-events.js
+
+$(document).on('click', '#add-product', function () {
+    generate_modal('product form', 'Product', 'R', '1', '1', 'form', 'productForm', '1', username);
+});
+// UPDATE/VIEW product (with values)
+$(document).on('click', '.update-product', function () {
+    var product_id = $(this).data('productid');
+    sessionStorage.setItem('product_id', product_id);
+
+    generate_modal('product form', 'Product', 'R', '1', '1', 'form', 'productForm', '0', username);
+});
+
+// DELETE product
+$(document).on('click', '.delete-product', function () {
+    const product_id = $(this).data('productid');
+
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "This will permanently delete the product.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, delete it!'
+     }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                type: 'POST',
+                url: 'controller.php',
+                data: {
+                    transaction: 'delete product',
+                    product_id: product_id,
+                    username: username
+                },
+                success: function (response) {
+                    if (response === 'Deleted') {
+                        Swal.fire('Deleted!', 'Product has been successfully deleted.', 'success');
+
+                        if (typeof generate_datatable === 'function') {
+                            generate_datatable('product table', '#product-datatable', 0, 'asc', [3]);
+                        }
+                    } else {
+                        Swal.fire('Error', 'Failed to delete product. ' + response, 'error');
+                    }
+                },
+                error: function () {
+                    Swal.fire('Error', 'An unexpected error occurred while deleting the product.', 'error');
+                }
+            });
+        }
+    });
+});
+
+
 
 
   $(document).on("click", ".update-page", function () {

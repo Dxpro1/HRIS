@@ -17156,7 +17156,7 @@ public function get_total_ob_paid_hours($employee_id, $parameter_1, $parameter_2
     public function insert_purchase_order(
         $vendor_id, $order_date, $terms, $fob, $delivery_note, $requested_by, $req_no,
         $gross_amount, $withholding_tax_rate, $withholding_tax_amount, $vat_tax_rate, $vat_amount, $net_amount,
-        $status, $conforme_supplier, $approved_by_assistant_gm, $approved_by_gm, $username, $items, $delivery_date
+        $status, $conforme_supplier, $approved_by_assistant_gm,  $username, $items, $delivery_date
     ) {
     if ($this->databaseConnection()) {
         try {
@@ -17176,11 +17176,11 @@ public function get_total_ob_paid_hours($employee_id, $parameter_1, $parameter_2
             $sql = $this->db_connection->prepare("INSERT INTO tblpurchaseorder (
                 PURCHASE_ORDER_ID, VENDOR_ID, ORDER_DATE, TERMS, FOB, DELIVERY_NOTE, REQUESTED_BY, REQ_NO,
                 GROSS_AMOUNT, WITHHOLDING_TAX_RATE, WITHHOLDING_TAX_AMOUNT, VAT_TAX_RATE, VAT_TAX_AMOUNT, NET_AMOUNT,
-                STATUS, CONFORME_SUPPLIER, APPROVED_BY_ASSISTANT_GM, APPROVED_BY_GM, CREATED_BY, CREATED_DATE, DELIVERY_DATE
+                STATUS, CONFORME_SUPPLIER, APPROVED_BY_ASSISTANT_GM,  CREATED_BY, CREATED_DATE, DELIVERY_DATE
             ) VALUES (
                 :purchase_order_id, :vendor_id, :order_date, :terms, :fob, :delivery_note, :requested_by, :req_no,
                 :gross_amount, :withholding_tax_rate, :withholding_tax_amount, :vat_tax_rate, :vat_amount, :net_amount,
-                :status, :conforme_supplier, :approved_by_assistant_gm, :approved_by_gm, :created_by, NOW(), :delivery_date
+                :status, :conforme_supplier, :approved_by_assistant_gm, :created_by, NOW(), :delivery_date
             )");
             $sql->bindParam(':purchase_order_id', $purchase_order_id);
             $sql->bindParam(':vendor_id', $vendor_id);
@@ -17199,7 +17199,6 @@ public function get_total_ob_paid_hours($employee_id, $parameter_1, $parameter_2
             $sql->bindParam(':status', $status);
             $sql->bindParam(':conforme_supplier', $conforme_supplier);
             $sql->bindParam(':approved_by_assistant_gm', $approved_by_assistant_gm);
-            $sql->bindParam(':approved_by_gm', $approved_by_gm);
             $sql->bindParam(':created_by', $username);
             $sql->bindParam(':delivery_date', $delivery_date);
             if(!$sql->execute()){
@@ -17319,7 +17318,7 @@ public function get_total_ob_paid_hours($employee_id, $parameter_1, $parameter_2
     public function update_purchase_order(
         $purchase_order_id, $vendor_id, $order_date, $terms, $fob, $delivery_note, $requested_by, $req_no,
         $gross_amount, $withholding_tax_rate, $withholding_tax_amount, $vat_tax_rate, $vat_amount, $net_amount,
-        $status, $conforme_supplier, $approved_by_assistant_gm, $approved_by_gm, $username, $items, $delivery_date
+        $status, $conforme_supplier, $approved_by_assistant_gm,  $username, $items, $delivery_date
         ) {
         if ($this->databaseConnection()) {
             try {
@@ -17334,7 +17333,7 @@ public function get_total_ob_paid_hours($employee_id, $parameter_1, $parameter_2
                         WITHHOLDING_TAX_AMOUNT = :withholding_tax_amount, VAT_TAX_RATE = :vat_tax_rate,
                         VAT_TAX_AMOUNT = :vat_amount, NET_AMOUNT = :net_amount, STATUS = :status,
                         CONFORME_SUPPLIER = :conforme_supplier, APPROVED_BY_ASSISTANT_GM = :approved_by_assistant_gm,
-                        APPROVED_BY_GM = :approved_by_gm, DELIVERY_DATE = :delivery_date
+                        DELIVERY_DATE = :delivery_date
                     WHERE PURCHASE_ORDER_ID = :purchase_order_id
                 ");
 
@@ -17355,7 +17354,6 @@ public function get_total_ob_paid_hours($employee_id, $parameter_1, $parameter_2
                 $sql_update_header->bindParam(':status', $status);
                 $sql_update_header->bindParam(':conforme_supplier', $conforme_supplier);
                 $sql_update_header->bindParam(':approved_by_assistant_gm', $approved_by_assistant_gm);
-                $sql_update_header->bindParam(':approved_by_gm', $approved_by_gm);
                 $sql_update_header->bindParam(':delivery_date', $delivery_date);
 
                 if (!$sql_update_header->execute()) {
@@ -17499,6 +17497,7 @@ public function get_total_ob_paid_hours($employee_id, $parameter_1, $parameter_2
         return $response;
     }
 
+   
     # -------------------------------------------------------------
     #   Dashboard Functions
     # -------------------------------------------------------------
@@ -17582,6 +17581,145 @@ public function get_total_ob_paid_hours($employee_id, $parameter_1, $parameter_2
         }
         return false;
     }
+
+    # NEW FUNCTION: Dashboard - Get Vendor Performance Summary
+    public function get_vendor_performance_summary(){
+        if ($this->databaseConnection()) {
+            // This subquery assumes you have tables:
+            // - tblpurchaseorderitem (PURCHASE_ORDER_ID, PRODUCT_ID)
+            // - tblproduct (PRODUCT_ID, PRODUCT_NAME)
+            // Adjust table/column names if they are different in your database.
+            $sql = $this->db_connection->prepare("
+                SELECT
+                    v.VENDOR_NAME,
+                    COUNT(po.PURCHASE_ORDER_ID) AS total_pos,
+                    SUM(CASE WHEN po.STATUS = 'Approved' THEN 1 ELSE 0 END) AS approved_pos,
+                    SUM(po.NET_AMOUNT) AS total_spend,
+                    AVG(po.NET_AMOUNT) AS average_po_value,
+                    MAX(po.ORDER_DATE) AS last_order_date,
+                    (SELECT p.PRODUCT_NAME
+                     FROM tblpurchaseorderitem poi
+                     JOIN tblproduct p ON poi.PRODUCT_ID = p.PRODUCT_ID
+                     WHERE poi.PURCHASE_ORDER_ID IN (SELECT po_inner.PURCHASE_ORDER_ID FROM tblpurchaseorder po_inner WHERE po_inner.VENDOR_ID = v.VENDOR_ID)
+                     GROUP BY p.PRODUCT_NAME
+                     ORDER BY COUNT(poi.PRODUCT_ID) DESC
+                     LIMIT 1) as most_purchased_product
+                FROM
+                    tblvendor v
+                LEFT JOIN
+                    tblpurchaseorder po ON v.VENDOR_ID = po.VENDOR_ID
+                GROUP BY
+                    v.VENDOR_ID, v.VENDOR_NAME
+                ORDER BY
+                    total_spend DESC
+            ");
+            if($sql->execute()){
+                return $sql->fetchAll(PDO::FETCH_ASSOC);
+            }
+            return false;
+        }
+        return false;
+    }
+ 
+
+    // In classes/api.php
+
+# -------------------------------------------------------------
+#   Product Functions
+# -------------------------------------------------------------
+
+# Insert product
+public function insert_product($product_name, $product_description, $unit_price, $username){
+    if ($this->databaseConnection()) {
+        $record_log = 'INS->' . $username . '->' . date('Y-m-d H:i:s');
+        
+        $sql = $this->db_connection->prepare('INSERT INTO tblproduct (PRODUCT_NAME, PRODUCT_DESCRIPTION, UNIT_PRICE, RECORD_LOG) VALUES (:product_name, :product_description, :unit_price, :record_log)');
+        $sql->bindParam(':product_name', $product_name);
+        $sql->bindParam(':product_description', $product_description);
+        $sql->bindParam(':unit_price', $unit_price);
+        $sql->bindParam(':record_log', $record_log);
+
+        if($sql->execute()){
+            return 'Inserted';
+        } else {
+            return $sql->errorInfo()[2];
+        }
+    }
+}
+
+# Update product
+public function update_product($product_id, $product_name, $product_description, $unit_price, $username){
+    if ($this->databaseConnection()) {
+        $record_log = 'UPD->' . $username . '->' . date('Y-m-d H:i:s');
+        
+        $sql = $this->db_connection->prepare('UPDATE tblproduct SET PRODUCT_NAME = :product_name, PRODUCT_DESCRIPTION = :product_description, UNIT_PRICE = :unit_price, RECORD_LOG = :record_log WHERE PRODUCT_ID = :product_id');
+        $sql->bindParam(':product_id', $product_id);
+        $sql->bindParam(':product_name', $product_name);
+        $sql->bindParam(':product_description', $product_description);
+        $sql->bindParam(':unit_price', $unit_price);
+        $sql->bindParam(':record_log', $record_log);
+
+        if($sql->execute()){
+            return 'Updated';
+        } else {
+            return $sql->errorInfo()[2];
+        }
+    }
+}
+
+# Delete product
+public function delete_product($product_id, $username){
+    if ($this->databaseConnection()) {
+        $sql = $this->db_connection->prepare('DELETE FROM tblproduct WHERE PRODUCT_ID = :product_id');
+        $sql->bindParam(':product_id', $product_id);
+
+        if($sql->execute()){
+            return 'Deleted';
+        } else {
+            return $sql->errorInfo()[2];
+        }
+    }
+}
+
+# Get product details
+public function get_product_details($product_id){
+    if ($this->databaseConnection()) {
+        $sql = $this->db_connection->prepare('SELECT * FROM tblproduct WHERE PRODUCT_ID = :product_id');
+        $sql->bindParam(':product_id', $product_id);
+        
+        if($sql->execute()){
+            return $sql->fetch(PDO::FETCH_ASSOC);
+        }
+        return false;
+    }
+}
+
+# Search products for autocomplete
+public function get_products($searchTerm = '') {
+    if ($this->databaseConnection()) {
+        try {
+            $sql = $this->db_connection->prepare("
+                SELECT PRODUCT_ID, PRODUCT_NAME 
+                FROM tblproduct 
+                WHERE PRODUCT_NAME LIKE :search 
+                ORDER BY PRODUCT_NAME
+            ");
+            $searchParam = '%' . $searchTerm . '%';
+            $sql->bindParam(':search', $searchParam);
+            $sql->execute();
+            $products = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+            return $products;
+
+        } catch (Exception $e) {
+            error_log("API Error (get_products): " . $e->getMessage());
+            return [];
+        }
+    }
+    error_log("API Error (get_products): Database connection failed.");
+    return [];
+}
+
 
 /**
  * Get total count of all published positions

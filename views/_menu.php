@@ -493,6 +493,9 @@
                         if($employee_list_page > 0){
                             $menu .= '<li><a href="vendors.php" key="t-human-resource">Vendor</a></li>';
                         }
+                         if($employee_list_page > 0){
+                            $menu .= '<li><a href="product.php" key="t-human-resource">Product</a></li>';
+                        }
 
                       
 

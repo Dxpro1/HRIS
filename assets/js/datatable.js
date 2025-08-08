@@ -490,6 +490,17 @@ else if(type == 'career table'){
        ];
     }
 
+    // Add this inside the generate_datatable function
+    else if(type == 'product table'){
+        column = [
+            { 'data' : 'PRODUCT_NAME' },
+            { 'data' : 'PRODUCT_DESCRIPTION' },
+            { 'data' : 'UNIT_PRICE' },
+            { 'data' : 'ACTION' }
+        ];
+    }
+
+
 	else if(type == 'meeting table'){
         column = [
             { 'data' : 'TITLE' },

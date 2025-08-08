@@ -29,6 +29,8 @@
         <link href="assets/css/bootstrap.min.css" id="bootstrap-style" rel="stylesheet" type="text/css" />
         <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
         <link href="assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
     </head>
 
    <body data-sidebar="dark">
@@ -90,7 +92,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <!-- Line Items -->
                         <div class="row">
                             <div class="col-lg-12">
@@ -101,7 +102,7 @@
                                             <div data-repeater-item class="row mb-3">
                                                 <div class="col-lg-3">
                                                     <label>Product Name</label>
-                                                    <input type="text" name="item_description" class="form-control item-description" required>
+                                                    <input type="text"  name="item_description" class="form-control item-description" required>
                                                 </div>
                                                 <div class="col-lg-2">
                                                     <label>Quantity</label>
@@ -217,18 +218,15 @@
                                 <div class="card mb-4">
                                     <div class="card-body">
                                         <div class="row">
-                                            <div class="col-md-4 mb-3">
+                                            <div class="col-md-6 mb-3">
                                                 <label for="conforme_supplier" class="form-label">Conforme Supplier</label>
                                                 <input type="text" class="form-control" id="conforme_supplier" name="conforme_supplier">
                                             </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="approved_by_assistant_gm" class="form-label">Approved by Assistant GM</label>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="approved_by_assistant_gm" class="form-label">Approver</label>
                                                 <input type="text" class="form-control" id="approved_by_assistant_gm" name="approved_by_assistant_gm">
                                             </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="approved_by_gm" class="form-label">Approved by GM</label>
-                                                <input type="text" class="form-control" id="approved_by_gm" name="approved_by_gm">
-                                            </div>
+                                    
                                         </div>
                                     </div>
                                 </div>
@@ -278,108 +276,285 @@
         <script src="assets/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
         <script src="assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
         <script src="assets/libs/jquery.repeater/jquery.repeater.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
         <script>
-        $(document).ready(function () {
-        // --- Repeater and Summary Calculation Logic (no changes needed here) ---
-        $('.repeater').repeater({
-            initEmpty: false,
-            show: function () {
-            $(this).slideDown();
-            updateSummary();
+   $(document).ready(function () {
+
+    // ---------- Helpers ----------
+    const $list = $('.repeater').find('[data-repeater-list]'); // container for rows
+    const itemSelector = '[data-repeater-item]';
+
+    function getBaseName($el) {
+        // derive base name for re-indexing (if name already contains items[...], extract last bracket)
+        const name = $el.attr('name') || '';
+        const m = name.match(/\[([^[]+)\]$/);
+        return m ? m[1] : name;
+    }
+
+    function storeBaseNames($row) {
+        // store base names on each input so we can recreate items[index][base] later
+        $row.find('input,select,textarea').each(function () {
+            const $this = $(this);
+            if (!$this.data('base-name')) {
+                $this.data('base-name', getBaseName($this));
+            }
+        });
+    }
+
+    function reIndexRows() {
+        // set input names to items[index][field]
+        $list.find(itemSelector).each(function (idx) {
+            $(this).find('input,select,textarea').each(function () {
+                const $el = $(this);
+                const base = $el.data('base-name') || getBaseName($el);
+                // If there's no base (shouldn't happen) skip
+                if (!base) return;
+                $el.attr('name', `items[${idx}][${base}]`);
+            });
+        });
+    }
+
+    function safeClearWidgetData($el) {
+        // Remove widget data that can break cloning (autocomplete, select2, etc.)
+        $el.find('*').each(function () {
+            try { $(this).removeData(); } catch (e) { /* ignore */ }
+            // also remove any id attributes to avoid duplicates
+            if ($(this).attr('id')) $(this).removeAttr('id');
+        });
+    }
+
+    // ---------- Autocomplete & row logic ----------
+    function initRow($row) {
+        // store base names (only first time)
+        storeBaseNames($row);
+
+        const $desc = $row.find('.item-description');
+        const $unit = $row.find('.item-unit');
+        const $price = $row.find('.item-price');
+        const $qty = $row.find('.item-quantity');
+        const $total = $row.find('.item-total');
+
+        // destroy any previous autocomplete instance on this element (safe)
+        try {
+            if ($desc.data('ui-autocomplete')) {
+                $desc.autocomplete('destroy');
+            }
+        } catch (e) { /* ignore */ }
+
+        // bind autocomplete
+        $desc.autocomplete({
+            minLength: 1,
+            delay: 250,
+            source: function (request, response) {
+                $.ajax({
+                    url: 'controller.php',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        transaction: 'product search',
+                        search: request.term
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return {
+                                label: item.text,
+                                value: item.text,
+                                id: item.id,
+                                description: item.description || '',
+                                price: item.price || ''
+                            };
+                        }));
+                    },
+                    error: function (xhr, st, err) {
+                        console.error('product search error', err, xhr.responseText);
+                        response([]);
+                    }
+                });
             },
-            hide: function (deleteElement) {
-            $(this).slideUp(deleteElement, updateSummary);
-            },
-            isFirstItemUndeletable: true
+            select: function (event, ui) {   
+                $desc.val(ui.item.value); // explicitly set text
+                if ($unit.length) $unit.val(ui.item.unit || '');
+                if ($price.length) {
+                    const p = parseFloat(ui.item.price || 0) || 0;
+                    $price.val(p.toFixed(2));
+                }
+                // if you have a description field in row, set it (optional)
+                const $descField = $row.find('.item-description-field'); // adjust selector if you have
+                if ($descField.length) $descField.val(ui.item.description || '');
+
+                updateRowTotal($row);
+                updateSummary();
+                return false;
+            }
         });
 
-        function updateSummary() {
-            let gross = 0.0;
-            $('[data-repeater-item]').each(function () {
+        // handle delete button
+        $row.find('[data-repeater-delete]').off('click').on('click', function (e) {
+            e.preventDefault();
+            // if only one row left and you want to prevent deletion, handle here
+            const $rows = $list.find(itemSelector);
+            if ($rows.length <= 1) {
+                // optional: clear first row instead of removing
+                $row.find('input, textarea').val('');
+                updateRowTotal($row);
+                updateSummary();
+                reIndexRows();
+                return;
+            }
+            $row.remove();
+            reIndexRows();
+            updateSummary();
+        });
+
+        // update totals when qty or price changes
+        $qty.add($price).off('input').on('input', function () {
+            updateRowTotal($row);
+            updateSummary();
+        });
+
+        // initial row total
+        updateRowTotal($row);
+        reIndexRows();
+    }
+
+    function updateRowTotal($row) {
+        const qty = parseFloat($row.find('.item-quantity').val()) || 0;
+        const price = parseFloat($row.find('.item-price').val()) || 0;
+        const total = qty * price;
+        $row.find('.item-total').text('₱' + total.toFixed(2));
+    }
+
+    function updateSummary() {
+        let gross = 0.0;
+        $list.find(itemSelector).each(function () {
             const qty = parseFloat($(this).find('.item-quantity').val()) || 0;
             const price = parseFloat($(this).find('.item-price').val()) || 0;
             const total = qty * price;
             $(this).find('.item-total').text(`₱${total.toFixed(2)}`);
             gross += total;
-            });
+        });
 
-            const wt = parseFloat($('#withholding_tax_rate').val()) || 0;
-            const vat = parseFloat($('#vat_tax_rate').val()) || 0;
-            const wtAmount = gross * (wt / 100);
-            const vatAmount = gross * (vat / 100);
-            const net = gross - wtAmount + vatAmount;
+        const wt = parseFloat($('#withholding_tax_rate').val()) || 0;
+        const vat = parseFloat($('#vat_tax_rate').val()) || 0;
+        const wtAmount = gross * (wt / 100);
+        const vatAmount = gross * (vat / 100);
+        const net = gross - wtAmount + vatAmount;
 
-            $('#summary_gross_amount').text(`₱${gross.toFixed(2)}`);
-            $('#summary_tax_rate_text').text(wt.toFixed(2));
-            $('#summary_tax_amount').text(`- ₱${wtAmount.toFixed(2)}`);
-            $('#summary_vat_rate_text').text(vat.toFixed(2));
-            $('#summary_vat_amount').text(`+ ₱${vatAmount.toFixed(2)}`);
-            $('#summary_net_amount').text(`₱${net.toFixed(2)}`);
-        }
+        $('#summary_gross_amount').text(`₱${gross.toFixed(2)}`);
+        $('#summary_tax_rate_text').text(wt.toFixed(2));
+        $('#summary_tax_amount').text(`- ₱${wtAmount.toFixed(2)}`);
+        $('#summary_vat_rate_text').text(vat.toFixed(2));
+        $('#summary_vat_amount').text(`+ ₱${vatAmount.toFixed(2)}`);
+        $('#summary_net_amount').text(`₱${net.toFixed(2)}`);
+    }
 
-        $(document).on('input', '.item-quantity, .item-price, #withholding_tax_rate, #vat_tax_rate', updateSummary);
+    // ---------- Add new row (replace default plugin add) ----------
+    $(document).on('click', '[data-repeater-create]', function (e) {
+        e.preventDefault();
+
+        // get a clean template row (clone of first)
+        const $template = $list.find(itemSelector).first();
+        let $new = $template.clone(false); // don't clone events
+
+        // remove any plugin/widget data & ids to avoid copying ui state
+        safeClearWidgetData($new);
+
+        // clear inputs and set defaults
+        $new.find('input, textarea').each(function () {
+            const $i = $(this);
+            const base = $i.data('base-name') || getBaseName($i);
+            // clear value
+            if ($i.is(':checkbox') || $i.is(':radio')) {
+                $i.prop('checked', false);
+            } else {
+                // set sensible defaults
+                if ($i.hasClass('item-quantity')) $i.val('1');
+                else if ($i.hasClass('item-price')) $i.val(parseFloat(0).toFixed(2));
+                else $i.val('');
+            }
+        });
+
+        // append and initialize
+        $list.append($new);
+        initRow($new);
+        reIndexRows();
         updateSummary();
+    });
 
-        // --- CORRECTED FORM SUBMISSION LOGIC ---
-        $('#purchaseOrderForm').submit(function(e){
-            e.preventDefault();
-            let formData = $(this).serializeArray();
-            let username = $('#username').text().trim();
+    // ---------- Initialize existing rows on page load ----------
+    $list.find(itemSelector).each(function () {
+        initRow($(this));
+    });
 
-            // Structure items from repeater
-            let itemsArray = [];
-            let otherFormData = {};
+    // update summary on tax changes
+    $(document).on('input', '#withholding_tax_rate, #vat_tax_rate', updateSummary);
 
-            formData.forEach(function(field){
-                let itemMatch = field.name.match(/^items\[(\d+)\]\[(.+)\]$/);
-                if(itemMatch){
-                    let index = itemMatch[1];
-                    let fieldName = itemMatch[2];
-                    if(!itemsArray[index]) { itemsArray[index] = {}; }
-                    itemsArray[index][fieldName] = field.value;
+    // ---------- Form submit (keeps your existing logic) ----------
+    $('#purchaseOrderForm').off('submit').on('submit', function (e) {
+        e.preventDefault();
+
+        // ensure names are indexed before serializing
+        reIndexRows();
+
+        let formData = $(this).serializeArray();
+        let username = $('#username').text().trim();
+
+        // Structure items from repeater
+        let itemsArray = [];
+        let otherFormData = {};
+
+        formData.forEach(function (field) {
+            let itemMatch = field.name.match(/^items\[(\d+)\]\[(.+)\]$/);
+            if (itemMatch) {
+                let index = itemMatch[1];
+                let fieldName = itemMatch[2];
+                if (!itemsArray[index]) { itemsArray[index] = {}; }
+                itemsArray[index][fieldName] = field.value;
+            } else {
+                otherFormData[field.name] = field.value;
+            }
+        });
+
+        // Calculate gross
+        let grossAmount = 0.0;
+        (itemsArray || []).forEach(item => {
+            const quantity = parseFloat(item.quantity) || 0;
+            const price = parseFloat(item.price) || 0;
+            grossAmount += quantity * price;
+        });
+
+        let submitData = otherFormData;
+        submitData.gross_amount = grossAmount.toFixed(2);
+        submitData.items = JSON.stringify(itemsArray || []);
+        submitData.transaction = 'add purchase order';
+        submitData.username = username;
+
+        $.ajax({
+            type: 'POST',
+            url: 'controller.php',
+            data: submitData,
+            success: function (response) {
+                if (response === 'Inserted') {
+                    Swal.fire('Success', 'Purchase Order has been added.', 'success').then(() => {
+                        window.location = 'purchase-order.php';
+                    });
                 } else {
-                    otherFormData[field.name] = field.value;
+                    Swal.fire('Error', response || 'An unexpected error occurred.', 'error');
                 }
-            });
-
-            // --- THIS IS THE FIX ---
-            // 1. Recalculate the gross amount from the items array
-            let grossAmount = 0.0;
-            (itemsArray || []).forEach(item => {
-                const quantity = parseFloat(item.quantity) || 0;
-                const price = parseFloat(item.price) || 0;
-                grossAmount += quantity * price;
-            });
-
-            // 2. Add the calculated gross_amount to the data being sent
-            let submitData = otherFormData;
-            submitData.gross_amount = grossAmount.toFixed(2);
-            // --- END OF FIX ---
-
-            submitData.items = JSON.stringify(itemsArray || []);
-            submitData.transaction = 'add purchase order';
-            submitData.username = username;
-
-            // AJAX call to submit the form
-            $.ajax({
-                type: 'POST',
-                url: 'controller.php',
-                data: submitData,
-                success: function(response){
-                    if(response === 'Inserted'){
-                        Swal.fire('Success','Purchase Order has been added.','success').then(() => {
-                            window.location = 'purchase-order.php';
-                        });
-                    } else {
-                        Swal.fire('Error', response || 'An unexpected error occurred.','error');
-                    }
-                },
-                error: function(xhr, status, error) {
-                    Swal.fire('AJAX Error', `Request failed: ${error}`, 'error');
-                }
-            });
+            },
+            error: function (xhr, status, error) {
+                Swal.fire('AJAX Error', `Request failed: ${error}`, 'error');
+            }
         });
-        });
+
+    });
+
+    // run initial summary
+    updateSummary();
+
+});
+
         </script>
 
        

@@ -6293,9 +6293,6 @@ function initialize_form_validation(formtype){
                 vendor_type: {
                     required: true
                 },
-                email: {
-                    email: true
-                },
                 phone: {
                     digits: true,
                     minlength: 10
@@ -6312,9 +6309,6 @@ function initialize_form_validation(formtype){
 
                 vendor_type: {
                     required: 'Please enter the supplier type',
-                },
-                email: {
-                    email: 'Please enter a valid email address'
                 },
                 phone: {
                     digits: 'Please enter only numbers',
@@ -6350,6 +6344,76 @@ function initialize_form_validation(formtype){
             }
         });
     }
+
+    // Add this inside the initialize_form_validation function
+
+else if(formtype == 'product form'){
+    $('#productForm').validate({
+        submitHandler: function (form) {
+            var transaction = 'submit product';
+
+            $.ajax({
+                type: 'POST',
+                url: 'controller.php',
+                data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction,
+                beforeSend: function(){
+                    document.getElementById('submitform').disabled = true;
+                    $('#submitform').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                },
+                success: function (response) {
+                    if(response === 'Updated' || response === 'Inserted'){
+                        if(response === 'Inserted'){
+                            show_alert('Insert Product Success', 'The product has been inserted.', 'success');
+                        }
+                        else{
+                            show_alert('Update Product Success', 'The product has been updated.', 'success');
+                        }
+
+                        $('#System-Modal').modal('hide');
+                        generate_datatable('product table', '#product-datatable', 0, 'asc', [3]);
+                    }
+                    else{
+                        show_alert('Product Error', response, 'error');
+                    }
+                },
+                complete: function(){
+                    document.getElementById('submitform').disabled = false;
+                    $('#submitform').html('Submit');
+                }
+            });
+            return false;
+        },
+        rules: {
+            product_name: {
+                required: true
+            },
+            unit_price: {
+                required: true,
+                number: true
+            }
+        },
+        messages: {
+            product_name: {
+                required: 'Please enter the product name'
+            },
+            unit_price: {
+                required: 'Please enter a unit price',
+                number: 'Please enter a valid number'
+            }
+        },
+        errorPlacement: function(label, element) {
+            label.addClass('text-danger');
+            label.insertAfter(element);
+        },
+        highlight: function(element) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function(element) {
+            $(element).removeClass('is-invalid');
+        }
+    });
+}
+
 
     
     else if(formtype == 'pmw status form'){

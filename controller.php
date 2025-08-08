@@ -12338,7 +12338,6 @@ else if($transaction == 'delete career'){
         $delivery_date = trim($_POST['delivery_date']);
         $conforme_supplier = trim($_POST['conforme_supplier']);
         $approved_by_assistant_gm = trim($_POST['approved_by_assistant_gm']);
-        $approved_by_gm = trim($_POST['approved_by_gm']);
         $username = trim($_POST['username']);
 
         // Calculate summary (ensure values are computed as on front-end)
@@ -12354,7 +12353,7 @@ else if($transaction == 'delete career'){
             $vendor_id, $order_date, $terms, $fob, $delivery_note, $requested_by,
             $req_no, $gross_amount, $withholding_tax_rate, $withholding_tax_amount,
             $vat_tax_rate, $vat_amount, $net_amount, $status, $conforme_supplier,
-            $approved_by_assistant_gm, $approved_by_gm, $username, $items, $delivery_date
+            $approved_by_assistant_gm, $username, $items, $delivery_date
         );
 
         echo $result; // 'Inserted' or error string
@@ -12396,8 +12395,7 @@ else if($transaction == 'delete career'){
 
         $conforme_supplier = trim($_POST['conforme_supplier']);
         $approved_by_assistant_gm = trim($_POST['approved_by_assistant_gm']);
-        $approved_by_gm = trim($_POST['approved_by_gm']);
-        
+         
         $username = $_POST['username']; // Make sure username is sent via AJAX
 
         // Decode items
@@ -12416,7 +12414,7 @@ else if($transaction == 'delete career'){
             $purchase_order_id, $vendor_id, $order_date, $terms, $fob, $delivery_note, $requested_by,
             $req_no, $gross_amount, $withholding_tax_rate, $withholding_tax_amount,
             $vat_tax_rate, $vat_amount, $net_amount, $status, $conforme_supplier,
-            $approved_by_assistant_gm, $approved_by_gm, $username, $items, $delivery_date
+            $approved_by_assistant_gm,  $username, $items, $delivery_date
         );
 
         echo $result; // Should echo 'Updated' or an error message
@@ -12656,31 +12654,132 @@ else if($transaction == 'delete career'){
         }
     }
 
+else if ($transaction == 'product search') {
+    if ($api->databaseConnection()) {
+        $search = $_POST['search'] ?? '';
+        $search = "%$search%";
+
+        $sql = $api->db_connection->prepare("
+            SELECT PRODUCT_ID, PRODUCT_NAME, PRODUCT_DESCRIPTION, UNIT_PRICE
+            FROM tblproduct
+            WHERE PRODUCT_NAME LIKE :search
+            ORDER BY PRODUCT_NAME ASC
+        ");
+        $sql->bindParam(':search', $search);
+        $sql->execute();
+
+        $products = [];
+        while ($row = $sql->fetch(PDO::FETCH_ASSOC)) {
+            $products[] = [
+                'id'          => $row['PRODUCT_ID'],
+                'text'        => $row['PRODUCT_NAME'],
+                'description' => $row['PRODUCT_DESCRIPTION'],
+                'price'       => $row['UNIT_PRICE']
+            ];
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode($products);
+        exit;
+    } else {
+        echo json_encode([]);
+        exit;
+    }
+}
+
+
+
+
+    // In controller.php
+
+# -------------------------------------------------------------
+#   Product transactions
+# -------------------------------------------------------------
+
+# Submit product (handles both insert and update)
+else if ($transaction == 'submit product') {
+    if (isset($_POST['username']) && !empty($_POST['username'])) {
+        $product_id = $_POST['product_id'] ?? null;
+        $product_name = $_POST['product_name'];
+        $product_description = $_POST['product_description'];
+        $unit_price = $_POST['unit_price'];
+        $username = $_POST['username'];
+
+        if (!empty($product_id)) {
+            $result = $api->update_product($product_id, $product_name, $product_description, $unit_price, $username);
+            echo $result;
+        } else {
+            $result = $api->insert_product($product_name, $product_description, $unit_price, $username);
+            echo $result;
+        }
+    }
+}
+
+# Get product details for update form
+else if ($transaction == 'get product details') {
+    if (isset($_POST['product_id'])) {
+        $product_id = $_POST['product_id'];
+        $details = $api->get_product_details($product_id);
+        echo json_encode($details);
+    }
+}
+
+# Delete product
+else if ($transaction == 'delete product') {
+    if (isset($_POST['product_id']) && isset($_POST['username'])) {
+        $product_id = $_POST['product_id'];
+        $username = $_POST['username'];
+        $result = $api->delete_product($product_id, $username);
+        echo $result;
+    }
+}
+
+# Search products for PO form autocomplete
+else if ($transaction == 'search products') {
+    if (isset($_POST['search'])) {
+        $search_term = $_POST['search'];
+        $products = $api->search_products($search_term);
+        
+        $response = [];
+        foreach($products as $product){
+            $response[] = [
+                'id' => $product['PRODUCT_ID'],
+                'text' => $product['PRODUCT_NAME'],
+                'price' => $product['UNIT_PRICE']
+            ];
+        }
+        echo json_encode($response);
+    }
+}
+
+
       # -------------------------------------------------------------
     #   Dashboard functions
     # -------------------------------------------------------------
 
     # Get Purchase Order Summary
-    else if ($transaction == 'get purchase order summary') {
+    else    if ($transaction == 'get purchase order summary') {
         $details = $api->get_purchase_order_summary();
         echo json_encode($details);
     }
-
     # Get Monthly Purchase Orders
     else if ($transaction == 'get monthly purchase orders') {
         $details = $api->get_monthly_purchase_orders();
         echo json_encode($details);
     }
-
     # Get Top Vendors
     else if ($transaction == 'get top vendors') {
         $details = $api->get_top_vendors_by_po_amount();
         echo json_encode($details);
     }
-
     # Get Vendor Type Distribution
     else if ($transaction == 'get vendor type distribution') {
         $details = $api->get_vendor_type_distribution();
+        echo json_encode($details);
+    }
+    # NEW: Get Vendor Performance Summary
+    else if ($transaction == 'get vendor performance summary'){
+        $details = $api->get_vendor_performance_summary();
         echo json_encode($details);
     }
 

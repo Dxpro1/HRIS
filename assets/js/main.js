@@ -833,6 +833,10 @@ if ($("#employee-list-datatable").length) {
     if ($('#vendor-datatable').length) {
     generate_datatable('vendor table', '#vendor-datatable', 0, 'asc', [4]);
     }
+    if ($("#product-datatable").length) {
+    generate_datatable("product table", "#product-datatable", 0, "asc", [3]);
+    }
+
 
 
     if ($("#suggest-to-win-vote-summary-datatable").length) {
